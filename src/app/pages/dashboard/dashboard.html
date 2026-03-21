@@ -8,7 +8,7 @@
   >
     <!-- Brand -->
     <div class="flex items-center gap-3 px-4 py-5 bg-[#4f46e5] shrink-0">
-      <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 font-bold text-white text-sm">DG</div>
+      <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 font-bold text-white text-sm">{{ initials() }}</div>
       @if (!collapsed()) {
         <div class="overflow-hidden">
           <p class="text-white font-bold text-sm leading-tight whitespace-nowrap">Delivery Guy</p>
@@ -119,7 +119,16 @@
           </svg>
           <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
-        <div class="w-9 h-9 rounded-xl bg-[#4f46e5] flex items-center justify-center text-white text-xs font-bold">DG</div>
+        <button
+          (click)="navigate('user-profile')"
+          class="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-xl hover:bg-gray-100 transition-colors group"
+          title="My profile"
+        >
+          <div class="w-8 h-8 rounded-xl bg-[#4f46e5] flex items-center justify-center text-white text-xs font-bold shrink-0">{{ initials() }}</div>
+          @if (currentUser()) {
+            <span class="text-xs font-medium text-gray-600 group-hover:text-gray-900 transition-colors whitespace-nowrap">{{ currentUser()!.name }}</span>
+          }
+        </button>
       </div>
     </header>
 
@@ -263,7 +272,8 @@
       @if (activePage() === 'customers') { <app-customers /> }
       @if (activePage() === 'riders')    { <app-riders />    }
       @if (activePage() === 'analytics') { <app-analytics /> }
-      @if (activePage() === 'users')     { <app-users />     }
+      @if (activePage() === 'users')        { <app-users />        }
+      @if (activePage() === 'user-profile') { <app-user-profile (navigateTo)="navigate($event)" /> }
 
     </main>
   </div>

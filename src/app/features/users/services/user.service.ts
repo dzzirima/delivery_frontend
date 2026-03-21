@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
 export interface User {
@@ -31,6 +32,8 @@ export interface UpdateUserPayload {
 export class UserService {
   private readonly base = `${environment.apiUrl}/user`;
 
+  readonly profile = signal<User | null>(null);
+
   constructor(private http: HttpClient) {}
 
   getAll(filters: UserListParams = {}) {
@@ -48,11 +51,15 @@ export class UserService {
   }
 
   getMyProfile() {
-    return this.http.get<{ data: User }>(`${this.base}/profile`);
+    return this.http.get<{ data: User }>(`${this.base}/profile`).pipe(
+      tap(res => this.profile.set(res.data)),
+    );
   }
 
   update(id: string, payload: UpdateUserPayload) {
-    return this.http.put<{ data: User }>(`${this.base}/${id}`, payload);
+    return this.http.put<{ data: User }>(`${this.base}/${id}`, payload).pipe(
+      tap(res => this.profile.set(res.data)),
+    );
   }
 
   delete(id: string) {
