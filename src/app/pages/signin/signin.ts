@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -12,7 +12,13 @@ export class Signin {
   password = '';
   showPassword = signal(false);
 
+  constructor(private router: Router) {}
+
   togglePassword() {
     this.showPassword.update(v => !v);
+  }
+
+  login() {
+    this.router.navigate(['/dashboard']);
   }
 }
