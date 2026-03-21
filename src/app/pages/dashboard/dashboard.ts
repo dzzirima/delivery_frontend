@@ -18,8 +18,12 @@ export class Dashboard {
 
   constructor(private router: Router) {}
 
-  navigate(page: Page) {
-    this.activePage.set(page);
+  navigate(page: string) {
+    this.activePage.set(page as Page);
+  }
+
+  toggleCollapsed() {
+    this.collapsed.update(v => !v);
   }
 
   signOut() {
