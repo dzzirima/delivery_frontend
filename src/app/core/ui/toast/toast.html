@@ -1,0 +1,59 @@
+<div class="fixed top-5 right-5 z-50 flex flex-col gap-3 w-80 pointer-events-none">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="pointer-events-auto flex items-start gap-3.5 rounded-2xl px-4 py-4 shadow-xl border backdrop-blur-sm animate-slide-in"
+      [class.bg-white]="true"
+      [class.border-green-100]="toast.type === 'success'"
+      [class.border-red-100]="toast.type === 'error'"
+      [class.border-indigo-100]="toast.type === 'info'"
+    >
+      <!-- Icon -->
+      <div
+        class="mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+        [class.bg-green-100]="toast.type === 'success'"
+        [class.bg-red-100]="toast.type === 'error'"
+        [class.bg-indigo-100]="toast.type === 'info'"
+      >
+        @if (toast.type === 'success') {
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        }
+        @if (toast.type === 'error') {
+          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        }
+        @if (toast.type === 'info') {
+          <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
+          </svg>
+        }
+      </div>
+
+      <!-- Text -->
+      <div class="flex-1 min-w-0">
+        <p
+          class="text-sm font-semibold"
+          [class.text-green-800]="toast.type === 'success'"
+          [class.text-red-700]="toast.type === 'error'"
+          [class.text-indigo-800]="toast.type === 'info'"
+        >{{ toast.title }}</p>
+        @if (toast.message) {
+          <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">{{ toast.message }}</p>
+        }
+      </div>
+
+      <!-- Dismiss -->
+      <button
+        (click)="toastService.dismiss(toast.id)"
+        class="mt-0.5 text-gray-300 hover:text-gray-500 transition-colors shrink-0"
+        aria-label="Dismiss"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  }
+</div>

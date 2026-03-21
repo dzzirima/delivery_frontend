@@ -31,7 +31,7 @@
       <div>
         <div class="flex items-center justify-between mb-1.5">
           <label class="block text-sm font-semibold text-gray-700">Password</label>
-          <a href="#" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Forgot password?</a>
+          <a routerLink="/forgot-password" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Forgot password?</a>
         </div>
         <div class="relative">
           <input
@@ -69,13 +69,18 @@
         <label for="remember" class="text-sm text-gray-600">Remember me for 30 days</label>
       </div>
 
+      <!-- Error -->
+      @if (error()) {
+        <p class="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2.5 border border-red-100">{{ error() }}</p>
+      }
+
       <!-- Submit -->
       <button
         type="submit"
-        (click)="login()"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 mt-2"
+        [disabled]="loading()"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 mt-2"
       >
-        Sign in
+        {{ loading() ? 'Signing in…' : 'Sign in' }}
       </button>
 
     </form>
