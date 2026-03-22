@@ -21,6 +21,14 @@ export interface UserListParams {
   search?: string;
 }
 
+export interface UserPage {
+  content: User[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 export interface UpdateUserPayload {
   email?: string;
   name?: string;
@@ -43,7 +51,7 @@ export class UserService {
     if (filters.status) params = params.set('status', filters.status);
     if (filters.role) params = params.set('role', filters.role);
     if (filters.search) params = params.set('search', filters.search);
-    return this.http.get<{ data: User[] }>(this.base, { params });
+    return this.http.get<{ data: UserPage }>(this.base, { params });
   }
 
   getById(id: string) {
