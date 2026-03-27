@@ -1,0 +1,220 @@
+<div class="p-6">
+
+  <!-- Page Header -->
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h1 class="text-xl font-bold text-gray-900">Applications</h1>
+      <p class="text-sm text-gray-500 mt-0.5">{{ totalElements() }} total</p>
+    </div>
+    <button
+      (click)="openNewForm()"
+      class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Application
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap items-center gap-3 mb-5">
+
+    <!-- Profile tabs -->
+    <div class="flex bg-gray-100 rounded-xl p-1 gap-0.5">
+      @for (p of ['', 'Peter', 'Nyasha']; track p) {
+        <button
+          (click)="setProfileFilter(p === '' ? '' : $any(p))"
+          [class.bg-white]="filterProfile() === p"
+          [class.text-gray-900]="filterProfile() === p"
+          [class.shadow-sm]="filterProfile() === p"
+          class="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 transition-all duration-150"
+        >
+          {{ p === '' ? 'All Profiles' : p }}
+        </button>
+      }
+    </div>
+
+    <!-- Status filter -->
+    <select
+      [ngModel]="filterStatus()"
+      (ngModelChange)="filterStatus.set($event); onStatusChange()"
+      name="statusFilter"
+      class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    >
+      <option value="">All Statuses</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+
+    <!-- Search -->
+    <div class="relative flex-1 min-w-[180px] max-w-xs">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        name="search"
+        type="text"
+        placeholder="Search company, position…"
+        class="w-full border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+    </div>
+
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <p class="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 mb-4">{{ error() }}</p>
+  }
+
+  <!-- Table -->
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-gray-50 border-b border-gray-200 text-left">
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Profile</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Company</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Position</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Agent</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Platform</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Follow-Up</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        @if (loading()) {
+          <tr>
+            <td colspan="8" class="text-center py-14">
+              <div class="inline-flex items-center gap-2 text-gray-400 text-sm">
+                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                </svg>
+                Loading applications…
+              </div>
+            </td>
+          </tr>
+        } @else if (applications().length === 0) {
+          <tr>
+            <td colspan="8" class="text-center py-14">
+              <p class="text-gray-400 text-sm mb-2">No applications found.</p>
+              <button (click)="openNewForm()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+                + Add your first application
+              </button>
+            </td>
+          </tr>
+        } @else {
+          @for (app of applications(); track app.id) {
+            <tr class="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors group">
+
+              <!-- Profile -->
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ profileClass(app.profileName) }}">
+                  {{ app.profileName }}
+                </span>
+              </td>
+
+              <!-- Company -->
+              <td class="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">{{ app.company }}</td>
+
+              <!-- Position -->
+              <td class="px-4 py-3 text-gray-700 max-w-[180px] truncate" [title]="app.position">{{ app.position }}</td>
+
+              <!-- Agent -->
+              <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ app.recruitingAgent || '—' }}</td>
+
+              <!-- Platform -->
+              <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ app.platform || '—' }}</td>
+
+              <!-- Status -->
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ statusClass(app.status) }}">
+                  {{ app.status }}
+                </span>
+              </td>
+
+              <!-- Follow-Up -->
+              <td class="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">{{ formatDate(app.followUpDate) }}</td>
+
+              <!-- Actions -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1">
+
+                  <!-- Interviews -->
+                  <button
+                    (click)="openInterviews(app)"
+                    class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                    title="View / Schedule Interviews"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Interviews
+                  </button>
+
+                  <!-- Edit -->
+                  <button
+                    (click)="openEdit(app)"
+                    class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                    title="Edit"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+
+                  <!-- Delete -->
+                  <button
+                    (click)="deleteApp(app.id)"
+                    class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                    title="Delete"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+
+                </div>
+              </td>
+
+            </tr>
+          }
+        }
+
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ── Application Form Modal ── -->
+@if (showAppForm()) {
+  <div class="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4 backdrop-blur-sm" (click)="closeAppForm()">
+    <div (click)="$event.stopPropagation()">
+      <app-application-form
+        [application]="editingApp()"
+        (saved)="saveApplication($event)"
+        (cancelled)="closeAppForm()"
+      />
+    </div>
+  </div>
+}
+
+<!-- ── Interviews Panel Modal ── -->
+@if (viewingApp()) {
+  <div class="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4 backdrop-blur-sm" (click)="viewingApp.set(null)">
+    <div (click)="$event.stopPropagation()" class="w-full max-w-2xl">
+      <app-interviews-panel
+        [application]="viewingApp()!"
+        (closed)="viewingApp.set(null)"
+      />
+    </div>
+  </div>
+}

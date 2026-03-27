@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../features/users/services/user.service';
+import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
 
 @Component({
@@ -14,7 +14,7 @@ export class ForgotPassword {
   loading = signal(false);
   error = signal('');
 
-  constructor(private userService: UserService, private toast: ToastService, private router: Router) {}
+  constructor(private authService: AuthService, private toast: ToastService, private router: Router) {}
 
   submit() {
     if (!this.email) {
@@ -23,7 +23,7 @@ export class ForgotPassword {
     }
     this.loading.set(true);
     this.error.set('');
-    this.userService.forgotPassword(this.email).subscribe({
+    this.authService.forgotPassword(this.email).subscribe({
       next: () => {
         this.toast.success('Reset code sent!', `Check ${this.email} for your password reset code.`);
         this.router.navigate(['/reset-password']);

@@ -1,0 +1,109 @@
+<div class="p-6">
+
+  <div class="mb-6">
+    <h1 class="text-xl font-bold text-gray-900">Interview Calendar</h1>
+    <p class="text-sm text-gray-500 mt-0.5">All scheduled and past interviews</p>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 mb-4">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20 text-gray-400 text-sm">
+      <svg class="w-5 h-5 animate-spin mr-2" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+      </svg>
+      Loading schedule…
+    </div>
+  } @else {
+
+    <!-- Upcoming -->
+    <section class="mb-8">
+      <h2 class="text-sm font-bold text-gray-700 uppercase tracking-widest mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
+        Upcoming ({{ upcoming().length }})
+      </h2>
+
+      @if (upcoming().length === 0) {
+        <div class="bg-white rounded-2xl border border-gray-200 px-6 py-10 text-center text-gray-400 text-sm">
+          No upcoming interviews scheduled.
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (entry of upcoming(); track entry.interview.id) {
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 hover:border-indigo-200 transition-colors shadow-sm">
+              <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1 flex-wrap">
+                    <p class="text-sm font-bold text-gray-900">
+                      {{ entry.application?.company ?? 'Unknown Company' }}
+                    </p>
+                    @if (entry.application?.profileName) {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                        [class]="entry.application!.profileName === 'Peter' ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-700'">
+                        {{ entry.application!.profileName }}
+                      </span>
+                    }
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ statusClass(entry.interview.status) }}">
+                      {{ entry.interview.status }}
+                    </span>
+                  </div>
+                  @if (entry.application?.position) {
+                    <p class="text-xs text-gray-500 mb-1.5">{{ entry.application!.position }}</p>
+                  }
+                  <p class="text-sm font-medium text-indigo-600">
+                    {{ formatDateTime(entry.interview.interviewDateTime) }}
+                  </p>
+                  @if (entry.interview.interviewerName) {
+                    <p class="text-xs text-gray-500 mt-1">
+                      Interviewer: {{ entry.interview.interviewerName }}
+                      @if (entry.interview.interviewerPhone) { · {{ entry.interview.interviewerPhone }} }
+                    </p>
+                  }
+                  @if (entry.interview.meetingLinkOrLocation) {
+                    <p class="text-xs text-gray-500 mt-0.5 truncate">📍 {{ entry.interview.meetingLinkOrLocation }}</p>
+                  }
+                  @if (entry.interview.documentsRequired) {
+                    <p class="text-xs text-gray-500 mt-0.5">📎 {{ entry.interview.documentsRequired }}</p>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Past -->
+    @if (past().length > 0) {
+      <section>
+        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-gray-300 inline-block"></span>
+          Past ({{ past().length }})
+        </h2>
+        <div class="space-y-2">
+          @for (entry of past(); track entry.interview.id) {
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-3.5 opacity-70">
+              <div class="flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <p class="text-sm font-semibold text-gray-700">
+                    {{ entry.application?.company ?? 'Unknown' }}
+                    @if (entry.application?.position) { · <span class="font-normal text-gray-500">{{ entry.application!.position }}</span> }
+                  </p>
+                  <p class="text-xs text-gray-400 mt-0.5">{{ formatDateTime(entry.interview.interviewDateTime) }}</p>
+                </div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ statusClass(entry.interview.status) }}">
+                  {{ entry.interview.status }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+  }
+
+</div>

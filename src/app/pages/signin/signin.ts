@@ -29,7 +29,7 @@ export class Signin {
     this.loading.set(true);
     this.error.set('');
     this.authService.signin({ userName: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => this.router.navigate(['/app/applications']),
       error: () => {
         this.error.set('Invalid credentials. Please try again.');
         this.loading.set(false);

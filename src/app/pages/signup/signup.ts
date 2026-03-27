@@ -42,7 +42,7 @@ export class Signup {
       role: 'ADMIN',
     }).subscribe({
       next: () => {
-        this.toast.success('Account created!', 'Welcome to TIH. Please sign in to continue.');
+        this.toast.success('Account created!', 'Welcome to GigMaster. Please sign in to continue.');
         setTimeout(() => this.router.navigate(['/signin']), 1500);
       },
       error: () => {

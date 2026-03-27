@@ -1,0 +1,94 @@
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <h2 class="text-base font-bold text-gray-900">{{ title }}</h2>
+    <button (click)="cancel()" class="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Form -->
+  <form (ngSubmit)="submit()" class="px-6 py-5 space-y-4">
+
+    <!-- Profile + Status row -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Profile</label>
+        <select [(ngModel)]="form.profileName" name="profileName"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          @for (p of profiles; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Status</label>
+        <select [(ngModel)]="form.status" name="status"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          @for (s of statuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Company -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Company <span class="text-red-400">*</span></label>
+      <input [(ngModel)]="form.company" name="company" type="text" placeholder="e.g. Acme Corp"
+        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+
+    <!-- Position -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Position <span class="text-red-400">*</span></label>
+      <input [(ngModel)]="form.position" name="position" type="text" placeholder="e.g. Senior Engineer"
+        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+
+    <!-- Agent + Platform row -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Recruiting Agent</label>
+        <input [(ngModel)]="form.recruitingAgent" name="recruitingAgent" type="text" placeholder="Optional"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Platform</label>
+        <input [(ngModel)]="form.platform" name="platform" type="text" placeholder="e.g. LinkedIn"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+    </div>
+
+    <!-- Follow-Up Date -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Follow-Up Date</label>
+      <input [(ngModel)]="form.followUpDate" name="followUpDate" type="date"
+        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Notes</label>
+      <textarea [(ngModel)]="form.notes" name="notes" rows="3" placeholder="Any relevant notes..."
+        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none">
+      </textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3 pt-1">
+      <button type="button" (click)="cancel()"
+        class="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+        Cancel
+      </button>
+      <button type="submit" [disabled]="!form.company.trim() || !form.position.trim()"
+        class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm shadow-indigo-200">
+        {{ application ? 'Save Changes' : 'Add Application' }}
+      </button>
+    </div>
+
+  </form>
+</div>

@@ -53,4 +53,12 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+
+  forgotPassword(email: string) {
+    return this.http.post<{ data: null }>(`${environment.apiUrl}/reset-password/forgot`, { email });
+  }
+
+  resetPassword(code: string, newPassword: string) {
+    return this.http.post<{ data: null }>(`${environment.apiUrl}/reset-password/reset`, { code, newPassword });
+  }
 }
