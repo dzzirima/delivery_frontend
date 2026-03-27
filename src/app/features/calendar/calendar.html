@@ -38,12 +38,11 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1 flex-wrap">
                     <p class="text-sm font-bold text-gray-900">
-                      {{ entry.application?.company ?? 'Unknown Company' }}
+                      {{ entry.application?.company || entry.interview.company || 'Unknown Company' }}
                     </p>
-                    @if (entry.application?.profileName) {
-                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                        [class]="entry.application!.profileName === 'Peter' ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-700'">
-                        {{ entry.application!.profileName }}
+                    @if (entry.application?.agentName) {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                        {{ entry.application!.agentName }}
                       </span>
                     }
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ statusClass(entry.interview.status) }}">
@@ -62,8 +61,8 @@
                       @if (entry.interview.interviewerPhone) { · {{ entry.interview.interviewerPhone }} }
                     </p>
                   }
-                  @if (entry.interview.meetingLinkOrLocation) {
-                    <p class="text-xs text-gray-500 mt-0.5 truncate">📍 {{ entry.interview.meetingLinkOrLocation }}</p>
+                  @if (entry.interview.locationOrLink) {
+                    <p class="text-xs text-gray-500 mt-0.5 truncate">📍 {{ entry.interview.locationOrLink }}</p>
                   }
                   @if (entry.interview.documentsRequired) {
                     <p class="text-xs text-gray-500 mt-0.5">📎 {{ entry.interview.documentsRequired }}</p>
@@ -89,7 +88,7 @@
               <div class="flex items-center justify-between gap-3 flex-wrap">
                 <div>
                   <p class="text-sm font-semibold text-gray-700">
-                    {{ entry.application?.company ?? 'Unknown' }}
+                    {{ entry.application?.company || entry.interview.company || 'Unknown' }}
                     @if (entry.application?.position) { · <span class="font-normal text-gray-500">{{ entry.application!.position }}</span> }
                   </p>
                   <p class="text-xs text-gray-400 mt-0.5">{{ formatDateTime(entry.interview.interviewDateTime) }}</p>

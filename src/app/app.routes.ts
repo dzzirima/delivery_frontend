@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
+import { applicationDetailResolver } from './features/applications/application-detail/application-detail.resolver';
 
 export const routes: Routes = [
   // Landing
@@ -48,8 +49,25 @@ export const routes: Routes = [
         loadComponent: () => import('./features/applications/applications').then(m => m.Applications),
       },
       {
+        path: 'applications/:id',
+        resolve: { application: applicationDetailResolver },
+        loadComponent: () => import('./features/applications/application-detail/application-detail').then(m => m.ApplicationDetailPage),
+      },
+      {
         path: 'calendar',
         loadComponent: () => import('./features/calendar/calendar').then(m => m.Calendar),
+      },
+      {
+        path: 'portfolio',
+        loadComponent: () => import('./features/portfolio/portfolio').then(m => m.PortfolioPage),
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/users/users').then(m => m.UsersPage),
+      },
+      {
+        path: 'organizations',
+        loadComponent: () => import('./features/organizations/organizations').then(m => m.OrganizationsPage),
       },
       {
         path: 'settings',
@@ -58,7 +76,7 @@ export const routes: Routes = [
     ],
   },
 
-  // Legacy redirect — anyone hitting /dashboard goes to the new path
+  // Legacy redirect
   {
     path: 'dashboard',
     redirectTo: '/app/applications',

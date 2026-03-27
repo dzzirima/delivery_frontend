@@ -13,17 +13,8 @@
   <!-- Form -->
   <form (ngSubmit)="submit()" class="px-6 py-5 space-y-4">
 
-    <!-- Profile + Status row -->
+    <!-- Status + Applied Date row -->
     <div class="grid grid-cols-2 gap-3">
-      <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Profile</label>
-        <select [(ngModel)]="form.profileName" name="profileName"
-          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-          @for (p of profiles; track p) {
-            <option [value]="p">{{ p }}</option>
-          }
-        </select>
-      </div>
       <div>
         <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Status</label>
         <select [(ngModel)]="form.status" name="status"
@@ -32,6 +23,11 @@
             <option [value]="s">{{ s }}</option>
           }
         </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Applied Date <span class="text-red-400">*</span></label>
+        <input [(ngModel)]="form.appliedDate" name="appliedDate" type="date"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
       </div>
     </div>
 
@@ -49,25 +45,104 @@
         class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
     </div>
 
-    <!-- Agent + Platform row -->
+    <!-- Platform + Application Type row -->
     <div class="grid grid-cols-2 gap-3">
       <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Recruiting Agent</label>
-        <input [(ngModel)]="form.recruitingAgent" name="recruitingAgent" type="text" placeholder="Optional"
-          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Platform</label>
+        <select [(ngModel)]="form.platform" name="platform"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          <option [value]="undefined">— Select —</option>
+          @for (p of platforms; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+        </select>
       </div>
       <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Platform</label>
-        <input [(ngModel)]="form.platform" name="platform" type="text" placeholder="e.g. LinkedIn"
-          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Application Type</label>
+        <select [(ngModel)]="form.applicationType" name="applicationType"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          <option [value]="undefined">— Select —</option>
+          @for (t of applicationTypes; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
       </div>
     </div>
 
-    <!-- Follow-Up Date -->
+    <!-- Recruiting Agent -->
     <div>
-      <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Follow-Up Date</label>
-      <input [(ngModel)]="form.followUpDate" name="followUpDate" type="date"
-        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Recruiting Agent</label>
+      <input [(ngModel)]="form.recruitingAgent" name="recruitingAgent" type="text" placeholder="Optional"
+        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+
+    <!-- Portfolio -->
+    <div class="relative portfolio-dropdown">
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Portfolio</label>
+
+      <!-- Trigger -->
+      @if (!dropdownOpen()) {
+        <button type="button" (click)="openDropdown()"
+          class="w-full flex items-center justify-between border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors hover:border-gray-300">
+          @if (selectedPortfolio()) {
+            <span class="text-gray-900 font-medium">{{ selectedPortfolio()!.firstName }} {{ selectedPortfolio()!.lastName }}</span>
+            <button type="button" (click)="$event.stopPropagation(); clearPortfolio()"
+              class="ml-2 text-gray-400 hover:text-red-500 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          } @else {
+            <span class="text-gray-400">— Select portfolio —</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          }
+        </button>
+      } @else {
+        <!-- Search input -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input [ngModel]="portfolioSearch()" (ngModelChange)="portfolioSearch.set($event)"
+            name="portfolioSearch" type="text" placeholder="Search portfolios…" autofocus
+            class="w-full border border-indigo-400 rounded-xl pl-9 pr-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+
+        <!-- Dropdown list -->
+        <div class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+          @if (portfoliosLoading()) {
+            <div class="px-4 py-3 text-sm text-gray-400 text-center">Loading…</div>
+          } @else if (filteredPortfolios().length === 0) {
+            <div class="px-4 py-3 text-sm text-gray-400 text-center">No portfolios found.</div>
+          } @else {
+            <ul class="max-h-48 overflow-y-auto">
+              <li>
+                <button type="button" (click)="clearPortfolio()"
+                  class="w-full text-left px-4 py-2.5 text-sm text-gray-400 hover:bg-gray-50 transition-colors italic">
+                  — None —
+                </button>
+              </li>
+              @for (p of filteredPortfolios(); track p.id) {
+                <li>
+                  <button type="button" (click)="selectPortfolio(p)"
+                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-indigo-50 transition-colors flex items-center justify-between"
+                    [class.bg-indigo-50]="portfolioId() === p.id"
+                    [class.text-indigo-700]="portfolioId() === p.id"
+                    [class.font-semibold]="portfolioId() === p.id"
+                    [class.text-gray-800]="portfolioId() !== p.id">
+                    <span>{{ p.firstName }} {{ p.lastName }}</span>
+                    @if (p.country) {
+                      <span class="text-xs text-gray-400 ml-2">{{ p.country }}</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
     </div>
 
     <!-- Notes -->
@@ -84,7 +159,7 @@
         class="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
         Cancel
       </button>
-      <button type="submit" [disabled]="!form.company.trim() || !form.position.trim()"
+      <button type="submit" [disabled]="!form.company.trim() || !form.position.trim() || !form.appliedDate"
         class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm shadow-indigo-200">
         {{ application ? 'Save Changes' : 'Add Application' }}
       </button>

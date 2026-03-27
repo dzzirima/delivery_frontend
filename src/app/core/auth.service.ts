@@ -28,13 +28,14 @@ export interface AuthResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'tih_token';
+  private readonly RESET_EMAIL_KEY = 'tih_reset_email';
 
   constructor(private http: HttpClient, private router: Router) {}
 
   signin(payload: SigninPayload) {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/user/signin`, payload).pipe(
-      tap(res => localStorage.setItem(this.TOKEN_KEY, res.data.token))
-    );
+    return this.http
+      .post<AuthResponse>(`${environment.apiUrl}/user/signin`, payload)
+      .pipe(tap(res => localStorage.setItem(this.TOKEN_KEY, res.data.token)));
   }
 
   signup(payload: SignupPayload) {
@@ -43,6 +44,7 @@ export class AuthService {
 
   signOut() {
     localStorage.removeItem(this.TOKEN_KEY);
+    sessionStorage.removeItem(this.RESET_EMAIL_KEY);
     this.router.navigate(['/signin']);
   }
 
@@ -54,11 +56,30 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role ?? payload.roles?.[0] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
   forgotPassword(email: string) {
+    sessionStorage.setItem(this.RESET_EMAIL_KEY, email);
     return this.http.post<{ data: null }>(`${environment.apiUrl}/reset-password/forgot`, { email });
   }
 
   resetPassword(code: string, newPassword: string) {
-    return this.http.post<{ data: null }>(`${environment.apiUrl}/reset-password/reset`, { code, newPassword });
+    const email = sessionStorage.getItem(this.RESET_EMAIL_KEY) ?? '';
+    return this.http
+      .post<{ data: null }>(`${environment.apiUrl}/reset-password/reset`, {
+        email,
+        code,
+        newPassword,
+      })
+      .pipe(tap(() => sessionStorage.removeItem(this.RESET_EMAIL_KEY)));
   }
 }

@@ -64,7 +64,7 @@
           <!-- Meeting Link/Location -->
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Meeting Link / Location</label>
-            <input [(ngModel)]="form.meetingLinkOrLocation" name="meetingLinkOrLocation" type="text" placeholder="Zoom link, office address, etc."
+            <input [(ngModel)]="form.locationOrLink" name="locationOrLink" type="text" placeholder="Zoom link, office address, etc."
               class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
 
@@ -126,8 +126,8 @@
                     @if (iv.interviewerPhone) { · {{ iv.interviewerPhone }} }
                   </p>
                 }
-                @if (iv.meetingLinkOrLocation) {
-                  <p class="text-xs text-gray-500 truncate">📍 {{ iv.meetingLinkOrLocation }}</p>
+                @if (iv.locationOrLink) {
+                  <p class="text-xs text-gray-500 truncate">📍 {{ iv.locationOrLink }}</p>
                 }
                 @if (iv.documentsRequired) {
                   <p class="text-xs text-gray-500 mt-0.5">📎 {{ iv.documentsRequired }}</p>

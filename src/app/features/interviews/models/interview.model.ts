@@ -10,12 +10,16 @@ export type InterviewStatus = (typeof INTERVIEW_STATUSES)[number];
 
 export interface Interview {
   id: string;
+  orgId: string;
+  agentId: string;
+  agentName: string;
   applicationId: string;
+  company: string;
   interviewDateTime: string;
   interviewerName?: string;
   interviewerPhone?: string;
   documentsRequired?: string;
-  meetingLinkOrLocation?: string;
+  locationOrLink?: string;
   notes?: string;
   status: InterviewStatus;
   createdAt: string;
@@ -28,7 +32,7 @@ export interface InterviewPayload {
   interviewerName?: string;
   interviewerPhone?: string;
   documentsRequired?: string;
-  meetingLinkOrLocation?: string;
+  locationOrLink?: string;
   notes?: string;
   status: InterviewStatus;
 }

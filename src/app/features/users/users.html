@@ -1,0 +1,226 @@
+<div class="p-6">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h1 class="text-xl font-bold text-gray-900">Users</h1>
+      <p class="text-sm text-gray-500 mt-0.5">{{ totalElements() }} total</p>
+    </div>
+    @if (isOrgAdmin) {
+      <button (click)="openAddAgent()"
+        class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Add Agent
+      </button>
+    }
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap items-center gap-3 mb-5">
+    <select [ngModel]="filterRole()" (ngModelChange)="filterRole.set($event); onFilterChange()" name="roleFilter"
+      class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <option value="">All Roles</option>
+      @for (r of roles; track r) { <option [value]="r">{{ r }}</option> }
+    </select>
+
+    <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); onFilterChange()" name="statusFilter"
+      class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <option value="">All Statuses</option>
+      @for (s of statuses; track s) { <option [value]="s">{{ s }}</option> }
+    </select>
+
+    <div class="relative flex-1 min-w-[180px] max-w-xs">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input [(ngModel)]="searchQuery" (ngModelChange)="onFilterChange()" name="search" type="text" placeholder="Search name, email…"
+        class="w-full border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 mb-4">{{ error() }}</p>
+  }
+
+  <!-- Table -->
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-gray-50 border-b border-gray-200 text-left">
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Phone</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Role</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Organisation</th>
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          <tr>
+            <td colspan="7" class="text-center py-14">
+              <div class="inline-flex items-center gap-2 text-gray-400 text-sm">
+                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                </svg>
+                Loading users…
+              </div>
+            </td>
+          </tr>
+        } @else if (users().length === 0) {
+          <tr>
+            <td colspan="7" class="text-center py-14 text-gray-400 text-sm">No users found.</td>
+          </tr>
+        } @else {
+          @for (u of users(); track u.id) {
+            <tr class="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+              <td class="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">{{ u.name }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ u.email }}</td>
+              <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ u.phoneNumber || '—' }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ roleClass(u.role) }}">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ statusClass(u.status) }}">
+                  {{ u.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ u.organisationName || '—' }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1">
+                  <button (click)="openSetPassword(u.id)"
+                    class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 transition-colors whitespace-nowrap"
+                    title="Set Password">
+                    Set Password
+                  </button>
+                  <button (click)="deleteUser(u.id)"
+                    class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Add Agent Modal -->
+@if (showAddAgentModal()) {
+  <div class="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4 backdrop-blur-sm" (click)="closeAddAgentModal()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto" (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <h2 class="text-base font-bold text-gray-900">Add Agent to Organisation</h2>
+        <button (click)="closeAddAgentModal()" class="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form (ngSubmit)="addAgent()" class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Full Name <span class="text-red-400">*</span></label>
+          <input [(ngModel)]="addAgentForm.name" name="agentName" type="text" placeholder="Alex Rivers"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Email <span class="text-red-400">*</span></label>
+          <input [(ngModel)]="addAgentForm.email" name="agentEmail" type="email" placeholder="agent@example.com"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Password <span class="text-red-400">*</span></label>
+            <button type="button" (click)="generatePassword()"
+              class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+              Auto-generate
+            </button>
+          </div>
+          <div class="relative">
+            <input [(ngModel)]="addAgentForm.password" name="agentPassword" [type]="agentPasswordType()" placeholder="Set initial password"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button type="button" (click)="toggleAgentPasswordVisibility()"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors">
+              @if (agentPasswordType() === 'password') {
+                <!-- Eye open -->
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              } @else {
+                <!-- Eye closed -->
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.97 9.97 0 012.318-3.95M6.938 6.938A9.97 9.97 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.97 9.97 0 01-1.457 2.605M6.938 6.938L3 3m3.938 3.938l10.124 10.124M17.062 17.062L21 21"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Phone</label>
+            <input [(ngModel)]="addAgentForm.phoneNumber" name="agentPhone" type="tel" placeholder="+1 555 000 0000"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Address</label>
+            <input [(ngModel)]="addAgentForm.address" name="agentAddress" type="text" placeholder="City, Country"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-1">
+          <button type="button" (click)="closeAddAgentModal()" class="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">Cancel</button>
+          <button type="submit" [disabled]="addingAgent() || !addAgentForm.name.trim() || !addAgentForm.email.trim() || !addAgentForm.password.trim()"
+            class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm shadow-indigo-200">
+            {{ addingAgent() ? 'Adding…' : 'Add Agent' }}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+}
+
+<!-- Set Password Modal -->
+@if (showPasswordModal()) {
+  <div class="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4 backdrop-blur-sm" (click)="closePasswordModal()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6" (click)="$event.stopPropagation()">
+      <h2 class="text-base font-bold text-gray-900 mb-4">Set New Password</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">New Password</label>
+          <input [(ngModel)]="newPassword" name="newPassword" type="password" placeholder="Enter new password"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div class="flex justify-end gap-3">
+          <button (click)="closePasswordModal()" class="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">Cancel</button>
+          <button (click)="setPassword()" [disabled]="settingPassword() || !newPassword.trim()"
+            class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+            {{ settingPassword() ? 'Saving…' : 'Set Password' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

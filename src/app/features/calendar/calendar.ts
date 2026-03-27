@@ -20,13 +20,13 @@ export class Calendar implements OnInit {
 
   upcoming = computed(() =>
     this.entries()
-      .filter(e => new Date(e.interview.interviewDateTime) >= new Date(new Date().setHours(0,0,0,0)))
+      .filter(e => new Date(e.interview.interviewDateTime) >= new Date(new Date().setHours(0, 0, 0, 0)))
       .sort((a, b) => new Date(a.interview.interviewDateTime).getTime() - new Date(b.interview.interviewDateTime).getTime())
   );
 
   past = computed(() =>
     this.entries()
-      .filter(e => new Date(e.interview.interviewDateTime) < new Date(new Date().setHours(0,0,0,0)))
+      .filter(e => new Date(e.interview.interviewDateTime) < new Date(new Date().setHours(0, 0, 0, 0)))
       .sort((a, b) => new Date(b.interview.interviewDateTime).getTime() - new Date(a.interview.interviewDateTime).getTime())
   );
 
@@ -42,12 +42,12 @@ export class Calendar implements OnInit {
   load() {
     this.loading.set(true);
     this.error.set('');
-    this.interviewService.getAll().subscribe({
+    this.interviewService.getAll({ page: 0, size: 200 }).subscribe({
       next: interviewsRes => {
-        const interviews = Array.isArray(interviewsRes.data) ? interviewsRes.data : [];
-        this.appService.getAll({ size: 1000 }).subscribe({
+        const interviews = interviewsRes.data?.content ?? [];
+        this.appService.getAll({ page: 0, size: 1000 }).subscribe({
           next: appsRes => {
-            const apps = Array.isArray(appsRes.data) ? appsRes.data : (appsRes.data?.content ?? []);
+            const apps = appsRes.data?.content ?? [];
             const appMap = new Map(apps.map((a: Application) => [a.id, a]));
             this.entries.set(interviews.map(iv => ({
               interview: iv,

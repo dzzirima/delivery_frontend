@@ -1,45 +1,49 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   Application,
   ApplicationPayload,
   APPLICATION_STATUSES,
   ApplicationStatus,
-  PROFILE_NAMES,
-  ProfileName,
 } from './models/application.model';
 import { ApplicationService } from './services/application.service';
 import { ToastService } from '../../core/toast.service';
 import { AppForm } from './ui/app-form/app-form';
 import { InterviewsPanel } from './ui/interviews-panel/interviews-panel';
+import { FollowUpsPanel } from '../follow-ups/ui/follow-ups-panel/follow-ups-panel';
 
 @Component({
   selector: 'app-applications',
-  imports: [FormsModule, AppForm, InterviewsPanel],
+  imports: [FormsModule, AppForm, InterviewsPanel, FollowUpsPanel],
   templateUrl: './applications.html',
 })
 export class Applications implements OnInit {
   readonly statuses = APPLICATION_STATUSES;
-  readonly profiles = PROFILE_NAMES;
 
   applications = signal<Application[]>([]);
   loading = signal(false);
   error = signal('');
   totalElements = signal(0);
 
-  filterProfile = signal<ProfileName | ''>('');
   filterStatus = signal<ApplicationStatus | ''>('');
   searchQuery = '';
 
   showAppForm = signal(false);
   editingApp = signal<Application | null>(null);
   viewingApp = signal<Application | null>(null);
+  followUpsApp = signal<Application | null>(null);
   saving = signal(false);
 
   constructor(
     private appService: ApplicationService,
     private toast: ToastService,
+    private router: Router,
   ) {}
+
+  viewDetails(id: string) {
+    this.router.navigate(['/app/applications', id]);
+  }
 
   ngOnInit() {
     this.loadApplications();
@@ -50,15 +54,16 @@ export class Applications implements OnInit {
     this.error.set('');
     this.appService
       .getAll({
-        profileName: this.filterProfile() || undefined,
         status: this.filterStatus() || undefined,
         search: this.searchQuery || undefined,
+        page: 0,
+        size: 20,
       })
       .subscribe({
         next: res => {
-          const data = res.data;
-          this.applications.set(Array.isArray(data) ? data : (data?.content ?? []));
-          this.totalElements.set((data as any)?.totalElements ?? this.applications().length);
+          const page = res.data;
+          this.applications.set(page?.content ?? []);
+          this.totalElements.set(page?.totalElements ?? 0);
           this.loading.set(false);
         },
         error: () => {
@@ -66,11 +71,6 @@ export class Applications implements OnInit {
           this.loading.set(false);
         },
       });
-  }
-
-  setProfileFilter(profile: ProfileName | '') {
-    this.filterProfile.set(profile);
-    this.loadApplications();
   }
 
   onStatusChange() {
@@ -98,6 +98,10 @@ export class Applications implements OnInit {
 
   openInterviews(app: Application) {
     this.viewingApp.set(app);
+  }
+
+  openFollowUps(app: Application) {
+    this.followUpsApp.set(app);
   }
 
   saveApplication(payload: ApplicationPayload) {
@@ -136,21 +140,15 @@ export class Applications implements OnInit {
 
   statusClass(status: ApplicationStatus): string {
     const map: Record<ApplicationStatus, string> = {
-      APPLIED:      'bg-blue-100 text-blue-700',
-      SCREENING:    'bg-violet-100 text-violet-700',
-      INTERVIEWING: 'bg-indigo-100 text-indigo-700',
-      OFFER:        'bg-green-100 text-green-700',
-      REJECTED:     'bg-red-100 text-red-700',
-      WITHDRAWN:    'bg-gray-100 text-gray-600',
-      GHOSTED:      'bg-amber-100 text-amber-700',
+      APPLIED:    'bg-blue-100 text-blue-700',
+      PENDING:    'bg-amber-100 text-amber-700',
+      INTERVIEW:  'bg-indigo-100 text-indigo-700',
+      ASSESSMENT: 'bg-violet-100 text-violet-700',
+      REJECTED:   'bg-red-100 text-red-700',
+      OFFER:      'bg-green-100 text-green-700',
+      ON_HOLD:    'bg-gray-100 text-gray-600',
     };
     return map[status] ?? 'bg-gray-100 text-gray-600';
-  }
-
-  profileClass(profile: ProfileName): string {
-    return profile === 'Peter'
-      ? 'bg-sky-100 text-sky-700'
-      : 'bg-rose-100 text-rose-700';
   }
 
   formatDate(dateStr?: string): string {

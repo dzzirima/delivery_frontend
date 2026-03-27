@@ -35,7 +35,7 @@ export class InterviewsPanel implements OnInit {
     this.loading.set(true);
     this.interviewService.getByApplicationId(this.application.id).subscribe({
       next: res => {
-        this.interviews.set(Array.isArray(res.data) ? res.data : []);
+        this.interviews.set(res.data?.content ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -59,7 +59,7 @@ export class InterviewsPanel implements OnInit {
       interviewerName: interview.interviewerName ?? '',
       interviewerPhone: interview.interviewerPhone ?? '',
       documentsRequired: interview.documentsRequired ?? '',
-      meetingLinkOrLocation: interview.meetingLinkOrLocation ?? '',
+      locationOrLink: interview.locationOrLink ?? '',
       notes: interview.notes ?? '',
       status: interview.status,
     };
@@ -137,7 +137,7 @@ export class InterviewsPanel implements OnInit {
       interviewerName: '',
       interviewerPhone: '',
       documentsRequired: '',
-      meetingLinkOrLocation: '',
+      locationOrLink: '',
       notes: '',
       status: 'SCHEDULED',
     };
