@@ -13,6 +13,15 @@ interface AddAgentForm {
   address: string;
 }
 
+interface EditUserForm {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  status: UserStatus;
+}
+
 @Component({
   selector: 'app-users',
   imports: [FormsModule],
@@ -39,6 +48,10 @@ export class UsersPage implements OnInit {
   get isOrgAdmin(): boolean {
     return this.authService.getRole() === 'ORG_ADMIN';
   }
+
+  showEditModal  = signal(false);
+  editForm       = signal<EditUserForm | null>(null);
+  savingEdit     = signal(false);
 
   showAddAgentModal = signal(false);
   addingAgent = signal(false);
@@ -168,6 +181,44 @@ export class UsersPage implements OnInit {
       error: () => {
         this.toast.error('Failed to add agent.');
         this.addingAgent.set(false);
+      },
+    });
+  }
+
+  openEditUser(u: User) {
+    this.editForm.set({ id: u.id, name: u.name, email: u.email, phoneNumber: u.phoneNumber ?? '', address: u.address ?? '', status: u.status });
+    this.showEditModal.set(true);
+  }
+
+  closeEditModal() {
+    this.showEditModal.set(false);
+    this.editForm.set(null);
+  }
+
+  setEditField(field: keyof EditUserForm, value: string) {
+    const f = this.editForm();
+    if (f) this.editForm.set({ ...f, [field]: value });
+  }
+
+  setEditStatus(status: UserStatus) {
+    const f = this.editForm();
+    if (f) this.editForm.set({ ...f, status });
+  }
+
+  saveEdit() {
+    const f = this.editForm();
+    if (!f) return;
+    this.savingEdit.set(true);
+    this.userService.update(f.id, { name: f.name, email: f.email, phoneNumber: f.phoneNumber, address: f.address, status: f.status }).subscribe({
+      next: res => {
+        this.users.update(list => list.map(u => u.id === f.id ? res.data : u));
+        this.toast.success('User updated.');
+        this.closeEditModal();
+        this.savingEdit.set(false);
+      },
+      error: () => {
+        this.toast.error('Failed to update user.');
+        this.savingEdit.set(false);
       },
     });
   }

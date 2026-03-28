@@ -22,6 +22,7 @@ export class MainLayout {
   });
 
   private resolveTitle(url: string): string {
+    if (url.includes('dashboard')) return 'Dashboard';
     if (url.includes('applications')) return 'Applications';
     if (url.includes('calendar')) return 'Interview Calendar';
     if (url.includes('portfolio')) return 'Portfolio';

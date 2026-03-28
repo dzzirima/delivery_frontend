@@ -41,6 +41,7 @@ export interface UserUpdatePayload {
   email?: string;
   phoneNumber?: string;
   address?: string;
+  status?: UserStatus;
 }
 
 export interface UserListParams {
