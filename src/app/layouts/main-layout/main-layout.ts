@@ -25,6 +25,7 @@ export class MainLayout {
     if (url.includes('applications')) return 'Applications';
     if (url.includes('calendar')) return 'Interview Calendar';
     if (url.includes('portfolio')) return 'Portfolio';
+    if (url.includes('analytics')) return 'Productivity Analytics';
     if (url.includes('users')) return 'Users';
     if (url.includes('organizations')) return 'Organisations';
     if (url.includes('settings')) return 'Settings';

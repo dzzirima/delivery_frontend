@@ -1,0 +1,153 @@
+<div class="p-6 space-y-6 max-w-7xl mx-auto">
+
+  <!-- ── Header ── -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900">Productivity Analytics</h2>
+      <p class="text-sm text-gray-500 mt-0.5">Agent performance vs daily target</p>
+    </div>
+
+    <!-- Daily target pill -->
+    @if (!orgLoading()) {
+      <div class="flex items-center gap-2">
+        @if (!editingTarget()) {
+          <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2 shadow-sm">
+            <span class="text-xs text-gray-500">Daily target</span>
+            <span class="font-bold text-gray-800 text-sm">{{ org()?.dailyTarget ?? 40 }}</span>
+            <button (click)="openEditTarget()"
+              class="ml-1 text-indigo-500 hover:text-indigo-700 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+              </svg>
+            </button>
+          </div>
+        } @else {
+          <div class="flex items-center gap-2 bg-white border border-indigo-300 rounded-xl px-3 py-1.5 shadow-sm">
+            <span class="text-xs text-gray-500">Daily target</span>
+            <input type="number" min="1"
+              [ngModel]="targetInput()" (ngModelChange)="targetInput.set($event)"
+              class="w-16 text-sm font-bold text-gray-800 border-none outline-none text-center bg-transparent"/>
+            <button (click)="saveTarget()" [disabled]="savingTarget()"
+              class="text-xs bg-indigo-600 text-white px-2 py-1 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+              {{ savingTarget() ? 'Saving…' : 'Save' }}
+            </button>
+            <button (click)="editingTarget.set(false)"
+              class="text-xs text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Filter Card ── -->
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+    <div class="flex flex-wrap items-end gap-4">
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
+        <input type="date"
+          [ngModel]="startDate()" (ngModelChange)="startDate.set($event)"
+          class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"/>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">End Date</label>
+        <input type="date"
+          [ngModel]="endDate()" (ngModelChange)="endDate.set($event)"
+          class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"/>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">Search Agent</label>
+        <input type="text" placeholder="Agent name…"
+          [ngModel]="agentFilter()" (ngModelChange)="agentFilter.set($event)"
+          class="border border-gray-300 rounded-xl px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"/>
+      </div>
+      <button (click)="applyFilters()"
+        class="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
+        Apply
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Table ── -->
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex items-center justify-center py-16 text-gray-400 text-sm gap-2">
+        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+        </svg>
+        Loading report…
+      </div>
+    }
+
+    <!-- Error -->
+    @else if (error()) {
+      <div class="flex items-center justify-center py-16 text-red-500 text-sm">{{ error() }}</div>
+    }
+
+    <!-- Empty -->
+    @else if (filteredReport().length === 0) {
+      <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+        <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <p class="text-sm font-medium">No data for this period</p>
+        <p class="text-xs mt-1">Adjust the date range or add agents</p>
+      </div>
+    }
+
+    <!-- Data table -->
+    @else {
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-200">
+            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Agent</th>
+            <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Applications</th>
+            <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Period Target</th>
+            <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Variance</th>
+            <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Success %</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (row of filteredReport(); track row.agentId) {
+            <tr class="{{ rowClass(row) }} transition-colors">
+              <td class="px-5 py-3.5 font-medium text-gray-800">{{ row.agentName || '—' }}</td>
+              <td class="px-5 py-3.5 text-right text-gray-700 font-medium">{{ row.totalApplications }}</td>
+              <td class="px-5 py-3.5 text-right text-gray-500">{{ row.periodTarget }}</td>
+              <td class="px-5 py-3.5 text-right">
+                <span class="{{ varianceBadge(row) }}">
+                  {{ row.variance >= 0 ? '+' : '' }}{{ row.variance }}
+                </span>
+              </td>
+              <td class="px-5 py-3.5 text-right {{ successBadge(row) }}">{{ row.successPercentage }}%</td>
+            </tr>
+          }
+        </tbody>
+
+        <!-- Summary footer -->
+        <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+          <tr>
+            <td class="px-5 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wide">
+              Total ({{ filteredReport().length }} agents)
+            </td>
+            <td class="px-5 py-3.5 text-right font-bold text-gray-800">{{ summaryTotal() }}</td>
+            <td class="px-5 py-3.5 text-right font-bold text-gray-500">{{ summaryTarget() }}</td>
+            <td class="px-5 py-3.5 text-right">
+              <span class="{{ summaryVariance() >= 0 ? 'text-emerald-700' : 'text-red-700' }} font-bold">
+                {{ summaryVariance() >= 0 ? '+' : '' }}{{ summaryVariance() }}
+              </span>
+            </td>
+            <td class="px-5 py-3.5 text-right font-bold
+              {{ summarySuccess() >= 100 ? 'text-emerald-700' : summarySuccess() >= 70 ? 'text-amber-700' : 'text-red-700' }}">
+              {{ summarySuccess() }}%
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    }
+  </div>
+
+</div>
