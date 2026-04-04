@@ -3,7 +3,8 @@
   <!-- Header -->
   <div class="flex items-center justify-between mb-5">
     <div>
-      <h1 class="text-xl font-bold text-gray-900">Portfolio</h1>
+      <!-- UI label is "Profile" — internal code stays "portfolio" -->
+      <h1 class="text-xl font-bold text-gray-900">Profiles</h1>
       <p class="text-sm text-gray-500 mt-0.5">{{ portfolios().length }} entries</p>
     </div>
     <button (click)="openNew()"
@@ -49,13 +50,14 @@
         } @else if (portfolios().length === 0) {
           <tr>
             <td colspan="7" class="text-center py-14">
-              <p class="text-gray-400 text-sm mb-2">No portfolio entries yet.</p>
+              <p class="text-gray-400 text-sm mb-2">No profile entries yet.</p>
               <button (click)="openNew()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">+ Add first entry</button>
             </td>
           </tr>
         } @else {
           @for (p of portfolios(); track p.id) {
-            <tr class="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+            <tr class="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors cursor-pointer"
+              (click)="viewPortfolio(p.id)">
               <td class="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">{{ p.firstName }} {{ p.lastName }}</td>
               <td class="px-4 py-3 text-gray-500">{{ p.country || '—' }}</td>
               <td class="px-4 py-3 text-gray-700">{{ p.agreedPercent != null ? p.agreedPercent + '%' : '—' }}</td>
@@ -66,7 +68,7 @@
                 </span>
               </td>
               <td class="px-4 py-3 text-gray-400 max-w-[200px] truncate text-xs" [title]="p.notes ?? ''">{{ p.notes || '—' }}</td>
-              <td class="px-4 py-3">
+              <td class="px-4 py-3" (click)="$event.stopPropagation()">
                 <div class="flex items-center gap-1">
                   <button (click)="openEdit(p)" class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +99,8 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto" (click)="$event.stopPropagation()">
 
       <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <h2 class="text-base font-bold text-gray-900">{{ editing() ? 'Edit Portfolio Entry' : 'New Portfolio Entry' }}</h2>
+        <!-- "Profile Entry" = renamed from "Portfolio Entry" -->
+        <h2 class="text-base font-bold text-gray-900">{{ editing() ? 'Edit Profile Entry' : 'New Profile Entry' }}</h2>
         <button (click)="closeForm()" class="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

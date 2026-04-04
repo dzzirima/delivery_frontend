@@ -17,37 +17,136 @@
     </button>
   </div>
 
-  <!-- Filters -->
-  <div class="flex flex-wrap items-center gap-3 mb-5">
-
-    <!-- Status filter -->
-    <select
-      [ngModel]="filterStatus()"
-      (ngModelChange)="filterStatus.set($event); onStatusChange()"
-      name="statusFilter"
-      class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-    >
-      <option value="">All Statuses</option>
-      @for (s of statuses; track s) {
-        <option [value]="s">{{ s }}</option>
-      }
-    </select>
-
-    <!-- Search -->
-    <div class="relative flex-1 min-w-[180px] max-w-xs">
-      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-      </svg>
-      <input
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearch()"
-        name="search"
-        type="text"
-        placeholder="Search company, position…"
-        class="w-full border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      />
+  <!-- Summary Cards -->
+  @if (stats()) {
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-5">
+      <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-sm">
+        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Total</p>
+        <p class="text-xl font-bold text-gray-900">{{ stats()!.total }}</p>
+      </div>
+      <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-center">
+        <p class="text-xs text-blue-600 font-medium uppercase tracking-wide mb-1">Applied</p>
+        <p class="text-xl font-bold text-blue-700">{{ stats()!.applied }}</p>
+      </div>
+      <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 text-center">
+        <p class="text-xs text-amber-600 font-medium uppercase tracking-wide mb-1">Pending</p>
+        <p class="text-xl font-bold text-amber-700">{{ stats()!.pending }}</p>
+      </div>
+      <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-center">
+        <p class="text-xs text-indigo-600 font-medium uppercase tracking-wide mb-1">Interview</p>
+        <p class="text-xl font-bold text-indigo-700">{{ stats()!.interview }}</p>
+      </div>
+      <div class="bg-violet-50 border border-violet-100 rounded-xl p-3 text-center">
+        <p class="text-xs text-violet-600 font-medium uppercase tracking-wide mb-1">Assessment</p>
+        <p class="text-xl font-bold text-violet-700">{{ stats()!.assessment }}</p>
+      </div>
+      <div class="bg-green-50 border border-green-100 rounded-xl p-3 text-center">
+        <p class="text-xs text-green-600 font-medium uppercase tracking-wide mb-1">Offer</p>
+        <p class="text-xl font-bold text-green-700">{{ stats()!.offer }}</p>
+      </div>
+      <div class="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+        <p class="text-xs text-red-600 font-medium uppercase tracking-wide mb-1">Rejected</p>
+        <p class="text-xl font-bold text-red-700">{{ stats()!.rejected }}</p>
+      </div>
+      <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
+        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">On Hold</p>
+        <p class="text-xl font-bold text-gray-600">{{ stats()!.onHold }}</p>
+      </div>
     </div>
+  }
 
+  <!-- Filters -->
+  <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-5 shadow-sm">
+    <div class="flex flex-wrap items-end gap-3">
+
+      <!-- Status filter -->
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Status</label>
+        <select
+          [ngModel]="filterStatus()"
+          (ngModelChange)="filterStatus.set($event); onFilterChange()"
+          name="statusFilter"
+          class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[140px]"
+        >
+          <option value="">All Statuses</option>
+          @for (s of statuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Agent filter -->
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Agent</label>
+        <select
+          [(ngModel)]="filterAgentId"
+          (ngModelChange)="onFilterChange()"
+          name="agentFilter"
+          class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[160px]"
+        >
+          <option value="">All Agents</option>
+          @for (agent of agents(); track agent.id) {
+            <option [value]="agent.id">{{ agent.name }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- From Date -->
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">From</label>
+        <input
+          type="date"
+          [(ngModel)]="filterFromDate"
+          (ngModelChange)="onFilterChange()"
+          name="fromDate"
+          class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+
+      <!-- To Date -->
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">To</label>
+        <input
+          type="date"
+          [(ngModel)]="filterToDate"
+          (ngModelChange)="onFilterChange()"
+          name="toDate"
+          class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+
+      <!-- Search -->
+      <div class="flex flex-col gap-1 flex-1 min-w-[180px]">
+        <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Search</label>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onFilterChange()"
+            name="search"
+            type="text"
+            placeholder="Company, position…"
+            class="w-full border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+      </div>
+
+      <!-- Clear filters -->
+      @if (hasActiveFilters()) {
+        <button
+          (click)="clearFilters()"
+          class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-gray-200"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Clear
+        </button>
+      }
+
+    </div>
   </div>
 
   <!-- Error -->
@@ -63,7 +162,8 @@
           <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Agent</th>
           <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Company</th>
           <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Position</th>
-          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Portfolio</th>
+          <!-- Column header renamed from "Portfolio" to "Profile" -->
+          <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Profile</th>
           <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Recruiting Agent</th>
           <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Platform</th>
           <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
@@ -88,10 +188,17 @@
         } @else if (applications().length === 0) {
           <tr>
             <td colspan="9" class="text-center py-14">
-              <p class="text-gray-400 text-sm mb-2">No applications found.</p>
-              <button (click)="openNewForm()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
-                + Add your first application
-              </button>
+              @if (hasActiveFilters()) {
+                <p class="text-gray-400 text-sm mb-2">No applications match the current filters.</p>
+                <button (click)="clearFilters()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+                  Clear filters
+                </button>
+              } @else {
+                <p class="text-gray-400 text-sm mb-2">No applications found.</p>
+                <button (click)="openNewForm()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+                  + Add your first application
+                </button>
+              }
             </td>
           </tr>
         } @else {
@@ -189,6 +296,45 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-between mt-4">
+      <p class="text-sm text-gray-500">
+        Page {{ currentPage() + 1 }} of {{ totalPages() }} &mdash; {{ totalElements() }} applications
+      </p>
+      <div class="flex items-center gap-1">
+        <!-- Prev -->
+        <button
+          (click)="goToPage(currentPage() - 1)"
+          [disabled]="currentPage() === 0"
+          class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          ‹ Prev
+        </button>
+
+        @for (p of pages; track p) {
+          <button
+            (click)="goToPage(p)"
+            [class]="p === currentPage()
+              ? 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white font-semibold'
+              : 'px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors'"
+          >
+            {{ p + 1 }}
+          </button>
+        }
+
+        <!-- Next -->
+        <button
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="currentPage() >= totalPages() - 1"
+          class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Next ›
+        </button>
+      </div>
+    </div>
+  }
 
 </div>
 

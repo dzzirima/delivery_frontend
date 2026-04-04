@@ -1,5 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { PortfolioService } from './services/portfolio.service';
 import { ToastService } from '../../core/toast.service';
 import { Portfolio, PortfolioPayload, PORTFOLIO_STATUSES, PortfolioStatus } from './models/portfolio.model';
@@ -22,7 +23,13 @@ export class PortfolioPage implements OnInit {
 
   form: PortfolioPayload = this.emptyForm();
 
+  private router = inject(Router);
+
   constructor(private portfolioService: PortfolioService, private toast: ToastService) {}
+
+  viewPortfolio(id: string) {
+    this.router.navigate(['/app/portfolio', id]);
+  }
 
   ngOnInit() {
     this.load();
@@ -77,26 +84,27 @@ export class PortfolioPage implements OnInit {
 
     req$.subscribe({
       next: () => {
-        this.toast.success(item ? 'Portfolio updated!' : 'Portfolio created!');
+        // Toast messages say "Profile" — internal code stays as portfolio
+        this.toast.success(item ? 'Profile updated!' : 'Profile created!');
         this.closeForm();
         this.saving.set(false);
         this.load();
       },
       error: () => {
-        this.toast.error('Failed to save portfolio.');
+        this.toast.error('Failed to save profile.');
         this.saving.set(false);
       },
     });
   }
 
   delete(id: string) {
-    if (!confirm('Delete this portfolio entry?')) return;
+    if (!confirm('Delete this profile entry?')) return;
     this.portfolioService.delete(id).subscribe({
       next: () => {
-        this.toast.success('Portfolio deleted.');
+        this.toast.success('Profile deleted.');
         this.portfolios.update(list => list.filter(p => p.id !== id));
       },
-      error: () => this.toast.error('Failed to delete portfolio.'),
+      error: () => this.toast.error('Failed to delete profile.'),
     });
   }
 

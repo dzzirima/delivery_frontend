@@ -62,6 +62,7 @@ export interface ApplicationPayload {
 export interface ApplicationDetails extends Application {
   interviews: import('../../interviews/models/interview.model').Interview[];
   followUps: import('../../follow-ups/models/follow-up.model').FollowUp[];
+  onboardingInformation: import('../../onboarding-process/models/onboarding-information.model').OnboardingInformation[];
 }
 
 export interface DuplicateCheckResult {

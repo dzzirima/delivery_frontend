@@ -40,7 +40,7 @@
         <p class="text-3xl font-bold text-slate-800">{{ summary()?.totalAgents ?? 0 }}</p>
       </div>
 
-      <!-- Portfolio -->
+      <!-- Profiles (card label renamed from "Portfolio" — internal stat key stays totalPortfolio) -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
         <div class="flex items-center gap-3 mb-3">
           <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
@@ -49,7 +49,7 @@
                 d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
-          <p class="text-sm text-slate-500 font-medium">Total Portfolio</p>
+          <p class="text-sm text-slate-500 font-medium">Total Profiles</p>
         </div>
         <p class="text-3xl font-bold text-slate-800">{{ summary()?.totalPortfolio ?? 0 }}</p>
       </div>
@@ -69,6 +69,52 @@
         </div>
         <p class="text-3xl font-bold text-slate-800">{{ summary()?.upcomingInterviews ?? 0 }}</p>
         <p class="text-xs text-purple-500 mt-1 font-medium">View calendar →</p>
+      </a>
+    }
+  </div>
+
+  <!-- ── SECTION 1b: Gig Stats ── -->
+  <div class="grid grid-cols-2 gap-4">
+    @if (loadingGigStats()) {
+      @for (i of [1,2]; track i) {
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 animate-pulse">
+          <div class="h-4 bg-slate-200 rounded w-2/3 mb-3"></div>
+          <div class="h-8 bg-slate-200 rounded w-1/2"></div>
+        </div>
+      }
+    } @else {
+      <!-- Live Gigs -->
+      <a routerLink="/app/gigs"
+        class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 cursor-pointer
+               hover:border-emerald-300 hover:shadow-md hover:scale-[1.02] transition-all duration-200 block">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <p class="text-sm text-slate-500 font-medium">Live Gigs</p>
+        </div>
+        <p class="text-3xl font-bold text-slate-800">{{ gigStats()?.liveCount ?? 0 }}</p>
+        <p class="text-xs text-emerald-500 mt-1 font-medium">View gigs →</p>
+      </a>
+
+      <!-- Dropped Gigs -->
+      <a routerLink="/app/gigs"
+        class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 cursor-pointer
+               hover:border-red-300 hover:shadow-md hover:scale-[1.02] transition-all duration-200 block">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <p class="text-sm text-slate-500 font-medium">Dropped Gigs</p>
+        </div>
+        <p class="text-3xl font-bold text-slate-800">{{ gigStats()?.droppedCount ?? 0 }}</p>
+        <p class="text-xs text-red-400 mt-1 font-medium">View gigs →</p>
       </a>
     }
   </div>

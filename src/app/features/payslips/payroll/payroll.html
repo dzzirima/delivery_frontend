@@ -1,0 +1,197 @@
+<div class="p-6">
+
+  <!-- Header -->
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+    <div>
+      <h1 class="text-xl font-bold text-gray-900">Payroll</h1>
+      <p class="text-sm text-gray-500 mt-0.5">{{ monthName(selectedMonth()) }} {{ selectedYear() }}</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Period selector -->
+      <select [ngModel]="selectedMonth()" (ngModelChange)="selectedMonth.set($event); onPeriodChange()" name="month"
+        class="border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        @for (m of months; track m.value) {
+          <option [value]="m.value">{{ m.label }}</option>
+        }
+      </select>
+
+      <input [ngModel]="selectedYear()" (ngModelChange)="selectedYear.set($event); onPeriodChange()" name="year"
+        type="number" min="2020" max="2099" step="1"
+        class="w-24 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+      <!-- Init Batch -->
+      <button (click)="initBatch()" [disabled]="hasBatch() || initLoading()"
+        class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200 disabled:opacity-50">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        {{ initLoading() ? 'Initialising…' : 'Init Batch' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Bulk Init Result -->
+  @if (bulkResult()) {
+    <div class="mb-5 bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <p class="text-sm font-semibold text-gray-900">
+          {{ bulkResult()!.generated }} payslip{{ bulkResult()!.generated !== 1 ? 's' : '' }} generated
+          @if (bulkResult()!.alreadyExists > 0) {
+            <span class="font-normal text-gray-500"> · {{ bulkResult()!.alreadyExists }} already existed</span>
+          }
+        </p>
+      </div>
+
+      @if (bulkResult()!.skipped.length > 0) {
+        <div>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Skipped Users</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-200 text-left">
+                  <th class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+                  <th class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">Reason</th>
+                  <th class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (s of bulkResult()!.skipped; track s.userId) {
+                  <tr class="border-b border-gray-100 last:border-b-0">
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ s.userName }}</td>
+                    <td class="px-3 py-2 text-gray-500 text-xs">{{ s.reason }}</td>
+                    <td class="px-3 py-2">
+                      <button (click)="onGenerateIndividual(s.userId)"
+                        class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors">
+                        Generate
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  @if (summary() && hasBatch()) {
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-5">
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Total Cost</p>
+        <p class="text-lg font-bold text-gray-900">{{ formatCurrency(summary()!.totalPayrollCost) }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Overtime</p>
+        <p class="text-lg font-bold text-indigo-600">{{ formatCurrency(summary()!.totalOvertimeCost) }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Deductions</p>
+        <p class="text-lg font-bold text-red-600">{{ formatCurrency(summary()!.totalDeductions) }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Reimbursements</p>
+        <p class="text-lg font-bold text-green-600">{{ formatCurrency(summary()!.totalReimbursements) }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Draft</p>
+        <p class="text-lg font-bold text-amber-600">{{ summary()!.draftCount }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Locked</p>
+        <p class="text-lg font-bold text-gray-700">{{ summary()!.lockedCount }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Payslips Table -->
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20 text-gray-400 text-sm gap-2">
+      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+      </svg>
+      Loading payroll…
+    </div>
+  } @else if (!hasBatch()) {
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <p class="text-gray-600 font-semibold">No payroll batch for this period</p>
+      <p class="text-sm text-gray-400 mt-1">Click "Init Batch" to generate payslips for all active contracts.</p>
+    </div>
+  } @else {
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-200 text-left">
+            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Net Salary</th>
+            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Basic</th>
+            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Overtime</th>
+            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of payslips(); track p.id) {
+            <tr class="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+              <td class="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">{{ p.userName }}</td>
+              <td class="px-4 py-3 font-bold text-gray-900 whitespace-nowrap">{{ formatCurrency(p.netSalary) }}</td>
+              <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ formatCurrency(p.basicSalary) }}</td>
+              <td class="px-4 py-3 text-indigo-600 whitespace-nowrap">{{ formatCurrency(p.overtimeAmount) }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ statusClass(p.status) }}">
+                  {{ p.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1">
+                  <button (click)="openEditor(p)"
+                    class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                    Edit
+                  </button>
+                  @if (p.status !== 'LOCKED') {
+                    <button (click)="onRegenerate(p.id)"
+                      class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 transition-colors">
+                      Regenerate
+                    </button>
+                    <button (click)="onFinalize(p.id)"
+                      class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
+                      Finalize
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer: Reset Batch -->
+    @if (canReset()) {
+      <div class="flex justify-end mt-4">
+        <button (click)="onResetBatch()"
+          class="px-4 py-2.5 rounded-xl text-sm font-semibold text-red-600 border border-red-200 hover:bg-red-50 transition-colors">
+          Reset Batch
+        </button>
+      </div>
+    }
+  }
+
+</div>
+
+<!-- Payslip Editor Modal -->
+@if (editingPayslip()) {
+  <app-payslip-editor
+    [payslip]="editingPayslip()!"
+    (closed)="closeEditor($event)" />
+}

@@ -1,16 +1,22 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { UserService } from './services/user.service';
 import { ToastService } from '../../core/toast.service';
 import { AuthService } from '../../core/auth.service';
 import { User, USER_ROLES, USER_STATUSES, UserRole, UserStatus } from './models/user.model';
+import { ContractService } from '../contracts/services/contract.service';
+import { ContractStatus } from '../contracts/models/contract.model';
 
-interface AddAgentForm {
+interface AddUserForm {
   name: string;
   email: string;
   password: string;
   phoneNumber: string;
   address: string;
+  nationalId: string;
+  role: UserRole;
 }
 
 interface EditUserForm {
@@ -36,6 +42,9 @@ export class UsersPage implements OnInit {
   error = signal('');
   totalElements = signal(0);
 
+  // Map of userId → contract status for the list column
+  contractStatusMap = signal<Map<string, ContractStatus>>(new Map());
+
   filterRole = signal<UserRole | ''>('');
   filterStatus = signal<UserStatus | ''>('');
   searchQuery = '';
@@ -53,16 +62,17 @@ export class UsersPage implements OnInit {
   editForm       = signal<EditUserForm | null>(null);
   savingEdit     = signal(false);
 
-  showAddAgentModal = signal(false);
-  addingAgent = signal(false);
-  addAgentForm: AddAgentForm = this.emptyAgentForm();
-  showAgentPassword = signal(false);
-  agentPasswordType = signal<'password' | 'text'>('password');
+  showAddUserModal = signal(false);
+  addingUser = signal(false);
+  addUserForm: AddUserForm = this.emptyUserForm();
+  userPasswordType = signal<'password' | 'text'>('password');
 
   constructor(
     private userService: UserService,
+    private contractService: ContractService,
     private toast: ToastService,
     private authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -72,16 +82,26 @@ export class UsersPage implements OnInit {
   load() {
     this.loading.set(true);
     this.error.set('');
-    this.userService.getAll({
-      role: this.filterRole() || undefined,
-      status: this.filterStatus() || undefined,
-      search: this.searchQuery || undefined,
-      page: 0,
-      size: 20,
-    }).subscribe({
-      next: res => {
-        this.users.set(res.data?.content ?? []);
-        this.totalElements.set(res.data?.totalElements ?? 0);
+
+    forkJoin([
+      this.userService.getAll({
+        role: this.filterRole() || undefined,
+        status: this.filterStatus() || undefined,
+        search: this.searchQuery || undefined,
+        page: 0,
+        size: 100,
+      }),
+      this.contractService.getAll(),
+    ]).subscribe({
+      next: ([usersRes, contractsRes]) => {
+        this.users.set(usersRes.data?.content ?? []);
+        this.totalElements.set(usersRes.data?.totalElements ?? 0);
+
+        const map = new Map<string, ContractStatus>();
+        for (const c of contractsRes.data ?? []) {
+          map.set(c.userId, c.status);
+        }
+        this.contractStatusMap.set(map);
         this.loading.set(false);
       },
       error: () => {
@@ -93,6 +113,10 @@ export class UsersPage implements OnInit {
 
   onFilterChange() {
     this.load();
+  }
+
+  viewUser(id: string) {
+    this.router.navigate(['/app/users', id]);
   }
 
   deleteUser(id: string) {
@@ -135,18 +159,18 @@ export class UsersPage implements OnInit {
     });
   }
 
-  openAddAgent() {
-    this.addAgentForm = this.emptyAgentForm();
-    this.agentPasswordType.set('password');
-    this.showAddAgentModal.set(true);
+  openAddUser() {
+    this.addUserForm = this.emptyUserForm();
+    this.userPasswordType.set('password');
+    this.showAddUserModal.set(true);
   }
 
-  closeAddAgentModal() {
-    this.showAddAgentModal.set(false);
+  closeAddUserModal() {
+    this.showAddUserModal.set(false);
   }
 
-  toggleAgentPasswordVisibility() {
-    this.agentPasswordType.set(this.agentPasswordType() === 'password' ? 'text' : 'password');
+  toggleUserPasswordVisibility() {
+    this.userPasswordType.set(this.userPasswordType() === 'password' ? 'text' : 'password');
   }
 
   generatePassword() {
@@ -155,32 +179,33 @@ export class UsersPage implements OnInit {
     for (let i = 0; i < 12; i++) {
       pwd += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    this.addAgentForm.password = pwd;
-    this.agentPasswordType.set('text');
+    this.addUserForm.password = pwd;
+    this.userPasswordType.set('text');
   }
 
-  addAgent() {
-    const f = this.addAgentForm;
+  addUser() {
+    const f = this.addUserForm;
     if (!f.name.trim() || !f.email.trim() || !f.password.trim()) return;
-    this.addingAgent.set(true);
+    this.addingUser.set(true);
     this.userService.addUserToOrg({
       name: f.name,
       email: f.email,
       password: f.password,
       phoneNumber: f.phoneNumber,
       address: f.address,
-      role: 'AGENT',
+      nationalId: f.nationalId || undefined,
+      role: f.role,
       status: 'ACTIVE',
     }).subscribe({
       next: () => {
-        this.toast.success('Agent added successfully!');
-        this.closeAddAgentModal();
-        this.addingAgent.set(false);
+        this.toast.success('User added successfully!');
+        this.closeAddUserModal();
+        this.addingUser.set(false);
         this.load();
       },
       error: () => {
-        this.toast.error('Failed to add agent.');
-        this.addingAgent.set(false);
+        this.toast.error('Failed to add user.');
+        this.addingUser.set(false);
       },
     });
   }
@@ -223,18 +248,33 @@ export class UsersPage implements OnInit {
     });
   }
 
-  private emptyAgentForm(): AddAgentForm {
-    return { name: '', email: '', password: '', phoneNumber: '', address: '' };
+  contractLabel(userId: string): string {
+    const status = this.contractStatusMap().get(userId);
+    if (!status) return 'No Contract';
+    return status === 'ACTIVE' ? 'Active' : 'Suspended';
+  }
+
+  contractBadgeClass(userId: string): string {
+    const status = this.contractStatusMap().get(userId);
+    if (!status) return 'bg-gray-100 text-gray-400';
+    return status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
+  }
+
+  private emptyUserForm(): AddUserForm {
+    return { name: '', email: '', password: '', phoneNumber: '', address: '', nationalId: '', role: 'AGENT' };
   }
 
   roleClass(role: UserRole): string {
     const map: Record<string, string> = {
-      SYSTEM_ADMIN: 'bg-red-100 text-red-700',
-      ORG_ADMIN:    'bg-indigo-100 text-indigo-700',
-      AGENT:        'bg-blue-100 text-blue-700',
-      ADMIN:        'bg-purple-100 text-purple-700',
-      CUSTOMER:     'bg-teal-100 text-teal-700',
-      RIDER:        'bg-amber-100 text-amber-700',
+      SYSTEM_ADMIN:      'bg-red-100 text-red-700',
+      ORG_ADMIN:         'bg-indigo-100 text-indigo-700',
+      AGENT:             'bg-blue-100 text-blue-700',
+      ADMIN:             'bg-purple-100 text-purple-700',
+      HR:                'bg-pink-100 text-pink-700',
+      IT:                'bg-cyan-100 text-cyan-700',
+      OPERATIONS:        'bg-orange-100 text-orange-700',
+      MANAGER:           'bg-violet-100 text-violet-700',
+      CALL_CENTER_AGENT: 'bg-teal-100 text-teal-700',
     };
     return map[role] ?? 'bg-gray-100 text-gray-600';
   }

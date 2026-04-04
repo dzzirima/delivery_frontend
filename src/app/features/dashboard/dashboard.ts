@@ -5,6 +5,7 @@ import { DashboardService } from './services/dashboard.service';
 import { DashboardSummary, DashboardAnalytics } from './models/dashboard.model';
 import { UserService } from '../users/services/user.service';
 import { User } from '../users/models/user.model';
+import { GigService, GigStats } from '../gigs/services/gig.service';
 
 const STATUS_COLORS: Record<string, string> = {
   APPLIED:    'bg-blue-100 text-blue-800',
@@ -24,12 +25,15 @@ const STATUS_COLORS: Record<string, string> = {
 export class DashboardPage implements OnInit {
   private svc         = inject(DashboardService);
   private userService = inject(UserService);
+  private gigService  = inject(GigService);
 
   summary      = signal<DashboardSummary | null>(null);
   analytics    = signal<DashboardAnalytics | null>(null);
+  gigStats     = signal<GigStats | null>(null);
   agents       = signal<User[]>([]);
   loadingSummary   = signal(true);
   loadingAnalytics = signal(true);
+  loadingGigStats  = signal(true);
 
   startDate = signal(this.firstOfMonth());
   endDate   = signal(this.today());
@@ -38,6 +42,7 @@ export class DashboardPage implements OnInit {
   ngOnInit() {
     this.fetchSummary();
     this.fetchAnalytics();
+    this.fetchGigStats();
     this.loadAgents();
   }
 
@@ -53,6 +58,14 @@ export class DashboardPage implements OnInit {
     this.svc.getSummary().subscribe({
       next: r => { this.summary.set(r.data); this.loadingSummary.set(false); },
       error: () => this.loadingSummary.set(false),
+    });
+  }
+
+  fetchGigStats() {
+    this.loadingGigStats.set(true);
+    this.gigService.getStats().subscribe({
+      next: r => { this.gigStats.set(r.data); this.loadingGigStats.set(false); },
+      error: () => this.loadingGigStats.set(false),
     });
   }
 

@@ -1,13 +1,15 @@
 export const USER_ROLES = [
   'AGENT',
+  'HR',
+  'IT',
+  'OPERATIONS',
+  'MANAGER',
+  'CALL_CENTER_AGENT',
   'ORG_ADMIN',
   'SYSTEM_ADMIN',
-  'ADMIN',
-  'CUSTOMER',
-  'RIDER',
 ] as const;
 
-export type UserRole = (typeof USER_ROLES)[number];
+export type UserRole = (typeof USER_ROLES)[number] | 'ADMIN';
 
 export const USER_STATUSES = ['ACTIVE', 'INACTIVE', 'SUSPENDED'] as const;
 export type UserStatus = (typeof USER_STATUSES)[number];
@@ -18,6 +20,7 @@ export interface User {
   name: string;
   phoneNumber: string;
   address: string;
+  nationalId?: string;
   status: UserStatus;
   notes?: string;
   role: UserRole;
@@ -32,6 +35,7 @@ export interface UserCreatePayload {
   password: string;
   phoneNumber: string;
   address: string;
+  nationalId?: string;
   role: UserRole;
   status: UserStatus;
 }

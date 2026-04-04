@@ -29,14 +29,50 @@
         <span>Dashboard</span>
       </a>
 
-      <a routerLink="/app/applications" routerLinkActive="!bg-indigo-600 !text-white"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-150 text-sm font-medium">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <span>Applications</span>
-      </a>
+      <!-- Applications (collapsible) -->
+      <div>
+        <button (click)="toggleApps()"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-sm font-medium"
+          [class]="isAppsParentActive()
+            ? 'bg-slate-800 text-white'
+            : 'text-slate-400 hover:bg-slate-800 hover:text-white'">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <span class="flex-1 text-left">Applications</span>
+          <svg class="w-4 h-4 shrink-0 transition-transform duration-300"
+            [class]="appsOpen() ? 'rotate-180' : ''"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <!-- Sub-menu: slide + fade -->
+        <div class="overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out"
+          [style.max-height]="appsOpen() ? '480px' : '0px'"
+          [style.opacity]="appsOpen() ? '1' : '0'">
+          <div class="ml-4 mt-1 pl-3 border-l border-slate-700 space-y-0.5 pb-1">
+            @for (s of appStatuses; track s.status) {
+              <a [routerLink]="['/app/applications']" [queryParams]="{ status: s.status }"
+                class="flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all duration-150"
+                [class]="isActiveStatus(s.status)
+                  ? 'bg-indigo-600 text-white font-semibold'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-white font-medium'">
+                <span>{{ s.label }}</span>
+                @if (statCount(s.key) > 0) {
+                  <span class="ml-2 min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full text-xs font-bold"
+                    [class]="isActiveStatus(s.status)
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-700 text-slate-300'">
+                    {{ statCount(s.key) }}
+                  </span>
+                }
+              </a>
+            }
+          </div>
+        </div>
+      </div>
 
       <a routerLink="/app/calendar" routerLinkActive="!bg-indigo-600 !text-white"
         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-150 text-sm font-medium">
@@ -53,7 +89,26 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
         </svg>
-        <span>Portfolio</span>
+        <!-- "Profiles" — nav label renamed from "Portfolio"; route and internals stay as portfolio -->
+        <span>Profiles</span>
+      </a>
+
+      <a routerLink="/app/gigs" routerLinkActive="!bg-indigo-600 !text-white"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-150 text-sm font-medium">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        <span>Gigs</span>
+      </a>
+
+      <a routerLink="/app/payroll" routerLinkActive="!bg-indigo-600 !text-white"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-150 text-sm font-medium">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Payroll</span>
       </a>
 
       <!-- Divider -->

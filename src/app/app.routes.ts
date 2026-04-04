@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
 import { applicationDetailResolver } from './features/applications/application-detail/application-detail.resolver';
+import { gigDashboardResolver } from './features/gigs/gig-dashboard/gig-dashboard.resolver';
 
 export const routes: Routes = [
   // Landing
@@ -66,8 +67,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/portfolio/portfolio').then(m => m.PortfolioPage),
       },
       {
+        path: 'portfolio/:id',
+        loadComponent: () => import('./features/portfolio/portfolio-detail/portfolio-detail').then(m => m.PortfolioDetail),
+      },
+      {
         path: 'users',
         loadComponent: () => import('./features/users/users').then(m => m.UsersPage),
+      },
+      {
+        path: 'users/:id',
+        loadComponent: () => import('./features/users/user-detail/user-detail').then(m => m.UserDetail),
       },
       {
         path: 'organizations',
@@ -80,6 +89,23 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./features/settings/settings').then(m => m.Settings),
+      },
+      {
+        path: 'gigs',
+        loadComponent: () => import('./features/gigs/gigs-list/gigs-list').then(m => m.GigsList),
+      },
+      {
+        path: 'payroll',
+        loadComponent: () => import('./features/payslips/payroll/payroll').then(m => m.Payroll),
+      },
+      {
+        path: 'gigs/create',
+        loadComponent: () => import('./features/gigs/gig-create/gig-create').then(m => m.GigCreate),
+      },
+      {
+        path: 'gigs/:id',
+        resolve: { gig: gigDashboardResolver },
+        loadComponent: () => import('./features/gigs/gig-dashboard/gig-dashboard').then(m => m.GigDashboard),
       },
     ],
   },

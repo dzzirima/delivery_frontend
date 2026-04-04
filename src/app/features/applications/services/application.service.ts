@@ -8,6 +8,21 @@ import {
   DuplicateCheckResult,
 } from '../models/application.model';
 
+export interface ApplicationStats {
+  total: number;
+  applied: number;
+  pending: number;
+  interview: number;
+  assessment: number;
+  rejected: number;
+  offer: number;
+  onHold: number;
+}
+
+export interface ApplicationStatsResponse {
+  data: ApplicationStats;
+}
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
@@ -34,6 +49,9 @@ export interface DuplicateCheckResponse {
 
 export interface ApplicationListParams {
   status?: string;
+  agentId?: string;
+  fromDate?: string;
+  toDate?: string;
   search?: string;
   page?: number;
   size?: number;
@@ -47,11 +65,22 @@ export class ApplicationService {
 
   getAll(params?: ApplicationListParams) {
     const httpParams: Record<string, string | number> = {};
-    if (params?.status) httpParams['status'] = params.status;
-    if (params?.search) httpParams['search'] = params.search;
+    if (params?.status)   httpParams['status']   = params.status;
+    if (params?.agentId)  httpParams['agentId']  = params.agentId;
+    if (params?.fromDate) httpParams['fromDate']  = params.fromDate;
+    if (params?.toDate)   httpParams['toDate']    = params.toDate;
+    if (params?.search)   httpParams['search']   = params.search;
     if (params?.page !== undefined) httpParams['page'] = params.page;
     if (params?.size !== undefined) httpParams['size'] = params.size;
     return this.http.get<ApplicationListResponse>(this.base, { params: httpParams });
+  }
+
+  getStats(params?: { agentId?: string; fromDate?: string; toDate?: string }) {
+    const httpParams: Record<string, string> = {};
+    if (params?.agentId)  httpParams['agentId']  = params.agentId;
+    if (params?.fromDate) httpParams['fromDate']  = params.fromDate;
+    if (params?.toDate)   httpParams['toDate']    = params.toDate;
+    return this.http.get<ApplicationStatsResponse>(`${this.base}/stats`, { params: httpParams });
   }
 
   getById(id: string) {
