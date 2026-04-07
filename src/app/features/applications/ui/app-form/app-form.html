@@ -133,8 +133,8 @@
                     [class.font-semibold]="portfolioId() === p.id"
                     [class.text-gray-800]="portfolioId() !== p.id">
                     <span>{{ p.firstName }} {{ p.lastName }}</span>
-                    @if (p.country) {
-                      <span class="text-xs text-gray-400 ml-2">{{ p.country }}</span>
+                    @if (p.state) {
+                      <span class="text-xs text-gray-400 ml-2">{{ p.state }}</span>
                     }
                   </button>
                 </li>

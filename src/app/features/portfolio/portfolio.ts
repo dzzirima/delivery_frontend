@@ -61,7 +61,9 @@ export class PortfolioPage implements OnInit {
     this.form = {
       firstName: p.firstName,
       lastName: p.lastName,
-      country: p.country ?? '',
+      state: p.state ?? '',
+      phoneNumber: p.phoneNumber ?? '',
+      address: p.address ?? '',
       agreedPercent: p.agreedPercent,
       notes: p.notes ?? '',
       status: p.status,
@@ -118,6 +120,6 @@ export class PortfolioPage implements OnInit {
   }
 
   private emptyForm(): PortfolioPayload {
-    return { firstName: '', lastName: '', country: '', agreedPercent: undefined, notes: '', status: 'ACTIVE' };
+    return { firstName: '', lastName: '', state: '', phoneNumber: '', address: '', agreedPercent: undefined, notes: '', status: 'ACTIVE' };
   }
 }

@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { OnboardingInformation, OnboardingInformationPayload } from '../models/onboarding-information.model';
+import {
+  OnboardingInformation,
+  OnboardingInformationPayload,
+  OnboardingLinkPayload,
+} from '../models/onboarding-information.model';
 
 export interface OnboardingInformationListResponse {
   data: OnboardingInformation[];
@@ -37,5 +41,22 @@ export class OnboardingInformationService {
 
   delete(id: string) {
     return this.http.delete<void>(`${this.base}/${id}`);
+  }
+
+  addLink(onboardingId: string, payload: OnboardingLinkPayload) {
+    return this.http.post<OnboardingInformationResponse>(`${this.base}/${onboardingId}/links`, payload);
+  }
+
+  updateLink(onboardingId: string, linkId: string, payload: Partial<OnboardingLinkPayload>) {
+    return this.http.put<OnboardingInformationResponse>(
+      `${this.base}/${onboardingId}/links/${linkId}`,
+      payload,
+    );
+  }
+
+  removeLink(onboardingId: string, linkId: string) {
+    return this.http.delete<OnboardingInformationResponse>(
+      `${this.base}/${onboardingId}/links/${linkId}`,
+    );
   }
 }

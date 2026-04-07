@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output, EventEmitter, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Application } from '../../models/application.model';
-import { Interview, InterviewPayload, INTERVIEW_STATUSES, InterviewStatus } from '../../../interviews/models/interview.model';
+import { Interview, InterviewPayload, INTERVIEW_STATUSES, InterviewStatus, INTERVIEW_TYPES, INTERVIEW_STAGES } from '../../../interviews/models/interview.model';
 import { InterviewService } from '../../../interviews/services/interview.service';
 import { ToastService } from '../../../../core/toast.service';
 
@@ -15,6 +15,8 @@ export class InterviewsPanel implements OnInit {
   @Output() closed = new EventEmitter<void>();
 
   readonly interviewStatuses = INTERVIEW_STATUSES;
+  readonly interviewTypes = INTERVIEW_TYPES;
+  readonly interviewStages = INTERVIEW_STAGES;
 
   interviews = signal<Interview[]>([]);
   loading = signal(true);
@@ -61,6 +63,8 @@ export class InterviewsPanel implements OnInit {
       documentsRequired: interview.documentsRequired ?? '',
       locationOrLink: interview.locationOrLink ?? '',
       notes: interview.notes ?? '',
+      interviewType: interview.interviewType,
+      interviewStage: interview.interviewStage,
       status: interview.status,
     };
     this.showForm.set(true);
@@ -139,6 +143,8 @@ export class InterviewsPanel implements OnInit {
       documentsRequired: '',
       locationOrLink: '',
       notes: '',
+      interviewType: undefined,
+      interviewStage: undefined,
       status: 'SCHEDULED',
     };
   }

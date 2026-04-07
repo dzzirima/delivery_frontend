@@ -5,6 +5,7 @@ export const USER_ROLES = [
   'OPERATIONS',
   'MANAGER',
   'CALL_CENTER_AGENT',
+  'STAFF',
   'ORG_ADMIN',
   'SYSTEM_ADMIN',
 ] as const;
@@ -27,6 +28,8 @@ export interface User {
   balance: number;
   orgId?: string;
   organisationName?: string;
+  department?: string;
+  dateOfBirth?: string;
 }
 
 export interface UserCreatePayload {
@@ -36,6 +39,7 @@ export interface UserCreatePayload {
   phoneNumber: string;
   address: string;
   nationalId?: string;
+  dateOfBirth?: string;
   role: UserRole;
   status: UserStatus;
 }

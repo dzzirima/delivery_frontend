@@ -7,7 +7,7 @@ import { ToastService } from '../../core/toast.service';
 import { AuthService } from '../../core/auth.service';
 import { User, USER_ROLES, USER_STATUSES, UserRole, UserStatus } from './models/user.model';
 import { ContractService } from '../contracts/services/contract.service';
-import { ContractStatus } from '../contracts/models/contract.model';
+import { ContractStatus, DEPARTMENTS } from '../contracts/models/contract.model';
 
 interface AddUserForm {
   name: string;
@@ -16,6 +16,7 @@ interface AddUserForm {
   phoneNumber: string;
   address: string;
   nationalId: string;
+  dateOfBirth: string;
   role: UserRole;
 }
 
@@ -194,6 +195,7 @@ export class UsersPage implements OnInit {
       phoneNumber: f.phoneNumber,
       address: f.address,
       nationalId: f.nationalId || undefined,
+      dateOfBirth: f.dateOfBirth || undefined,
       role: f.role,
       status: 'ACTIVE',
     }).subscribe({
@@ -260,8 +262,13 @@ export class UsersPage implements OnInit {
     return status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
   }
 
+  departmentLabel(value?: string): string {
+    if (!value) return '—';
+    return DEPARTMENTS.find(d => d.value === value)?.label ?? value;
+  }
+
   private emptyUserForm(): AddUserForm {
-    return { name: '', email: '', password: '', phoneNumber: '', address: '', nationalId: '', role: 'AGENT' };
+    return { name: '', email: '', password: '', phoneNumber: '', address: '', nationalId: '', dateOfBirth: '', role: 'AGENT' };
   }
 
   roleClass(role: UserRole): string {

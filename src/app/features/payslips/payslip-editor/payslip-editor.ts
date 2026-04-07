@@ -158,6 +158,13 @@ export class PayslipEditor implements OnInit {
           </tr>`).join('')
       : `<tr><td colspan="2" style="padding:6px 12px;color:#9ca3af;font-style:italic;">No adjustments</td></tr>`;
 
+    const orgName = p.organisationName ?? 'Organisation';
+    const deptLabel = p.department
+      ? p.department.split('_').map((w: string) => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')
+      : '';
+    const generatedOn = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    const generatedAt = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -165,79 +172,144 @@ export class PayslipEditor implements OnInit {
   <title>Payslip — ${p.userName} — ${period}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #111827; background: #fff; padding: 40px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #4f46e5; padding-bottom: 16px; margin-bottom: 24px; }
-    .brand { font-size: 22px; font-weight: 800; color: #4f46e5; }
-    .brand-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
-    .badge { background: #dc2626; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; }
-    .employee { margin-bottom: 20px; }
-    .employee-name { font-size: 20px; font-weight: 700; color: #111827; }
-    .employee-period { font-size: 13px; color: #6b7280; margin-top: 2px; }
-    .section-title { font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 8px; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #111827; background: #fff; padding: 40px 48px; max-width: 800px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; margin-bottom: 24px; border-bottom: 3px solid #1e3a5f; }
+    .org-name { font-size: 24px; font-weight: 800; color: #1e3a5f; letter-spacing: -0.5px; }
+    .org-sub { font-size: 11px; color: #6b7280; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .header-right { text-align: right; }
+    .doc-title { font-size: 18px; font-weight: 700; color: #1e3a5f; }
+    .period-badge { display: inline-block; margin-top: 4px; background: #1e3a5f; color: #fff; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 4px; letter-spacing: 0.05em; }
+
+    /* ── Employee info ── */
+    .employee-card { display: flex; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; }
+    .emp-left { flex: 1; }
+    .emp-name { font-size: 18px; font-weight: 700; color: #111827; }
+    .emp-role { font-size: 12px; color: #4f46e5; font-weight: 600; margin-top: 3px; }
+    .emp-detail { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .emp-right { text-align: right; }
+    .emp-right .label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.06em; }
+    .emp-right .value { font-size: 12px; color: #374151; font-weight: 600; margin-top: 1px; }
+
+    /* ── Section ── */
+    .section-title { font-size: 10px; font-weight: 700; color: #1e3a5f; text-transform: uppercase; letter-spacing: 0.1em; margin: 20px 0 6px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
     table { width: 100%; border-collapse: collapse; }
+    td { padding: 5px 10px; font-size: 12.5px; }
     tr:nth-child(even) td { background: #f9fafb; }
-    td { padding: 6px 12px; }
     td:last-child { text-align: right; font-weight: 600; color: #1f2937; }
-    .divider { border: none; border-top: 1px solid #e5e7eb; margin: 16px 0; }
-    .total-row td { padding: 8px 12px; font-weight: 700; font-size: 14px; border-top: 2px solid #e5e7eb; }
-    .net-box { background: #f0f4ff; border: 2px solid #4f46e5; border-radius: 8px; padding: 16px 20px; margin-top: 24px; display: flex; justify-content: space-between; align-items: center; }
-    .net-label { font-size: 13px; font-weight: 600; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.05em; }
-    .net-amount { font-size: 26px; font-weight: 800; color: #111827; }
-    .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; color: #9ca3af; font-size: 11px; }
+    .total-row td { padding: 8px 10px; font-weight: 700; font-size: 13px; background: #f1f5f9 !important; border-top: 1.5px solid #cbd5e1; color: #1e3a5f; }
+
+    /* ── Net box ── */
+    .net-box { display: flex; justify-content: space-between; align-items: center; background: #1e3a5f; border-radius: 8px; padding: 18px 24px; margin-top: 24px; }
+    .net-label { font-size: 12px; font-weight: 600; color: #93c5fd; text-transform: uppercase; letter-spacing: 0.08em; }
+    .net-period { font-size: 11px; color: #93c5fd; margin-top: 2px; }
+    .net-amount { font-size: 28px; font-weight: 800; color: #fff; }
+
+    /* ── Disclaimer ── */
+    .disclaimer { margin-top: 28px; padding: 10px 14px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 6px; display: flex; align-items: flex-start; gap: 8px; }
+    .disclaimer-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .disclaimer-text { font-size: 11px; color: #92400e; line-height: 1.5; }
+    .disclaimer-text strong { font-weight: 700; }
+
+    /* ── Footer ── */
+    .footer { margin-top: 24px; padding-top: 14px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; color: #9ca3af; font-size: 10.5px; }
+
     @media print {
-      body { padding: 20px; }
-      @page { margin: 1cm; }
+      body { padding: 16px 24px; }
+      @page { margin: 1cm; size: A4; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Header -->
   <div class="header">
     <div>
-      <div class="brand">GigMaster</div>
-      <div class="brand-sub">Payroll Management</div>
+      <div class="org-name">${orgName}</div>
+      <div class="org-sub">Payroll Department</div>
     </div>
-    <span class="badge">LOCKED</span>
+    <div class="header-right">
+      <div class="doc-title">PAYSLIP</div>
+      <span class="period-badge">${period}</span>
+    </div>
   </div>
 
-  <div class="employee">
-    <div class="employee-name">${p.userName}</div>
-    <div class="employee-period">${period}</div>
+  <!-- Employee card -->
+  <div class="employee-card">
+    <div class="emp-left">
+      <div class="emp-name">${p.userName}</div>
+      ${p.jobTitle ? `<div class="emp-role">${p.jobTitle}${deptLabel ? ' &nbsp;·&nbsp; ' + deptLabel : ''}</div>` : (deptLabel ? `<div class="emp-role">${deptLabel}</div>` : '')}
+      ${p.userPhone ? `<div class="emp-detail">📞 ${p.userPhone}</div>` : ''}
+      ${p.userAddress ? `<div class="emp-detail">📍 ${p.userAddress}</div>` : ''}
+    </div>
+    <div class="emp-right">
+      <div class="label">Pay Period</div>
+      <div class="value">${period}</div>
+      <div class="label" style="margin-top:10px;">Working Days</div>
+      <div class="value">${wd} / 22</div>
+      <div class="label" style="margin-top:10px;">Pay Status</div>
+      <div class="value" style="color:#16a34a;">LOCKED</div>
+    </div>
   </div>
 
-  <div class="section-title">Salary Components</div>
+  <!-- Salary Components -->
+  <div class="section-title">Earnings</div>
   <table>
     <tr>
-      <td style="color:#6b7280;">Basic Salary${wd < 22 ? ` <span style="color:#d97706;font-size:11px;">(${wd}/22 days)</span>` : ''}</td>
-      <td>${fmt(prorated)}${wd < 22 ? `<div style="font-size:11px;color:#9ca3af;text-align:right;">of ${fmt(p.basicSalary)}</div>` : ''}</td>
+      <td style="color:#6b7280;">Basic Salary${wd < 22 ? ` <span style="color:#d97706;font-size:11px;">(${wd}/22 days prorated)</span>` : ''}</td>
+      <td>${fmt(prorated)}${wd < 22 ? `<div style="font-size:11px;color:#9ca3af;text-align:right;">contract: ${fmt(p.basicSalary)}</div>` : ''}</td>
     </tr>
-    <tr><td style="color:#6b7280;">Housing Allowance</td><td>${fmt(p.housingAllowance)}</td></tr>
-    <tr><td style="color:#6b7280;">Transport Allowance</td><td>${fmt(p.transportAllowance)}</td></tr>
-    <tr><td style="color:#6b7280;">Cellphone Allowance</td><td>${fmt(p.cellphoneAllowance)}</td></tr>
-    <tr><td style="color:#6b7280;">Medical Allowance</td><td>${fmt(p.medicalAllowance)}</td></tr>
-    <tr><td style="color:#6b7280;">Other Allowances</td><td>${fmt(p.otherAllowances)}</td></tr>
-    <tr class="total-row"><td>Fixed Total</td><td>${fmt(fixedSum)}</td></tr>
+    ${p.housingAllowance > 0 ? `<tr><td style="color:#6b7280;">Housing Allowance</td><td>${fmt(p.housingAllowance)}</td></tr>` : ''}
+    ${p.transportAllowance > 0 ? `<tr><td style="color:#6b7280;">Transport Allowance</td><td>${fmt(p.transportAllowance)}</td></tr>` : ''}
+    ${p.cellphoneAllowance > 0 ? `<tr><td style="color:#6b7280;">Cellphone Allowance</td><td>${fmt(p.cellphoneAllowance)}</td></tr>` : ''}
+    ${p.medicalAllowance > 0 ? `<tr><td style="color:#6b7280;">Medical Allowance</td><td>${fmt(p.medicalAllowance)}</td></tr>` : ''}
+    ${p.otherAllowances > 0 ? `<tr><td style="color:#6b7280;">Other Allowances</td><td>${fmt(p.otherAllowances)}</td></tr>` : ''}
+    <tr class="total-row"><td>Total Earnings</td><td>${fmt(fixedSum)}</td></tr>
   </table>
 
+  <!-- Overtime -->
+  ${overtimeAmt > 0 ? `
   <div class="section-title">Overtime</div>
   <table>
-    <tr><td style="color:#6b7280;">Normal OT (${p.normalOvertimeHours} hrs × ${p.normalOvertimeRate}x)</td><td>${fmt(p.normalOvertimeHours * (p.basicSalary / 160) * p.normalOvertimeRate)}</td></tr>
-    <tr><td style="color:#6b7280;">Holiday OT (${p.holidayOvertimeHours} hrs × ${p.holidayOvertimeRate}x)</td><td>${fmt(p.holidayOvertimeHours * (p.basicSalary / 160) * p.holidayOvertimeRate)}</td></tr>
-    <tr class="total-row"><td>Overtime Total</td><td>${fmt(overtimeAmt)}</td></tr>
-  </table>
+    ${p.normalOvertimeHours > 0 ? `<tr><td style="color:#6b7280;">Normal OT &nbsp;(${p.normalOvertimeHours} hrs × ${p.normalOvertimeRate}×)</td><td>${fmt(p.normalOvertimeHours * (p.basicSalary / 160) * p.normalOvertimeRate)}</td></tr>` : ''}
+    ${p.holidayOvertimeHours > 0 ? `<tr><td style="color:#6b7280;">Holiday OT &nbsp;(${p.holidayOvertimeHours} hrs × ${p.holidayOvertimeRate}×)</td><td>${fmt(p.holidayOvertimeHours * (p.basicSalary / 160) * p.holidayOvertimeRate)}</td></tr>` : ''}
+    <tr class="total-row"><td>Total Overtime</td><td>${fmt(overtimeAmt)}</td></tr>
+  </table>` : ''}
 
+  <!-- Adjustments -->
+  ${items.length ? `
   <div class="section-title">Adjustments</div>
-  <table>${miscRows}
-    ${items.length ? `<tr class="total-row"><td>Adjustments Total</td><td style="color:${miscSum < 0 ? '#dc2626' : '#16a34a'}">${miscSum < 0 ? '− ' : '+ '}${fmt(Math.abs(miscSum))}</td></tr>` : ''}
-  </table>
+  <table>
+    ${miscRows}
+    <tr class="total-row">
+      <td>Net Adjustments</td>
+      <td style="color:${miscSum < 0 ? '#dc2626' : '#16a34a'}">${miscSum < 0 ? '− ' : '+ '}${fmt(Math.abs(miscSum))}</td>
+    </tr>
+  </table>` : ''}
 
+  <!-- Net Salary -->
   <div class="net-box">
-    <span class="net-label">Net Salary</span>
-    <span class="net-amount">${fmt(netSalary)}</span>
+    <div>
+      <div class="net-label">Net Salary</div>
+      <div class="net-period">${period}</div>
+    </div>
+    <div class="net-amount">${fmt(netSalary)}</div>
   </div>
 
+  <!-- System-generated disclaimer -->
+  <div class="disclaimer">
+    <span class="disclaimer-icon">⚠</span>
+    <div class="disclaimer-text">
+      <strong>System-Generated Document.</strong> This payslip was automatically generated by the payroll management system on ${generatedOn} at ${generatedAt}.
+      It does not require a physical signature and is valid as an official payroll record. Do not alter this document.
+    </div>
+  </div>
+
+  <!-- Footer -->
   <div class="footer">
-    <span>Generated by GigMaster &mdash; ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-    <span>Status: LOCKED &mdash; This is a system-generated payslip</span>
+    <span>${orgName} &mdash; Payroll Management System</span>
+    <span>Generated: ${generatedOn} ${generatedAt} &nbsp;|&nbsp; Ref: ${p.id.substring(0, 8).toUpperCase()}</span>
   </div>
 
   <script>window.onload = () => { window.print(); }<\/script>

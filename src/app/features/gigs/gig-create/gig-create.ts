@@ -22,6 +22,10 @@ export class GigCreate implements OnInit {
 
   form: Omit<GigPayload, 'applicationId'> = {
     startingDate: '',
+    endDate: null,
+    orientationDateTime: null,
+    orientationNotes: null,
+    startDateLink: null,
     payRate: 0,
     maximumHoursPerDay: null,
     equipmentType: 'COMPANY_OFFER',
@@ -50,7 +54,11 @@ export class GigCreate implements OnInit {
     this.saving.set(true);
     this.error.set('');
 
-    const payload: GigPayload = { applicationId: this.applicationId, ...this.form };
+    const payload: GigPayload = {
+      applicationId: this.applicationId,
+      ...this.form,
+      orientationDateTime: this.form.orientationDateTime ? this.toISODateTime(this.form.orientationDateTime) : null,
+    };
 
     this.gigService.create(payload).subscribe({
       next: res => {
@@ -70,5 +78,10 @@ export class GigCreate implements OnInit {
 
   equipmentLabel(type: EquipmentType): string {
     return type === 'COMPANY_OFFER' ? 'Company Offer' : 'Own Equipment';
+  }
+
+  private toISODateTime(dt: string): string {
+    const normalised = dt.replace(' ', 'T');
+    return normalised.length === 16 ? normalised + ':00' : normalised;
   }
 }

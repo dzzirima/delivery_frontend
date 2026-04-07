@@ -34,7 +34,7 @@
           </div>
           <div>
             <h1 class="text-xl font-bold text-slate-900">{{ portfolio()!.firstName }} {{ portfolio()!.lastName }}</h1>
-            <p class="text-sm text-slate-500 mt-0.5">{{ portfolio()!.country || 'No country set' }}</p>
+            <p class="text-sm text-slate-500 mt-0.5">{{ portfolio()!.state || 'No state set' }}</p>
           </div>
         </div>
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ statusClass(portfolio()!.status) }}">
@@ -44,6 +44,18 @@
 
       <!-- Details grid -->
       <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-5 border-t border-slate-100">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">State</p>
+          <p class="text-sm font-semibold text-slate-800">{{ portfolio()!.state || '—' }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Phone</p>
+          <p class="text-sm font-semibold text-slate-800">{{ portfolio()!.phoneNumber || '—' }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Address</p>
+          <p class="text-sm font-semibold text-slate-800">{{ portfolio()!.address || '—' }}</p>
+        </div>
         <div>
           <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Agreed %</p>
           <p class="text-sm font-semibold text-slate-800">

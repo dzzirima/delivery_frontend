@@ -72,6 +72,12 @@ export class GigDashboard implements OnInit {
     const g = this.gig()!;
     this.editForm = {
       startingDate: g.startingDate,
+      endDate: g.endDate ?? undefined,
+      orientationDateTime: g.orientationDateTime
+        ? g.orientationDateTime.replace(' ', 'T').substring(0, 16)
+        : undefined,
+      orientationNotes: g.orientationNotes ?? undefined,
+      startDateLink: g.startDateLink ?? undefined,
       payRate: g.payRate,
       maximumHoursPerDay: g.maximumHoursPerDay ?? undefined,
       equipmentType: g.equipmentType,
@@ -90,15 +96,21 @@ export class GigDashboard implements OnInit {
   saveDetails() {
     this.savingDetails.set(true);
     this.error.set('');
-    this.gigService.patch(this.gig()!.id, this.editForm).subscribe({
+    const patch: GigPatch = {
+      ...this.editForm,
+      orientationDateTime: this.editForm.orientationDateTime
+        ? this.toISODateTime(this.editForm.orientationDateTime)
+        : this.editForm.orientationDateTime,
+    };
+    this.gigService.patch(this.gig()!.id, patch).subscribe({
       next: res => {
         this.gig.set(res.data);
         this.editMode.set(false);
         this.savingDetails.set(false);
         this.toast.success('Gig details updated!');
       },
-      error: () => {
-        this.error.set('Failed to update details.');
+      error: (err) => {
+        this.error.set(err?.error?.message ?? 'Failed to update details.');
         this.savingDetails.set(false);
       },
     });
@@ -213,5 +225,10 @@ export class GigDashboard implements OnInit {
 
   equipmentLabel(type: EquipmentType): string {
     return type === 'COMPANY_OFFER' ? 'Company Offer' : 'Own Equipment';
+  }
+
+  private toISODateTime(dt: string): string {
+    const normalised = dt.replace(' ', 'T');
+    return normalised.length === 16 ? normalised + ':00' : normalised;
   }
 }

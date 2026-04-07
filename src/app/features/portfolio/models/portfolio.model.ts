@@ -5,12 +5,15 @@ export interface Portfolio {
   id: string;
   firstName: string;
   lastName: string;
-  country?: string;
+  state?: string;
+  phoneNumber?: string;
+  address?: string;
   agreedPercent?: number;
   notes?: string;
   status: PortfolioStatus;
   orgId: string;
   orgName?: string;
+  totalLiveGigs: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,7 +21,9 @@ export interface Portfolio {
 export interface PortfolioPayload {
   firstName: string;
   lastName: string;
-  country?: string;
+  state?: string;
+  phoneNumber?: string;
+  address?: string;
   agreedPercent?: number;
   notes?: string;
   status: PortfolioStatus;

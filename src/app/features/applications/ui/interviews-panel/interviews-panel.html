@@ -47,6 +47,30 @@
             </div>
           </div>
 
+          <!-- Interview Type + Stage -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Interview Type</label>
+              <select [(ngModel)]="form.interviewType" name="interviewType"
+                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option [value]="undefined">— Select —</option>
+                @for (t of interviewTypes; track t) {
+                  <option [value]="t">{{ t }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Interview Stage</label>
+              <select [(ngModel)]="form.interviewStage" name="interviewStage"
+                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option [value]="undefined">— Select —</option>
+                @for (s of interviewStages; track s) {
+                  <option [value]="s">{{ s }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
           <!-- Interviewer Name + Phone -->
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -120,6 +144,12 @@
                   <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ interviewStatusClass(iv.status) }}">
                     {{ iv.status }}
                   </span>
+                  @if (iv.interviewType) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">{{ iv.interviewType }}</span>
+                  }
+                  @if (iv.interviewStage) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">{{ iv.interviewStage }}</span>
+                  }
                 </div>
                 @if (iv.interviewerName) {
                   <p class="text-xs text-gray-600 mb-0.5">Interviewer: <span class="font-medium text-gray-800">{{ iv.interviewerName }}</span>

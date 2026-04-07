@@ -10,6 +10,11 @@ export interface Payslip {
   id: string;
   userId: string;
   userName: string;
+  userPhone?: string;
+  userAddress?: string;
+  jobTitle?: string;
+  department?: string;
+  organisationName?: string;
   month: number;
   year: number;
   status: PayslipStatus;

@@ -107,6 +107,40 @@
             class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"></textarea>
         </div>
 
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+            End Date
+          </label>
+          <input [(ngModel)]="form.endDate" name="endDate" type="date"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+            Orientation Date & Time
+          </label>
+          <input [(ngModel)]="form.orientationDateTime" name="orientationDateTime" type="datetime-local"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+            Start Date Link
+          </label>
+          <input [(ngModel)]="form.startDateLink" name="startDateLink" type="url"
+            placeholder="Optional — link to start date info"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+            Orientation Notes
+          </label>
+          <textarea [(ngModel)]="form.orientationNotes" name="orientationNotes" rows="2"
+            placeholder="Optional — notes about the orientation session"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"></textarea>
+        </div>
+
       </div>
 
       <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">

@@ -133,6 +133,10 @@ export class Calendar implements OnInit {
     return new Date(dt).toLocaleDateString('en-GB', { day: '2-digit' });
   }
 
+  formatEnum(val?: string): string {
+    return val ? val.split('_').join(' ') : 'N/A';
+  }
+
   statusClass(status: InterviewStatus): string {
     const map: Record<InterviewStatus, string> = {
       SCHEDULED:   'bg-blue-50 text-blue-700 border border-blue-200',

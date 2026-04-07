@@ -24,6 +24,10 @@ export interface Gig {
   portfolioId: string | null;
   portfolioName: string | null;
   startingDate: string;
+  endDate: string | null;
+  orientationDateTime: string | null;
+  orientationNotes: string | null;
+  startDateLink: string | null;
   payRate: number;
   maximumHoursPerDay: number | null;
   equipmentType: EquipmentType;
@@ -43,6 +47,10 @@ export interface GigPayload {
   applicationId: string;
   workerId?: string | null;
   startingDate: string;
+  endDate?: string | null;
+  orientationDateTime?: string | null;
+  orientationNotes?: string | null;
+  startDateLink?: string | null;
   payRate: number;
   maximumHoursPerDay?: number | null;
   equipmentType: EquipmentType;
@@ -56,6 +64,10 @@ export interface GigPatch {
   workerId?: string | null;
   clearWorker?: boolean;
   startingDate?: string;
+  endDate?: string | null;
+  orientationDateTime?: string | null;
+  orientationNotes?: string | null;
+  startDateLink?: string | null;
   payRate?: number;
   maximumHoursPerDay?: number | null;
   equipmentType?: EquipmentType;

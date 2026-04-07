@@ -6,13 +6,14 @@ import { catchError } from 'rxjs/operators';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.model';
 import { ContractService } from '../../contracts/services/contract.service';
-import { Contract, ContractPayload, ContractStatus } from '../../contracts/models/contract.model';
+import { Contract, ContractPayload, ContractStatus, Department, DEPARTMENTS } from '../../contracts/models/contract.model';
 import { PayslipService } from '../../payslips/services/payslip.service';
 import { Payslip } from '../../payslips/models/payslip.model';
 import { ToastService } from '../../../core/toast.service';
 
 interface ContractForm {
   jobTitle: string;
+  department: Department | '';
   basicSalary: number | null;
   housingAllowance: number;
   transportAllowance: number;
@@ -30,6 +31,8 @@ interface ContractForm {
   templateUrl: './user-detail.html',
 })
 export class UserDetail implements OnInit {
+  readonly departments = DEPARTMENTS;
+
   user = signal<User | null>(null);
   contract = signal<Contract | null>(null);
   payslips = signal<Payslip[]>([]);
@@ -86,6 +89,7 @@ export class UserDetail implements OnInit {
     if (!c) return;
     this.contractForm = {
       jobTitle: c.jobTitle ?? '',
+      department: c.department ?? '',
       basicSalary: c.basicSalary,
       housingAllowance: c.housingAllowance,
       transportAllowance: c.transportAllowance,
@@ -112,6 +116,7 @@ export class UserDetail implements OnInit {
     const payload: ContractPayload = {
       userId: this.user()!.id,
       jobTitle: f.jobTitle || undefined,
+      department: f.department || undefined,
       status: f.status,
       basicSalary: f.basicSalary,
       housingAllowance: f.housingAllowance,
@@ -170,9 +175,15 @@ export class UserDetail implements OnInit {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
   }
 
+  departmentLabel(value?: Department | ''): string {
+    if (!value) return '';
+    return DEPARTMENTS.find(d => d.value === value)?.label ?? value;
+  }
+
   private emptyForm(): ContractForm {
     return {
       jobTitle: '',
+      department: '',
       basicSalary: null,
       housingAllowance: 0,
       transportAllowance: 0,

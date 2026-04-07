@@ -4,7 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { ApplicationDetails, ApplicationStatus } from '../models/application.model';
 import { Interview, InterviewPayload, INTERVIEW_STATUSES, InterviewStatus } from '../../interviews/models/interview.model';
 import { FollowUp } from '../../follow-ups/models/follow-up.model';
-import { OnboardingInformation } from '../../onboarding-process/models/onboarding-information.model';
+import {
+  OnboardingInformation,
+  OnboardingInformationPayload,
+  OnboardingLinkPayload,
+  OnboardingType,
+  OnboardingStatus,
+  ONBOARDING_TYPES,
+  ONBOARDING_STATUSES,
+} from '../../onboarding-process/models/onboarding-information.model';
 import { Gig } from '../../gigs/models/gig.model';
 import { InterviewService } from '../../interviews/services/interview.service';
 import { FollowUpService } from '../../follow-ups/services/follow-up.service';
@@ -42,7 +50,16 @@ export class ApplicationDetailPage implements OnInit {
   savingOnboarding = signal(false);
   editingOnboardingId = signal<string | null>(null);
   deletingOnboardingId = signal<string | null>(null);
-  onboardingForm = { notes: '', onBoardingDate: '' };
+  onboardingForm: { notes: string; onBoardingDate: string; type: OnboardingType | ''; status: OnboardingStatus } =
+    { notes: '', onBoardingDate: '', type: '', status: 'PENDING' };
+
+  linkFormEntryId = signal<string | null>(null);
+  savingLink = signal(false);
+  deletingLink = signal<string | null>(null);
+  linkForm: { url: string; label: string; expiryDate: string } = { url: '', label: '', expiryDate: '' };
+
+  readonly onboardingTypes    = ONBOARDING_TYPES;
+  readonly onboardingStatuses = ONBOARDING_STATUSES;
 
   constructor(
     route: ActivatedRoute,
@@ -160,7 +177,12 @@ export class ApplicationDetailPage implements OnInit {
   // ── Onboarding ─────────────────────────────────────────────────────────
 
   openOnboardingEdit(entry: OnboardingInformation) {
-    this.onboardingForm = { notes: entry.notes, onBoardingDate: entry.onBoardingDate ?? '' };
+    this.onboardingForm = {
+      notes: entry.notes,
+      onBoardingDate: entry.onBoardingDate ? entry.onBoardingDate.replace(' ', 'T').substring(0, 16) : '',
+      type: entry.type ?? '',
+      status: entry.status ?? 'PENDING',
+    };
     this.editingOnboardingId.set(entry.id);
     this.showOnboardingForm.set(true);
   }
@@ -168,16 +190,20 @@ export class ApplicationDetailPage implements OnInit {
   cancelOnboardingForm() {
     this.showOnboardingForm.set(false);
     this.editingOnboardingId.set(null);
-    this.onboardingForm = { notes: '', onBoardingDate: '' };
+    this.onboardingForm = { notes: '', onBoardingDate: '', type: '', status: 'PENDING' };
   }
 
   saveOnboarding() {
     if (!this.onboardingForm.notes.trim()) return;
     this.savingOnboarding.set(true);
-    const payload = {
+    const payload: OnboardingInformationPayload = {
       applicationId: this.app.id,
       notes: this.onboardingForm.notes,
-      onBoardingDate: this.onboardingForm.onBoardingDate || null,
+      onBoardingDate: this.onboardingForm.onBoardingDate
+        ? this.toISODateTime(this.onboardingForm.onBoardingDate)
+        : null,
+      type: this.onboardingForm.type || undefined,
+      status: this.onboardingForm.status,
     };
     const editId = this.editingOnboardingId();
     if (editId) {
@@ -225,6 +251,96 @@ export class ApplicationDetailPage implements OnInit {
     });
   }
 
+  // ── Links ───────────────────────────────────────────────────────────────
+
+  toggleLinkForm(entryId: string) {
+    if (this.linkFormEntryId() === entryId) {
+      this.linkFormEntryId.set(null);
+    } else {
+      this.linkForm = { url: '', label: '', expiryDate: '' };
+      this.linkFormEntryId.set(entryId);
+    }
+  }
+
+  submitLink(entryId: string) {
+    if (!this.linkForm.url.trim()) return;
+    this.savingLink.set(true);
+    const payload: OnboardingLinkPayload = {
+      url: this.linkForm.url.trim(),
+      label: this.linkForm.label.trim() || undefined,
+      expiryDate: this.linkForm.expiryDate || undefined,
+    };
+    this.onboardingService.addLink(entryId, payload).subscribe({
+      next: res => {
+        this.onboardingEntries.update(list => list.map(e => e.id === entryId ? res.data : e));
+        this.linkForm = { url: '', label: '', expiryDate: '' };
+        this.linkFormEntryId.set(null);
+        this.savingLink.set(false);
+        this.toast.success('Link added!');
+      },
+      error: () => {
+        this.toast.error('Failed to add link.');
+        this.savingLink.set(false);
+      },
+    });
+  }
+
+  removeLink(entryId: string, linkId: string) {
+    this.deletingLink.set(linkId);
+    this.onboardingService.removeLink(entryId, linkId).subscribe({
+      next: res => {
+        this.onboardingEntries.update(list => list.map(e => e.id === entryId ? res.data : e));
+        this.deletingLink.set(null);
+        this.toast.success('Link removed.');
+      },
+      error: () => {
+        this.toast.error('Failed to remove link.');
+        this.deletingLink.set(null);
+      },
+    });
+  }
+
+  // ── Onboarding display helpers ──────────────────────────────────────────
+
+  formatEnum(val?: string): string {
+    return val ? val.split('_').join(' ') : 'N/A';
+  }
+
+  onboardingTypeColor(type?: string): string {
+    const map: Record<string, string> = {
+      TECHNICAL_ENGINEERING: 'bg-blue-50 text-blue-700 border-blue-200',
+      OPERATIONAL_HR:        'bg-purple-50 text-purple-700 border-purple-200',
+      PRODUCT_DOMAIN:        'bg-teal-50 text-teal-700 border-teal-200',
+      REMOTE_ASYNCHRONOUS:   'bg-orange-50 text-orange-700 border-orange-200',
+      GENERAL:               'bg-slate-50 text-slate-600 border-slate-200',
+    };
+    return map[type ?? ''] ?? 'bg-slate-50 text-slate-600 border-slate-200';
+  }
+
+  onboardingStatusColor(status?: string): string {
+    const map: Record<string, string> = {
+      PENDING:   'bg-amber-50 text-amber-700 border-amber-200',
+      COMPLETED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      MISSED:    'bg-red-50 text-red-700 border-red-200',
+    };
+    return map[status ?? ''] ?? 'bg-slate-50 text-slate-600 border-slate-200';
+  }
+
+  expiryInfo(expiryDate?: string): { label: string; color: string } | null {
+    if (!expiryDate) return null;
+    const now    = new Date();
+    const exp    = new Date(expiryDate);
+    const diffMs = exp.getTime() - now.setHours(0, 0, 0, 0);
+    const days   = Math.ceil(diffMs / 86400000);
+    if (days < 0)   return { label: `Expired ${Math.abs(days)}d ago`, color: 'text-red-600' };
+    if (days === 0) return { label: 'Expires today',                   color: 'text-amber-600' };
+    if (days <= 7)  return { label: `Expires in ${days}d`,             color: 'text-amber-500' };
+    return {
+      label: `Expires ${exp.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+      color: 'text-emerald-600',
+    };
+  }
+
   // ── Utilities ──────────────────────────────────────────────────────────
 
   statusConfig(status: ApplicationStatus) {
@@ -264,6 +380,12 @@ export class ApplicationDetailPage implements OnInit {
       day: '2-digit', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit',
     });
+  }
+
+  /** Normalises datetime-local values ("YYYY-MM-DDTHH:mm") to "YYYY-MM-DDTHH:mm:ss" for Java LocalDateTime. */
+  private toISODateTime(dt: string): string {
+    const normalised = dt.replace(' ', 'T');
+    return normalised.length === 16 ? normalised + ':00' : normalised;
   }
 
   private emptyInterviewForm(): Omit<InterviewPayload, 'applicationId'> {

@@ -8,6 +8,22 @@ export const INTERVIEW_STATUSES = [
 
 export type InterviewStatus = (typeof INTERVIEW_STATUSES)[number];
 
+export const INTERVIEW_TYPES = [
+  'PHONE_CALL',
+  'VIDEO_CALL',
+] as const;
+
+export type InterviewType = (typeof INTERVIEW_TYPES)[number];
+
+export const INTERVIEW_STAGES = [
+  'PRE_SCREENING',
+  'PRE_INTERVIEW',
+  'FIRST_ROUND_INTERVIEW',
+  'FINAL_INTERVIEW',
+] as const;
+
+export type InterviewStage = (typeof INTERVIEW_STAGES)[number];
+
 export interface Interview {
   id: string;
   orgId: string;
@@ -21,6 +37,8 @@ export interface Interview {
   documentsRequired?: string;
   locationOrLink?: string;
   notes?: string;
+  interviewType?: InterviewType;
+  interviewStage?: InterviewStage;
   status: InterviewStatus;
   createdAt: string;
   updatedAt: string;
@@ -34,5 +52,7 @@ export interface InterviewPayload {
   documentsRequired?: string;
   locationOrLink?: string;
   notes?: string;
+  interviewType?: InterviewType;
+  interviewStage?: InterviewStage;
   status: InterviewStatus;
 }
