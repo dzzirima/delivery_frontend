@@ -26,8 +26,13 @@ export class Signup {
   }
 
   register() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!this.fullName || !this.email || !this.password || !this.phone || !this.address) {
       this.error.set('Please fill in all fields.');
+      return;
+    }
+    if (!emailRegex.test(this.email)) {
+      this.error.set('Please enter a valid email address.');
       return;
     }
     this.loading.set(true);
@@ -39,14 +44,20 @@ export class Signup {
       phoneNumber: this.phone,
       address: this.address,
       status: 'ACTIVE',
-      role: 'ADMIN',
+      role: 'ORG_ADMIN',
     }).subscribe({
       next: () => {
         this.toast.success('Account created!', 'Welcome to GigMaster. Please sign in to continue.');
         setTimeout(() => this.router.navigate(['/signin']), 1500);
       },
-      error: () => {
-        this.error.set('Registration failed. Please try again.');
+      error: (err) => {
+        const body = err?.error;
+        const fieldErrors: Record<string, string> = body?.errors ?? {};
+        const fieldMessages = Object.values(fieldErrors);
+        const msg = fieldMessages.length > 0
+          ? fieldMessages.join(' ')
+          : body?.message || 'Registration failed. Please try again.';
+        this.error.set(msg);
         this.loading.set(false);
       },
     });

@@ -36,7 +36,7 @@ export class Payroll implements OnInit {
 
   hasBatch = computed(() => this.payslips().length > 0);
   canReset = computed(() =>
-    this.hasBatch() && this.payslips().every(p => p.status !== 'LOCKED')
+    this.hasBatch() && this.payslips().every(p => p.status === 'DRAFT')
   );
 
   constructor(private payslipService: PayslipService) {}
@@ -145,8 +145,8 @@ export class Payroll implements OnInit {
   }
 
   statusClass(status: string): string {
-    return status === 'LOCKED'
-      ? 'bg-red-100 text-red-700'
-      : 'bg-amber-100 text-amber-700';
+    if (status === 'CLOSED') return 'bg-green-100 text-green-700';
+    if (status === 'LOCKED') return 'bg-blue-100 text-blue-700';
+    return 'bg-amber-100 text-amber-700';
   }
 }

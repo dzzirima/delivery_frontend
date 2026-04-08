@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-white flex flex-col">
+
+  <!-- ── NAVBAR ── -->
+  <nav class="bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <span class="text-xl font-bold text-gray-900">GigMaster</span>
+      </div>
+      <button (click)="signOut()"
+        class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        Sign out
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="flex-1 flex items-center justify-center px-6 py-20 bg-gradient-to-br from-red-50 via-white to-rose-50">
+    <div class="max-w-xl w-full text-center">
+
+      <!-- Error code -->
+      <p class="text-8xl font-extrabold text-red-100 leading-none select-none mb-2">403</p>
+
+      <!-- Icon -->
+      <div class="flex justify-center -mt-8 mb-8">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M12 15v.01M12 12V8m0 10a9 9 0 100-18 9 9 0 000 18z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 bg-red-100 text-red-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+        Access Denied
+      </div>
+
+      <h1 class="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+        You don't have<br />
+        <span class="text-red-500">permission to view this page.</span>
+      </h1>
+
+      <p class="text-lg text-gray-500 leading-relaxed mb-10 max-w-md mx-auto">
+        Your current role does not have access to this section.
+        If you believe this is a mistake, please contact your administrator.
+      </p>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button (click)="goBack()"
+          class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          Back to Dashboard
+        </button>
+        <button (click)="signOut()"
+          class="inline-flex items-center gap-2 bg-white border border-gray-200 hover:border-red-300 text-gray-700 hover:text-red-600 font-semibold px-8 py-3.5 rounded-xl transition-colors text-sm">
+          Sign out
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="bg-gray-900 text-gray-400 py-8 px-6">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <span class="text-white font-bold">GigMaster</span>
+      </div>
+      <p class="text-sm">&copy; 2026 GigMaster. All rights reserved.</p>
+    </div>
+  </footer>
+
+</div>

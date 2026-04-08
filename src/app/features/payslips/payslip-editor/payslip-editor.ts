@@ -249,7 +249,7 @@ export class PayslipEditor implements OnInit {
       <div class="label" style="margin-top:10px;">Working Days</div>
       <div class="value">${wd} / 22</div>
       <div class="label" style="margin-top:10px;">Pay Status</div>
-      <div class="value" style="color:#16a34a;">LOCKED</div>
+      <div class="value" style="color:#16a34a;">Paid</div>
     </div>
   </div>
 

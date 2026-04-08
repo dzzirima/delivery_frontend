@@ -25,6 +25,10 @@ export class PayslipService {
 
   constructor(private http: HttpClient) {}
 
+  getMyPaidPayslips() {
+    return this.http.get<PayslipListResponse>(`${this.base}/me`);
+  }
+
   bulkInit(month: number, year: number) {
     return this.http.post<BulkInitResponse>(`${this.base}/bulk-init`, { month, year });
   }

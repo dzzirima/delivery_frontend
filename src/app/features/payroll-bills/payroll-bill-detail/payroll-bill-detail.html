@@ -1,0 +1,223 @@
+<div class="p-6">
+
+  <!-- Back -->
+  <button (click)="goBack()"
+    class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-600 font-medium mb-5 transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Payroll Bills
+  </button>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20 text-gray-400 text-sm gap-2">
+      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+      </svg>
+      Loading bill…
+    </div>
+
+  } @else if (detail()) {
+
+    <!-- Bill Header -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-5 mb-5">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2.5 mb-1">
+            <h1 class="text-xl font-bold text-gray-900">{{ bill!.billingPeriod }}</h1>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ billStatusClass(bill!.status) }}">
+              {{ bill!.status }}
+            </span>
+          </div>
+          <p class="text-sm text-gray-500">{{ bill!.payslipCount }} payslip{{ bill!.payslipCount !== 1 ? 's' : '' }}</p>
+        </div>
+
+        <!-- Action buttons — only shown while DRAFT -->
+        @if (isDraft()) {
+          <div class="flex flex-wrap gap-2">
+            <!-- Regenerate all drafts -->
+            <button (click)="onRegenerateBatch()" [disabled]="regenerating() || !hasDrafts"
+              class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 disabled:opacity-40 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              {{ regenerating() ? 'Regenerating…' : 'Regenerate Drafts' }}
+            </button>
+
+            <!-- Delete all drafts -->
+            <button (click)="onDeleteDrafts()" [disabled]="deletingDrafts() || !hasDrafts"
+              class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-40 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              {{ deletingDrafts() ? 'Deleting…' : 'Delete Drafts' }}
+            </button>
+
+            <!-- Close entire bill -->
+            <button (click)="onCloseBill()" [disabled]="closing()"
+              class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 transition-colors shadow-sm shadow-green-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              {{ closing() ? 'Closing…' : 'Close Bill' }}
+            </button>
+
+            <!-- Delete bill -->
+            <button (click)="onDeleteBill()" [disabled]="deletingBill()"
+              class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors shadow-sm shadow-red-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              {{ deletingBill() ? 'Deleting…' : 'Delete Bill' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (error()) {
+        <div class="mt-3 flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2.5">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ error() }}
+        </div>
+      }
+    </div>
+
+    <!-- Aggregate Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Gross</p>
+        <p class="text-lg font-bold text-gray-900">{{ formatCurrency(detail()!.totalGross) }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">Before adjustments</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4">
+        <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest mb-1">Net Payout</p>
+        <p class="text-lg font-bold text-indigo-700">{{ formatCurrency(detail()!.totalNet) }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">Total payable</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-red-100 shadow-sm p-4">
+        <p class="text-xs font-semibold text-red-500 uppercase tracking-widest mb-1">Deductions</p>
+        <p class="text-lg font-bold text-red-600">{{ formatCurrency(detail()!.totalDeductions) }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-green-100 shadow-sm p-4">
+        <p class="text-xs font-semibold text-green-600 uppercase tracking-widest mb-1">Reimbursements</p>
+        <p class="text-lg font-bold text-green-700">{{ formatCurrency(detail()!.totalReimbursements) }}</p>
+      </div>
+    </div>
+
+    <!-- Variance Card -->
+    @if (detail()!.previousTotalNet !== null) {
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-4 mb-5">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Month-over-Month Variance</p>
+        <div class="flex flex-wrap items-center gap-6">
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Previous Net</p>
+            <p class="text-base font-semibold text-gray-700">{{ formatCurrency(detail()!.previousTotalNet) }}</p>
+          </div>
+          <div class="text-gray-300 text-xl">→</div>
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Current Net</p>
+            <p class="text-base font-semibold text-gray-700">{{ formatCurrency(detail()!.totalNet) }}</p>
+          </div>
+          <div class="ml-auto">
+            @if (varianceSign() === 'up') {
+              <span class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-green-50 text-green-700 font-bold text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/>
+                </svg>
+                {{ formatCurrency(detail()!.netVariance) }} &nbsp; {{ formatPct(detail()!.netVariancePercent) }}
+              </span>
+            } @else if (varianceSign() === 'down') {
+              <span class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-red-50 text-red-700 font-bold text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                </svg>
+                {{ formatCurrency(detail()!.netVariance) }} &nbsp; {{ formatPct(detail()!.netVariancePercent) }}
+              </span>
+            } @else {
+              <span class="px-3 py-1.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm">No change</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Payslips Table -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-sm font-semibold text-gray-700">Payslips</h2>
+      </div>
+
+      @if (payslips.length === 0) {
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <p class="text-gray-500 font-medium text-sm">No payslips in this bill.</p>
+        </div>
+      } @else {
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 text-left">
+              <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Employee</th>
+              <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Department</th>
+              <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Net Salary</th>
+              <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Days</th>
+              <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+              <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of payslips; track p.id) {
+              <tr class="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors cursor-pointer"
+                (click)="openPayslip(p)">
+                <td class="px-5 py-3.5">
+                  <p class="font-semibold text-gray-900 whitespace-nowrap">{{ p.userName }}</p>
+                  @if (p.jobTitle) {
+                    <p class="text-xs text-gray-400 mt-0.5">{{ p.jobTitle }}</p>
+                  }
+                </td>
+                <td class="px-5 py-3.5 text-gray-500 text-xs">{{ p.department ?? '—' }}</td>
+                <td class="px-5 py-3.5 font-bold text-gray-900 whitespace-nowrap">{{ formatCurrency(p.netSalary) }}</td>
+                <td class="px-5 py-3.5 text-gray-500 text-center">{{ p.workingDays }}/22</td>
+                <td class="px-5 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ slipStatusClass(p.status) }}">
+                    {{ p.status === 'CLOSED' ? 'Paid' : p.status }}
+                  </span>
+                </td>
+                <td class="px-5 py-3.5" (click)="$event.stopPropagation()">
+                  <div class="flex items-center gap-1">
+                    <button (click)="openPayslip(p)"
+                      class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                      {{ p.status === 'DRAFT' ? 'Edit' : 'View' }}
+                    </button>
+                    @if (p.status === 'DRAFT') {
+                      <button (click)="onRegenerate(p.id)"
+                        class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 transition-colors">
+                        Regenerate
+                      </button>
+                      <button (click)="onFinalize(p.id)"
+                        class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
+                        Finalize
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+  }
+</div>
+
+<!-- Payslip Editor Modal -->
+@if (viewingPayslip()) {
+  <app-payslip-editor
+    [payslip]="viewingPayslip()!"
+    (closed)="closePayslipEditor($event)" />
+}

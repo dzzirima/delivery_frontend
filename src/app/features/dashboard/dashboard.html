@@ -73,8 +73,8 @@
     }
   </div>
 
-  <!-- ── SECTION 1b: Gig Stats ── -->
-  <div class="grid grid-cols-2 gap-4">
+  <!-- ── SECTION 1b: Gig Stats — ORG_ADMIN / SYSTEM_ADMIN only ── -->
+  <div class="grid grid-cols-2 gap-4" *ifRole="['ORG_ADMIN', 'SYSTEM_ADMIN']">
     @if (loadingGigStats()) {
       @for (i of [1,2]; track i) {
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 animate-pulse">

@@ -1,4 +1,4 @@
-export type PayslipStatus = 'DRAFT' | 'LOCKED';
+export type PayslipStatus = 'DRAFT' | 'LOCKED' | 'CLOSED';
 
 export interface PayslipMiscItem {
   id: string;
@@ -32,6 +32,7 @@ export interface Payslip {
   overtimeAmount: number;
   netSalary: number;
   miscItems: PayslipMiscItem[];
+  payrollBillId?: string;
   createdAt: string;
   updatedAt: string;
 }

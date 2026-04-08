@@ -1,0 +1,90 @@
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col items-center justify-center px-4 py-12">
+
+  <!-- Logo -->
+  <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-200">
+    <svg class="w-9 h-9 text-white" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 7c0-1.1-.9-2-2-2h-3l-2-2H8L6 5H3C1.9 5 1 5.9 1 7v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7zm-9 11c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+      <circle cx="10" cy="13" r="3"/>
+    </svg>
+  </div>
+
+  <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Set up your organisation</h1>
+  <p class="text-gray-500 mb-8 text-center max-w-sm">Before you can start, you need to create your organisation. This only takes a moment.</p>
+
+  <!-- Card -->
+  <div class="bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 w-full max-w-md p-8">
+    <form class="space-y-5" (ngSubmit)="submit()">
+
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Organisation Name <span class="text-red-500">*</span></label>
+        <input
+          type="text"
+          [(ngModel)]="name"
+          name="name"
+          (ngModelChange)="onNameChange()"
+          placeholder="Acme Corp"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+        />
+      </div>
+
+      <!-- Slug -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Slug <span class="text-red-500">*</span></label>
+        <input
+          type="text"
+          [(ngModel)]="slug"
+          name="slug"
+          (ngModelChange)="onSlugChange()"
+          placeholder="acme-corp"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm font-mono"
+        />
+        <p class="mt-1 text-xs text-gray-400">Unique identifier, auto-generated from name. Only lowercase letters, numbers and hyphens.</p>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Organisation Email <span class="text-red-500">*</span></label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="hello@acmecorp.com"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+        />
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Phone <span class="text-gray-400 font-normal">(optional)</span></label>
+        <input
+          type="tel"
+          [(ngModel)]="phone"
+          name="phone"
+          placeholder="+263 77 123 4567"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+        />
+      </div>
+
+      <!-- Error -->
+      @if (error()) {
+        <p class="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2.5 border border-red-100">{{ error() }}</p>
+      }
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 mt-2"
+      >
+        {{ loading() ? 'Creating…' : 'Create Organisation' }}
+      </button>
+
+    </form>
+  </div>
+
+  <button (click)="signOut()" class="mt-6 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+    Sign out
+  </button>
+
+</div>

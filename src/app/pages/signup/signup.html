@@ -34,9 +34,21 @@
           type="email"
           [(ngModel)]="email"
           name="email"
+          #emailField="ngModel"
+          required
+          email
           placeholder="you@example.com"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+          class="w-full border rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition text-sm"
+          [class.border-gray-200]="!emailField.invalid || emailField.pristine"
+          [class.focus:ring-indigo-500]="!emailField.invalid || emailField.pristine"
+          [class.border-red-400]="emailField.invalid && emailField.dirty"
+          [class.focus:ring-red-400]="emailField.invalid && emailField.dirty"
         />
+        @if (emailField.dirty && emailField.hasError('required')) {
+          <p class="mt-1 text-xs text-red-600">Email is required.</p>
+        } @else if (emailField.dirty && emailField.hasError('email')) {
+          <p class="mt-1 text-xs text-red-600">Please enter a valid email address.</p>
+        }
       </div>
 
       <!-- Password -->

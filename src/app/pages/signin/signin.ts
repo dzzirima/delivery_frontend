@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../core/auth.service';
+import { switchMap } from 'rxjs';
+import { AuthService, UserProfile } from '../../core/auth.service';
 
 @Component({
   selector: 'app-signin',
@@ -28,12 +29,34 @@ export class Signin {
     }
     this.loading.set(true);
     this.error.set('');
-    this.authService.signin({ userName: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigate(['/app/applications']),
-      error: () => {
-        this.error.set('Invalid credentials. Please try again.');
-        this.loading.set(false);
-      },
-    });
+    this.authService
+      .signin({ userName: this.email, password: this.password })
+      .pipe(switchMap(() => this.authService.getProfile()))
+      .subscribe({
+        next: (res) => this.routeAfterLogin(res.data),
+        error: (err) => {
+          const msg = err?.error?.message || 'Invalid credentials. Please try again.';
+          this.error.set(msg);
+          this.loading.set(false);
+        },
+      });
+  }
+
+  private routeAfterLogin(profile: UserProfile) {
+    const { role, orgId, organisationStatus } = profile;
+
+    if (role === 'ORG_ADMIN') {
+      if (!orgId) {
+        this.router.navigate(['/setup-organization']);
+        return;
+      }
+    }
+
+    // All roles: check org status
+    if (orgId && organisationStatus === 'ACTIVE') {
+      this.router.navigate(['/app/dashboard']);
+    } else {
+      this.router.navigate(['/org-inactive']);
+    }
   }
 }

@@ -1,0 +1,76 @@
+<div class="p-6">
+
+  <!-- Header -->
+  <div class="mb-5">
+    <h1 class="text-xl font-bold text-gray-900">My Payslips</h1>
+    <p class="text-sm text-gray-500 mt-0.5">Your paid payslips — click any row to view or print</p>
+  </div>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20 text-gray-400 text-sm gap-2">
+      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+      </svg>
+      Loading payslips…
+    </div>
+
+  } @else if (payslips().length === 0) {
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+      </svg>
+      <p class="text-gray-600 font-semibold">No paid payslips yet</p>
+      <p class="text-sm text-gray-400 mt-1">Payslips will appear here once they have been paid.</p>
+    </div>
+
+  } @else {
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-200 text-left">
+            <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Period</th>
+            <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Net Salary</th>
+            <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Working Days</th>
+            <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+            <th class="px-5 py-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of payslips(); track p.id) {
+            <tr class="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors cursor-pointer"
+              (click)="open(p)">
+              <td class="px-5 py-3.5 font-semibold text-gray-900 whitespace-nowrap">
+                {{ monthName(p.month) }} {{ p.year }}
+              </td>
+              <td class="px-5 py-3.5 font-bold text-gray-900 whitespace-nowrap">
+                {{ formatCurrency(p.netSalary) }}
+              </td>
+              <td class="px-5 py-3.5 text-gray-500 text-center">{{ p.workingDays }}/22</td>
+              <td class="px-5 py-3.5">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                  Paid
+                </span>
+              </td>
+              <td class="px-5 py-3.5 text-right">
+                <button (click)="$event.stopPropagation(); open(p)"
+                  class="px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors whitespace-nowrap">
+                  View →
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</div>
+
+<!-- Viewer Modal -->
+@if (viewing()) {
+  <app-payslip-editor
+    [payslip]="viewing()!"
+    (closed)="closeViewer()" />
+}

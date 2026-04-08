@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -25,17 +25,33 @@ export interface AuthResponse {
   };
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  orgId: string | null;
+  organisationName: string | null;
+  organisationStatus: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED' | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'tih_token';
   private readonly RESET_EMAIL_KEY = 'tih_reset_email';
+
+  /** Reactive signal of the current user's role. Initialised from any stored token. */
+  readonly role = signal<string | null>(this.getRole());
 
   constructor(private http: HttpClient, private router: Router) {}
 
   signin(payload: SigninPayload) {
     return this.http
       .post<AuthResponse>(`${environment.apiUrl}/user/signin`, payload)
-      .pipe(tap(res => localStorage.setItem(this.TOKEN_KEY, res.data.token)));
+      .pipe(tap(res => {
+        localStorage.setItem(this.TOKEN_KEY, res.data.token);
+        this.role.set(this.getRole());
+      }));
   }
 
   signup(payload: SignupPayload) {
@@ -45,6 +61,7 @@ export class AuthService {
   signOut() {
     localStorage.removeItem(this.TOKEN_KEY);
     sessionStorage.removeItem(this.RESET_EMAIL_KEY);
+    this.role.set(null);
     this.router.navigate(['/signin']);
   }
 
@@ -65,6 +82,10 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  getProfile() {
+    return this.http.get<{ data: UserProfile }>(`${environment.apiUrl}/user/profile`);
   }
 
   forgotPassword(email: string) {

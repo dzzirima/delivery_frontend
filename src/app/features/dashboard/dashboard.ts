@@ -6,6 +6,7 @@ import { DashboardSummary, DashboardAnalytics } from './models/dashboard.model';
 import { UserService } from '../users/services/user.service';
 import { User } from '../users/models/user.model';
 import { GigService, GigStats } from '../gigs/services/gig.service';
+import { IfRoleDirective } from '../../core/directives/if-role.directive';
 
 const STATUS_COLORS: Record<string, string> = {
   APPLIED:    'bg-blue-100 text-blue-800',
@@ -19,7 +20,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, IfRoleDirective],
   templateUrl: './dashboard.html',
 })
 export class DashboardPage implements OnInit {

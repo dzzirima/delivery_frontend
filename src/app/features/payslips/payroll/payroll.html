@@ -156,9 +156,9 @@
                 <div class="flex items-center gap-1">
                   <button (click)="openEditor(p)"
                     class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">
-                    {{ p.status === 'LOCKED' ? 'View' : 'Edit' }}
+                    {{ p.status === 'DRAFT' ? 'Edit' : 'View' }}
                   </button>
-                  @if (p.status !== 'LOCKED') {
+                  @if (p.status === 'DRAFT') {
                     <button (click)="onRegenerate(p.id)"
                       class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 transition-colors">
                       Regenerate

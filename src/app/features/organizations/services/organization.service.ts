@@ -34,7 +34,7 @@ export class OrganizationService {
   }
 
   getMyOrganization() {
-    return this.http.get<OrganizationResponse>(`${this.base}/my`);
+    return this.http.get<OrganizationResponse>(`${this.base}/me`);
   }
 
   create(payload: OrganizationPayload) {
