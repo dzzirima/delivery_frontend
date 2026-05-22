@@ -1,0 +1,2363 @@
+<div class="flex h-screen overflow-hidden bg-[#f1f5f9]">
+
+  <!-- ── SIDEBAR ── -->
+  <aside
+    [class.w-64]="!collapsed()"
+    [class.w-[72px]]="collapsed()"
+    class="flex flex-col bg-[#131929] transition-all duration-300 ease-in-out shrink-0 overflow-hidden"
+  >
+    <!-- Brand -->
+    <div class="flex items-center gap-3 px-4 py-5 bg-[#4f46e5] shrink-0">
+      <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 font-bold text-white text-sm">
+        {{ initials() }}
+      </div>
+      @if (!collapsed()) {
+        <div class="overflow-hidden flex-1 min-w-0">
+          <p class="text-white font-bold text-sm leading-tight whitespace-nowrap">
+            {{ currentUser()?.name ?? 'My Organisation' }}
+          </p>
+          <p class="text-indigo-200 text-xs whitespace-nowrap capitalize">
+            {{ isOrgAdmin ? 'Org Admin' : 'Dispatcher' }}
+          </p>
+        </div>
+        <button
+          (click)="toggleCollapsed()"
+          class="shrink-0 p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/15 transition-all duration-150"
+          title="Collapse sidebar"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      } @else {
+        <button
+          (click)="toggleCollapsed()"
+          class="shrink-0 p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/15 transition-all duration-150"
+          title="Expand sidebar"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      }
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 py-4 space-y-1 px-2">
+      @for (item of navItems; track item.id) {
+        <button
+          (click)="navigate(item.id)"
+          [class.bg-\[#4f46e5\]]="activePage() === item.id"
+          [class.text-white]="activePage() === item.id"
+          [class.text-gray-400]="activePage() !== item.id"
+          [class.justify-center]="collapsed()"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-sm font-medium hover:bg-white/10"
+          [title]="collapsed() ? item.label : ''"
+        >
+          @if (item.icon === 'home') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+          }
+          @if (item.icon === 'bolt') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          }
+          @if (item.icon === 'truck') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/>
+            </svg>
+          }
+          @if (item.icon === 'users') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          }
+          @if (item.icon === 'package') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          }
+          @if (item.icon === 'user-plus') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+          }
+          @if (item.icon === 'store') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22V12h6v10"/>
+            </svg>
+          }
+          @if (item.icon === 'cog') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          }
+          @if (!collapsed()) {
+            <span class="whitespace-nowrap">{{ item.label }}</span>
+          }
+        </button>
+      }
+    </nav>
+
+    <!-- User profile + actions -->
+    <div class="px-2 pb-2 shrink-0 border-t border-white/10 pt-3">
+
+      <!-- User row -->
+      <button
+        (click)="navigate('user-profile')"
+        [class.justify-center]="collapsed()"
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-150 text-sm font-medium mb-1"
+        [title]="collapsed() ? (currentUser()?.name ?? 'Profile') : ''"
+      >
+        <div class="w-7 h-7 rounded-lg bg-[#4f46e5] flex items-center justify-center text-white text-xs font-bold shrink-0">
+          {{ initials() }}
+        </div>
+        @if (!collapsed()) {
+          <div class="overflow-hidden text-left min-w-0">
+            <p class="text-xs font-semibold text-white leading-tight truncate">{{ currentUser()?.name ?? '—' }}</p>
+            <p class="text-[10px] text-indigo-300 truncate capitalize">{{ isOrgAdmin ? 'Org Admin' : 'Dispatcher' }}</p>
+          </div>
+        }
+      </button>
+
+      <!-- Notification + Collapse + Sign out row -->
+      <div class="flex items-center gap-1 px-1"
+           [class.justify-center]="collapsed()">
+
+        <!-- Notifications -->
+        <button class="relative flex-1 flex items-center justify-center p-2 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-150"
+                [class.w-full]="collapsed()" title="Notifications">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+        </button>
+
+        <!-- Sign out -->
+        <button
+          (click)="signOut()"
+          class="flex-1 flex items-center justify-center p-2 rounded-xl text-gray-400 hover:bg-white/10 hover:text-red-400 transition-all duration-150"
+          title="Sign Out"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Feature outlet -->
+    <main class="flex-1 p-6"
+      [class.overflow-y-auto]="activePage() !== 'dashboard'"
+      [class.overflow-hidden]="activePage() === 'dashboard'">
+
+      @if (flashSuccess()) {
+        <div class="mb-4 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl">{{ flashSuccess() }}</div>
+      }
+      @if (flashError()) {
+        <div class="mb-4 px-4 py-2.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">{{ flashError() }}</div>
+      }
+
+      <!-- ── Dashboard Home ── -->
+      @if (activePage() === 'dashboard') {
+        <!-- Full-bleed map: break out of main's p-6 -->
+        <div class="relative -m-6 h-full min-h-0">
+
+          <!-- OSM Map -->
+          <div #dashboardMap class="absolute inset-0 z-0"></div>
+
+          <!-- ── Stats bar (top) ── -->
+          <div class="absolute top-4 left-4 right-4 z-10 flex items-center gap-2 pointer-events-none">
+            <!-- Stat pills -->
+            <div class="flex items-center gap-1.5 bg-white rounded-full px-3 py-1.5 shadow-md pointer-events-auto">
+              <span class="text-[11px] text-gray-500">Deliveries</span>
+              <span class="text-xs font-bold text-gray-900">{{ statsLoading() ? '…' : (dashboardStats()?.todayDeliveries ?? '—') }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white rounded-full px-3 py-1.5 shadow-md pointer-events-auto">
+              <span class="text-[11px] text-gray-500">Fleet</span>
+              <span class="text-xs font-bold text-gray-900">{{ statsLoading() ? '…' : (dashboardStats()?.totalBikes ?? '—') }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white rounded-full px-3 py-1.5 shadow-md pointer-events-auto">
+              <span class="text-[11px] text-gray-500">Shops</span>
+              <span class="text-xs font-bold text-gray-900">{{ statsLoading() ? '…' : (dashboardStats()?.totalShops ?? '—') }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white rounded-full px-3 py-1.5 shadow-md pointer-events-auto">
+              <span class="text-[11px] text-gray-500">Clients</span>
+              <span class="text-xs font-bold text-gray-900">{{ statsLoading() ? '…' : (dashboardStats()?.totalClients ?? '—') }}</span>
+            </div>
+
+            <div class="flex-1"></div>
+
+            <!-- New Dispatch button -->
+            <button
+              (click)="openCreateDispatch()"
+              class="flex items-center gap-1.5 bg-[#4f46e5]/90 hover:bg-indigo-700 text-white font-semibold px-4 py-1.5 rounded-full transition-colors text-xs shadow-md pointer-events-auto shrink-0">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              New Dispatch
+            </button>
+          </div>
+
+          <!-- ── Dispatch panel (top-left) ── -->
+          <div class="absolute top-28 left-4 z-10 w-72 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-80">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+              <h3 class="text-sm font-bold text-gray-900">Active Dispatches</h3>
+              @if (dashboardDispLoading()) {
+                <span class="text-xs text-gray-400">Loading…</span>
+              } @else {
+                <span class="text-xs text-gray-400">{{ filteredDispatches().length }} jobs</span>
+              }
+            </div>
+
+            <!-- Search bar -->
+            <div class="px-3 py-2 border-b border-gray-100 shrink-0">
+              <div class="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-1.5">
+                <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search client, address…"
+                  [ngModel]="dispatchSearchQuery()"
+                  (ngModelChange)="dispatchSearchQuery.set($event)"
+                  class="flex-1 bg-transparent text-xs text-gray-700 placeholder-gray-400 outline-none"
+                />
+                @if (dispatchSearchQuery()) {
+                  <button (click)="dispatchSearchQuery.set('')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="overflow-y-auto flex-1">
+              @if (filteredDispatches().length === 0 && !dashboardDispLoading()) {
+                <p class="text-xs text-gray-400 text-center py-6">{{ dispatchSearchQuery() ? 'No results' : 'No active dispatches' }}</p>
+              }
+              @for (item of filteredDispatches(); track item.id) {
+                <div class="group relative border-b border-gray-50 last:border-0"
+                     [class.bg-indigo-50]="selectedDispatchId() === item.id"
+                     (mouseenter)="hoveredDispatchId.set(item.id)"
+                     (mouseleave)="hoveredDispatchId.set(null)">
+                  <button
+                    (click)="focusDispatch(item)"
+                    class="w-full text-left px-4 py-3 pr-10 transition-colors hover:bg-indigo-50">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="w-2 h-2 rounded-full shrink-0"
+                        [style.background]="statusColour(item.status)"></span>
+                      <span class="text-xs font-semibold text-gray-800 truncate">
+                        {{ item.clientName ?? 'No client' }}
+                      </span>
+                      <span class="ml-auto text-xs font-bold text-indigo-600">${{ item.price | number:'1.2-2' }}</span>
+                    </div>
+                    <p class="text-xs text-gray-400 truncate pl-4">{{ item.pickupAddress }}</p>
+                    <p class="text-xs text-gray-300 truncate pl-4">→ {{ item.dropoffAddress }}</p>
+                  </button>
+                  <!-- Edit button -->
+                  <button
+                    (click)="$event.stopPropagation(); openEditDispatch(item)"
+                    title="Edit dispatch"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- ── Dispatch hover detail card ── -->
+          @if (hoveredDispatch()) {
+            <div class="absolute top-28 left-[20.5rem] z-20 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 pointer-events-none">
+              <!-- Header -->
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background]="statusColour(hoveredDispatch()!.status)"></span>
+                <span class="text-sm font-bold text-gray-900 truncate flex-1">{{ hoveredDispatch()!.clientName ?? 'No client' }}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white shrink-0"
+                  [style.background]="statusColour(hoveredDispatch()!.status)">
+                  {{ hoveredDispatch()!.status | titlecase }}
+                </span>
+              </div>
+
+              <div class="space-y-2 text-xs">
+                <!-- Pickup -->
+                <div class="flex gap-2">
+                  <span class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 block"></span>
+                  </span>
+                  <div>
+                    <p class="text-gray-400 font-medium leading-none mb-0.5">Pickup</p>
+                    <p class="text-gray-700">{{ hoveredDispatch()!.pickupAddress }}</p>
+                  </div>
+                </div>
+                <!-- Dropoff -->
+                <div class="flex gap-2">
+                  <span class="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 block"></span>
+                  </span>
+                  <div>
+                    <p class="text-gray-400 font-medium leading-none mb-0.5">Dropoff</p>
+                    <p class="text-gray-700">{{ hoveredDispatch()!.dropoffAddress }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <p class="text-gray-400 font-medium">Price</p>
+                  <p class="font-bold text-indigo-600">${{ hoveredDispatch()!.price | number:'1.2-2' }}</p>
+                </div>
+                @if (hoveredDispatch()!.driverName) {
+                  <div>
+                    <p class="text-gray-400 font-medium">Rider</p>
+                    <p class="font-semibold text-gray-700 truncate">{{ hoveredDispatch()!.driverName }}</p>
+                  </div>
+                }
+                @if (hoveredDispatch()!.distanceKm) {
+                  <div>
+                    <p class="text-gray-400 font-medium">Distance</p>
+                    <p class="font-semibold text-gray-700">{{ hoveredDispatch()!.distanceKm | number:'1.1-1' }} km</p>
+                  </div>
+                }
+                @if (hoveredDispatch()!.estimatedDurationMinutes) {
+                  <div>
+                    <p class="text-gray-400 font-medium">Est. Time</p>
+                    <p class="font-semibold text-gray-700">{{ hoveredDispatch()!.estimatedDurationMinutes }} min</p>
+                  </div>
+                }
+                @if (hoveredDispatch()!.description) {
+                  <div class="col-span-2">
+                    <p class="text-gray-400 font-medium">Note</p>
+                    <p class="text-gray-700">{{ hoveredDispatch()!.description }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- ── Selected dispatch info bar (bottom-centre) ── -->
+          @if (selectedDispatch()) {
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl px-5 py-3 flex items-center gap-5 pointer-events-auto"
+                 style="min-width:320px;max-width:520px">
+              <!-- Status pill -->
+              <span class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold text-white"
+                    [style.background]="statusColour(selectedDispatch()!.status)">
+                <span class="w-1.5 h-1.5 rounded-full bg-white/70 inline-block"></span>
+                {{ selectedDispatch()!.status | titlecase }}
+              </span>
+
+              <div class="w-px h-7 bg-gray-200 shrink-0"></div>
+
+              <!-- Price -->
+              <div class="text-center shrink-0">
+                <p class="text-xs text-gray-400 leading-none mb-0.5">Price</p>
+                <p class="text-sm font-bold text-indigo-600">${{ selectedDispatch()!.price | number:'1.2-2' }}</p>
+              </div>
+
+              <div class="w-px h-7 bg-gray-200 shrink-0"></div>
+
+              <!-- Distance -->
+              <div class="text-center shrink-0">
+                <p class="text-xs text-gray-400 leading-none mb-0.5">Distance</p>
+                <p class="text-sm font-bold text-gray-800">
+                  {{ selectedDispatch()!.distanceKm != null ? (selectedDispatch()!.distanceKm | number:'1.1-1') + ' km' : '—' }}
+                </p>
+              </div>
+
+              <div class="w-px h-7 bg-gray-200 shrink-0"></div>
+
+              <!-- Route summary -->
+              <div class="min-w-0 flex-1">
+                <p class="text-xs text-gray-500 truncate">{{ selectedDispatch()!.pickupAddress }}</p>
+                <p class="text-xs text-gray-300 truncate">→ {{ selectedDispatch()!.dropoffAddress }}</p>
+              </div>
+
+              <!-- Dismiss -->
+              <button (click)="selectedDispatchId.set(null); refreshMapMarkers()"
+                class="shrink-0 w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          }
+
+          <!-- ── Map legend (bottom-right) ── -->
+          <div class="absolute bottom-4 right-4 z-10 bg-white/85 backdrop-blur-md rounded-xl shadow-lg px-3 py-2 flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+              <div class="w-3.5 h-3.5 rounded-sm bg-[#4f46e5] border-2 border-white shadow-sm"></div>
+              <span class="text-xs text-gray-600">Shop</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-[#f59e0b] border-2 border-white shadow-sm"></div>
+              <span class="text-xs text-gray-600">Pickup</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-[#ef4444] border-2 border-white shadow-sm"></div>
+              <span class="text-xs text-gray-600">Dropoff</span>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- ── Dispatch ── -->
+      @if (activePage() === 'dispatch') {
+        <div>
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Dispatch</h1>
+              <p class="text-gray-500 text-sm mt-0.5">Manage direct-assign and internal-bid deliveries.</p>
+            </div>
+            <button (click)="openCreateDispatch()"
+              class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              New Dispatch
+            </button>
+          </div>
+
+          <!-- Stats bar -->
+          @if (dispatchStats()) {
+            <div class="grid grid-cols-4 gap-3 mb-6">
+              @for (stat of [
+                { label: 'Assigned',   value: dispatchStats()!.assigned,   color: '#f59e0b' },
+                { label: 'Accepted',   value: dispatchStats()!.accepted,   color: '#3b82f6' },
+                { label: 'In Transit', value: dispatchStats()!.inTransit,  color: '#8b5cf6' },
+                { label: 'Declined',   value: dispatchStats()!.declined,   color: '#ef4444' },
+                { label: 'Published',  value: dispatchStats()!.published,  color: '#f97316' },
+                { label: 'Delivered',  value: dispatchStats()!.delivered,  color: '#22c55e' },
+                { label: 'Cancelled',  value: dispatchStats()!.cancelled,  color: '#6b7280' },
+                { label: 'Total',      value: dispatchStats()!.total,      color: '#1e293b' }
+              ]; track stat.label) {
+                <div class="bg-white rounded-xl border border-gray-100 p-3 flex flex-col gap-1">
+                  <span class="text-2xl font-bold" [style.color]="stat.color">{{ stat.value }}</span>
+                  <span class="text-xs text-gray-500 font-medium">{{ stat.label }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Filter bar -->
+          <div class="flex items-center gap-3 mb-4">
+            <select [(ngModel)]="dispatchFilter" (change)="loadDispatch()"
+              class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+              <option value="">All statuses</option>
+              <option value="ASSIGNED">Assigned</option>
+              <option value="ACCEPTED">Accepted</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="ARRIVED">Arrived</option>
+              <option value="DECLINED">Declined</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+            <button (click)="loadDispatch()" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Refresh</button>
+            <span class="text-sm text-gray-400 ml-auto">{{ dispatchTotal() }} total</span>
+          </div>
+
+          <!-- Board -->
+          @if (dispatchLoading()) {
+            <div class="py-16 text-center text-sm text-gray-400">Loading dispatches…</div>
+          } @else if (dispatches().length === 0) {
+            <div class="bg-white rounded-2xl border border-gray-100 py-16 text-center">
+              <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <p class="text-gray-500 text-sm">No dispatches found. Create one to get started.</p>
+            </div>
+          } @else {
+            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                    <th class="px-4 py-3 text-left">Client / Route</th>
+                    <th class="px-4 py-3 text-left">Driver</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Price</th>
+                    <th class="px-4 py-3 text-left">Created</th>
+                    <th class="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of dispatches(); track item.id) {
+                    <tr class="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
+                      <td class="px-4 py-3">
+                        <div class="font-semibold text-gray-800 text-sm">{{ item.clientName ?? '—' }}</div>
+                        <div class="text-xs text-gray-400 mt-0.5">{{ item.pickupAddress }} → {{ item.dropoffAddress }}</div>
+                        @if (item.description) {
+                          <div class="text-xs text-gray-400 italic">{{ item.description }}</div>
+                        }
+                      </td>
+                      <td class="px-4 py-3">
+                        @if (item.driverName) {
+                          <div class="text-sm font-medium text-gray-700">{{ item.driverName }}</div>
+                          @if (item.driverPhone) {
+                            <div class="text-xs text-gray-400">{{ item.driverPhone }}</div>
+                          }
+                        } @else {
+                          <span class="text-gray-300 text-sm">—</span>
+                        }
+                      </td>
+                      <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold"
+                          [style.background]="dispatchStatusColor(item.status) + '20'"
+                          [style.color]="dispatchStatusColor(item.status)">
+                          {{ item.status | titlecase }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-sm font-semibold text-gray-800">
+                        {{ item.price | currency:'USD':'symbol':'1.2-2' }}
+                      </td>
+                      <td class="px-4 py-3 text-xs text-gray-400">
+                        {{ item.createdAt | date:'MMM d, HH:mm' }}
+                      </td>
+                      <td class="px-4 py-3">
+                        <div class="flex items-center justify-end gap-2">
+                          @if (dispatchActioning() === item.id) {
+                            <span class="text-xs text-gray-400">Working…</span>
+                          } @else {
+                            @if (item.status === 'ASSIGNED' || item.status === 'DECLINED') {
+                              <button (click)="openReassign(item)"
+                                class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Reassign</button>
+                            }
+                            @if (item.status === 'DECLINED' || item.status === 'ASSIGNED') {
+                              <button (click)="publishDispatch(item.id)"
+                                class="text-xs text-orange-500 hover:text-orange-700 font-medium">Publish</button>
+                            }
+                            @if (['ASSIGNED','ACCEPTED','DECLINED','PUBLISHED'].includes(item.status)) {
+                              <button (click)="cancelDispatch(item.id)"
+                                class="text-xs text-red-500 hover:text-red-700 font-medium">Cancel</button>
+                            }
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+
+        <!-- Reassign Modal -->
+        @if (reassignModal()) {
+          <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 transition-all"
+            [class.ring-2]="reassignModalError()" [class.ring-red-400]="reassignModalError()">
+              <h3 class="text-lg font-bold text-gray-900 mb-1">Reassign Job</h3>
+              <p class="text-sm text-gray-500 mb-3">Select a rider from your organisation to take this job.</p>
+              @if (reassignModalError()) {
+                <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+                  <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>{{ reassignModalError() }}</span>
+                </div>
+              }
+
+              @if (ridersLoading()) {
+                <div class="text-sm text-gray-400 mb-5">Loading riders…</div>
+              } @else if (orgRiders().length === 0) {
+                <div class="border border-amber-200 bg-amber-50 rounded-lg px-3 py-2.5 text-sm text-amber-600 mb-5">
+                  No riders in this organisation yet.
+                </div>
+              } @else {
+                <select [(ngModel)]="reassignDriverId"
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white mb-5">
+                  <option value="">Select a rider…</option>
+                  @for (rider of orgRiders(); track rider.id) {
+                    <option [value]="rider.id">{{ rider.name }}{{ rider.phone ? ' · ' + rider.phone : '' }}</option>
+                  }
+                </select>
+              }
+
+              <div class="flex items-center justify-end gap-3">
+                <button (click)="closeReassign()"
+                  class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200">Cancel</button>
+                <button (click)="saveReassign()" [disabled]="!reassignDriverId || dispatchActioning() !== null"
+                  class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50">
+                  {{ dispatchActioning() ? 'Saving…' : 'Reassign' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+
+  <!-- ── Create Dispatch Modal ── -->
+  @if (createDispatchModal()) {
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeCreateDispatch()">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-7 transition-all"
+        [class.ring-2]="dispatchModalError()" [class.ring-red-400]="dispatchModalError()"
+        (click)="$event.stopPropagation()">
+            <h3 class="text-lg font-bold text-gray-900 mb-1">New Dispatch</h3>
+            <p class="text-sm text-gray-500 mb-3">Choose a dispatch type and fill in the details.</p>
+            @if (dispatchModalError()) {
+              <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+                <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>{{ dispatchModalError() }}</span>
+              </div>
+            }
+
+            <!-- Tabs -->
+            <div class="flex rounded-xl bg-gray-100 p-1 mb-6">
+              <button (click)="switchDispatchTab('PUBLIC')"
+                class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
+                [class.bg-white]="dispatchTab() === 'PUBLIC'"
+                [class.text-indigo-600]="dispatchTab() === 'PUBLIC'"
+                [class.shadow-sm]="dispatchTab() === 'PUBLIC'"
+                [class.text-gray-500]="dispatchTab() !== 'PUBLIC'">
+                Public Dispatch
+              </button>
+              <button (click)="switchDispatchTab('INTERNAL')"
+                class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
+                [class.bg-white]="dispatchTab() === 'INTERNAL'"
+                [class.text-indigo-600]="dispatchTab() === 'INTERNAL'"
+                [class.shadow-sm]="dispatchTab() === 'INTERNAL'"
+                [class.text-gray-500]="dispatchTab() !== 'INTERNAL'">
+                Internal Dispatch
+              </button>
+            </div>
+
+            <!-- Public Dispatch Fields -->
+            @if (dispatchTab() === 'PUBLIC') {
+              <div class="space-y-4">
+                <!-- Client search -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">Client</label>
+                  <div class="relative">
+                    <input
+                      [ngModel]="dispatchClientSearch()"
+                      (ngModelChange)="dispatchClientSearch.set($event); dispatchForm.orgClientId = ''"
+                      (focus)="dispatchClientFocused.set(true)"
+                      (blur)="dispatchClientFocused.set(false)"
+                      placeholder="Search by name or phone…"
+                      class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                      [class.border-indigo-400]="dispatchForm.orgClientId"
+                      [class.border-gray-200]="!dispatchForm.orgClientId"
+                    />
+                    @if (dispatchForm.orgClientId) {
+                      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-500 text-xs font-semibold">Selected</span>
+                    }
+
+                    <!-- Dropdown -->
+                    @if (dispatchClientFocused() && !dispatchQuickAdd()) {
+                      <div class="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                        @for (c of filteredDispatchClients(); track c.id) {
+                          <button type="button"
+                            (mousedown)="$event.preventDefault(); selectDispatchClient(c)"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-indigo-50 flex items-center justify-between gap-2">
+                            <span class="font-medium text-gray-800">{{ c.name }}</span>
+                            @if (c.phone) { <span class="text-xs text-gray-400 shrink-0">{{ c.phone }}</span> }
+                          </button>
+                        }
+                        @if (filteredDispatchClients().length === 0) {
+                          <p class="px-4 py-2.5 text-sm text-gray-400">No clients found.</p>
+                        }
+                        <button type="button"
+                          (mousedown)="$event.preventDefault(); openDispatchQuickAdd()"
+                          class="w-full text-left px-4 py-2.5 text-sm text-indigo-600 font-semibold hover:bg-indigo-50 border-t border-gray-100 flex items-center gap-2">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                          </svg>
+                          Add "{{ dispatchClientSearch() || 'new client' }}"
+                        </button>
+                      </div>
+                    }
+                  </div>
+
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-gray-600">Pickup Address</label>
+                    <div class="flex items-center gap-3">
+                      @if (dispatchSelectedClient()?.address) {
+                        <button type="button"
+                          (click)="dispatchForm.pickupAddress = dispatchSelectedClient()!.address; dispatchForm.pickupLat = null; dispatchForm.pickupLng = null"
+                          class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                          Use client address
+                        </button>
+                      }
+                      @if (shops().length === 1) {
+                        <button type="button"
+                          (click)="dispatchForm.pickupAddress = shops()[0].address; dispatchForm.pickupLat = shops()[0].latitude; dispatchForm.pickupLng = shops()[0].longitude; dispatchForm.shopId = shops()[0].id; dispatchShopId.set(shops()[0].id)"
+                          class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                          Use {{ shops()[0].name }}
+                        </button>
+                      } @else if (shops().length > 1) {
+                        <div class="relative">
+                          <button type="button"
+                            (click)="dispatchShopPickerOpen.set(!dispatchShopPickerOpen())"
+                            class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                            Use shop address
+                          </button>
+                          @if (dispatchShopPickerOpen()) {
+                            <div class="fixed inset-0 z-10" (click)="dispatchShopPickerOpen.set(false)"></div>
+                            <div class="absolute right-0 top-6 z-20 w-72 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+                              <p class="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Select a shop</p>
+                              @for (shop of shops(); track shop.id) {
+                                <button type="button"
+                                  (click)="dispatchForm.pickupAddress = shop.address; dispatchForm.pickupLat = shop.latitude; dispatchForm.pickupLng = shop.longitude; dispatchForm.shopId = shop.id; dispatchShopId.set(shop.id); dispatchShopPickerOpen.set(false)"
+                                  class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors border-t border-gray-100 first:border-0">
+                                  <p class="font-semibold text-gray-800">{{ shop.name }}</p>
+                                  <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
+                                </button>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <input
+                    appGooglePlaces
+                    (placeSelected)="onPickupPlaceSelected($event)"
+                    [(ngModel)]="dispatchForm.pickupAddress"
+                    placeholder="e.g. 123 Main St"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-gray-600">Dropoff Address</label>
+                    <div class="flex items-center gap-3">
+                      @if (dispatchSelectedClient()?.address) {
+                        <button type="button"
+                          (click)="dispatchForm.dropoffAddress = dispatchSelectedClient()!.address; dispatchForm.dropoffLat = null; dispatchForm.dropoffLng = null"
+                          class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                          Use client address
+                        </button>
+                      }
+                      @if (shops().length === 1) {
+                        <button type="button"
+                          (click)="dispatchForm.dropoffAddress = shops()[0].address; dispatchForm.dropoffLat = shops()[0].latitude; dispatchForm.dropoffLng = shops()[0].longitude"
+                          class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                          Use {{ shops()[0].name }}
+                        </button>
+                      } @else if (shops().length > 1) {
+                        <div class="relative">
+                          <button type="button"
+                            (click)="dispatchShopPickerDropoffOpen.set(!dispatchShopPickerDropoffOpen())"
+                            class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                            Use shop address
+                          </button>
+                          @if (dispatchShopPickerDropoffOpen()) {
+                            <div class="fixed inset-0 z-10" (click)="dispatchShopPickerDropoffOpen.set(false)"></div>
+                            <div class="absolute right-0 top-6 z-20 w-72 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+                              <p class="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Select a shop</p>
+                              @for (shop of shops(); track shop.id) {
+                                <button type="button"
+                                  (click)="dispatchForm.dropoffAddress = shop.address; dispatchForm.dropoffLat = shop.latitude; dispatchForm.dropoffLng = shop.longitude; dispatchShopPickerDropoffOpen.set(false)"
+                                  class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors border-t border-gray-100 first:border-0">
+                                  <p class="font-semibold text-gray-800">{{ shop.name }}</p>
+                                  <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
+                                </button>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <input
+                    appGooglePlaces
+                    (placeSelected)="onDropoffPlaceSelected($event)"
+                    [(ngModel)]="dispatchForm.dropoffAddress"
+                    placeholder="e.g. 456 Park Ave"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+                </div>
+
+                <!-- Description + item picker -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-gray-600">Description</label>
+                    <button type="button"
+                      (click)="dispatchItemPickerOpen.set(true); dispatchItemSearch.set('')"
+                      class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                      Add from shop
+                      @if (dispatchSelectedItems().length > 0) {
+                        <span class="ml-1 bg-indigo-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">{{ dispatchSelectedItems().length }}</span>
+                      }
+                    </button>
+                  </div>
+
+                  <!-- Selected items chips -->
+                  @if (dispatchSelectedItems().length > 0) {
+                    <div class="flex flex-wrap gap-1.5 mb-2">
+                      @for (sel of dispatchSelectedItems(); track sel.item.id) {
+                        <div class="flex items-center gap-1 bg-indigo-100 rounded-lg px-2 py-1 text-xs text-indigo-700">
+                          <span class="font-semibold">{{ sel.item.name }}</span>
+                          <div class="flex items-center gap-0.5 ml-1">
+                            <button type="button" (click)="updateDispatchItemQty(sel.item.id, sel.qty - 1)"
+                              class="w-4 h-4 rounded flex items-center justify-center hover:bg-indigo-200 transition-colors font-bold leading-none">−</button>
+                            <span class="w-5 text-center font-bold">{{ sel.qty }}</span>
+                            <button type="button" (click)="updateDispatchItemQty(sel.item.id, sel.qty + 1)"
+                              class="w-4 h-4 rounded flex items-center justify-center hover:bg-indigo-200 transition-colors font-bold leading-none">+</button>
+                          </div>
+                          <button type="button" (click)="removeDispatchItem(sel.item.id)"
+                            class="ml-1 text-indigo-400 hover:text-indigo-700 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <textarea [(ngModel)]="dispatchForm.description" placeholder="Package contents, notes…" rows="2"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Price ($)</label>
+                    <input [(ngModel)]="dispatchForm.budget" type="number" min="0" step="0.01"
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Payment Method</label>
+                    <select [(ngModel)]="dispatchForm.paymentMethod"
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                      <option value="CASH">Cash</option>
+                      <option value="CARD">Card</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Internal Dispatch Fields -->
+            @if (dispatchTab() === 'INTERNAL') {
+              <div class="space-y-4">
+
+                <!-- Rider -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">Rider</label>
+                  @if (ridersLoading()) {
+                    <div class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-400">Loading riders…</div>
+                  } @else if (orgRiders().length === 0) {
+                    <div class="w-full border border-amber-200 bg-amber-50 rounded-lg px-3 py-2 text-sm text-amber-600">
+                      No riders in this organisation yet.
+                    </div>
+                  } @else {
+                    <select [(ngModel)]="dispatchForm.driverId"
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white">
+                      <option value="">Select a rider…</option>
+                      @for (rider of orgRiders(); track rider.id) {
+                        <option [value]="rider.id">{{ rider.name }}{{ rider.phone ? ' · ' + rider.phone : '' }}</option>
+                      }
+                    </select>
+                  }
+                </div>
+
+                <!-- Client search -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">Client</label>
+                  <div class="relative">
+                    <input
+                      [ngModel]="dispatchClientSearch()"
+                      (ngModelChange)="dispatchClientSearch.set($event); dispatchForm.orgClientId = ''"
+                      (focus)="dispatchClientFocused.set(true)"
+                      (blur)="dispatchClientFocused.set(false)"
+                      placeholder="Search by name or phone…"
+                      class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                      [class.border-indigo-400]="dispatchForm.orgClientId"
+                      [class.border-gray-200]="!dispatchForm.orgClientId"
+                    />
+                    @if (dispatchForm.orgClientId) {
+                      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-500 text-xs font-semibold">Selected</span>
+                    }
+                    @if (dispatchClientFocused() && !dispatchQuickAdd()) {
+                      <div class="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                        @for (c of filteredDispatchClients(); track c.id) {
+                          <button type="button"
+                            (mousedown)="$event.preventDefault(); selectDispatchClient(c)"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-indigo-50 flex items-center justify-between gap-2">
+                            <span class="font-medium text-gray-800">{{ c.name }}</span>
+                            @if (c.phone) { <span class="text-xs text-gray-400 shrink-0">{{ c.phone }}</span> }
+                          </button>
+                        }
+                        @if (filteredDispatchClients().length === 0) {
+                          <p class="px-4 py-2.5 text-sm text-gray-400">No clients found.</p>
+                        }
+                        <button type="button"
+                          (mousedown)="$event.preventDefault(); openDispatchQuickAdd()"
+                          class="w-full text-left px-4 py-2.5 text-sm text-indigo-600 font-semibold hover:bg-indigo-50 border-t border-gray-100 flex items-center gap-2">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                          </svg>
+                          Add "{{ dispatchClientSearch() || 'new client' }}"
+                        </button>
+                      </div>
+                    }
+                  </div>
+                  @if (dispatchQuickAdd()) {
+                    <div class="mt-3 p-4 bg-indigo-50 rounded-xl space-y-3 border border-indigo-100">
+                      <p class="text-xs font-semibold text-indigo-700">New Client</p>
+                      <input [(ngModel)]="dispatchQuickForm.name" placeholder="Full name *"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"/>
+                      <input [(ngModel)]="dispatchQuickForm.phone" placeholder="Phone number"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"/>
+                      <input appGooglePlaces (placeSelected)="onQuickClientAddressSelected($event)"
+                        [(ngModel)]="dispatchQuickForm.address" placeholder="Address"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"/>
+                      <div class="flex gap-2 pt-1">
+                        <button type="button" (click)="saveQuickDispatchClient()" [disabled]="dispatchQuickSaving() || !dispatchQuickForm.name.trim()"
+                          class="flex-1 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                          {{ dispatchQuickSaving() ? 'Saving…' : 'Add Client' }}
+                        </button>
+                        <button type="button" (click)="dispatchQuickAdd.set(false)"
+                          class="px-4 py-2 rounded-lg bg-white text-gray-600 text-sm font-semibold hover:bg-gray-100 transition-colors border border-gray-200">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- Pickup -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-gray-600">Pickup Address</label>
+                    <div class="flex items-center gap-3">
+                      @if (dispatchSelectedClient()?.address) {
+                        <button type="button"
+                          (click)="dispatchForm.pickupAddress = dispatchSelectedClient()!.address; dispatchForm.pickupLat = null; dispatchForm.pickupLng = null"
+                          class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                          Use client address
+                        </button>
+                      }
+                      @if (shops().length > 0) {
+                        <div class="relative">
+                          <button type="button"
+                            (click)="dispatchShopPickerOpen.set(!dispatchShopPickerOpen())"
+                            class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                            Use shop address
+                          </button>
+                          @if (dispatchShopPickerOpen()) {
+                            <div class="fixed inset-0 z-10" (click)="dispatchShopPickerOpen.set(false)"></div>
+                            <div class="absolute right-0 top-6 z-20 w-72 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+                              <p class="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Select a shop</p>
+                              @for (shop of shops(); track shop.id) {
+                                <button type="button"
+                                  (click)="dispatchForm.pickupAddress = shop.address; dispatchForm.pickupLat = shop.latitude; dispatchForm.pickupLng = shop.longitude; dispatchForm.shopId = shop.id; dispatchShopId.set(shop.id); dispatchShopPickerOpen.set(false)"
+                                  class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors border-t border-gray-100 first:border-0">
+                                  <p class="font-semibold text-gray-800">{{ shop.name }}</p>
+                                  <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
+                                </button>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <input
+                    appGooglePlaces
+                    (placeSelected)="onPickupPlaceSelected($event)"
+                    [(ngModel)]="dispatchForm.pickupAddress"
+                    placeholder="e.g. 123 Main St"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+                </div>
+
+                <!-- Dropoff -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-gray-600">Dropoff Address</label>
+                    <div class="flex items-center gap-3">
+                      @if (dispatchSelectedClient()?.address) {
+                        <button type="button"
+                          (click)="dispatchForm.dropoffAddress = dispatchSelectedClient()!.address; dispatchForm.dropoffLat = null; dispatchForm.dropoffLng = null"
+                          class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                          Use client address
+                        </button>
+                      }
+                      @if (shops().length === 1) {
+                        <button type="button"
+                          (click)="dispatchForm.dropoffAddress = shops()[0].address; dispatchForm.dropoffLat = shops()[0].latitude; dispatchForm.dropoffLng = shops()[0].longitude"
+                          class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                          Use {{ shops()[0].name }}
+                        </button>
+                      } @else if (shops().length > 1) {
+                        <div class="relative">
+                          <button type="button"
+                            (click)="dispatchShopPickerDropoffOpen.set(!dispatchShopPickerDropoffOpen())"
+                            class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors">
+                            Use shop address
+                          </button>
+                          @if (dispatchShopPickerDropoffOpen()) {
+                            <div class="fixed inset-0 z-10" (click)="dispatchShopPickerDropoffOpen.set(false)"></div>
+                            <div class="absolute right-0 top-6 z-20 w-72 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+                              <p class="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Select a shop</p>
+                              @for (shop of shops(); track shop.id) {
+                                <button type="button"
+                                  (click)="dispatchForm.dropoffAddress = shop.address; dispatchForm.dropoffLat = shop.latitude; dispatchForm.dropoffLng = shop.longitude; dispatchShopPickerDropoffOpen.set(false)"
+                                  class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors border-t border-gray-100 first:border-0">
+                                  <p class="font-semibold text-gray-800">{{ shop.name }}</p>
+                                  <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
+                                </button>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <input
+                    appGooglePlaces
+                    (placeSelected)="onDropoffPlaceSelected($event)"
+                    [(ngModel)]="dispatchForm.dropoffAddress"
+                    placeholder="e.g. 456 Park Ave"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+                </div>
+
+                <!-- Description -->
+                <!-- Description + item picker -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-gray-600">Description</label>
+                    <button type="button"
+                      (click)="dispatchItemPickerOpen.set(true); dispatchItemSearch.set('')"
+                      class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                      Add from shop
+                      @if (dispatchSelectedItems().length > 0) {
+                        <span class="ml-1 bg-indigo-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">{{ dispatchSelectedItems().length }}</span>
+                      }
+                    </button>
+                  </div>
+
+                  <!-- Selected items chips -->
+                  @if (dispatchSelectedItems().length > 0) {
+                    <div class="flex flex-wrap gap-1.5 mb-2">
+                      @for (sel of dispatchSelectedItems(); track sel.item.id) {
+                        <div class="flex items-center gap-1 bg-indigo-100 rounded-lg px-2 py-1 text-xs text-indigo-700">
+                          <span class="font-semibold">{{ sel.item.name }}</span>
+                          <div class="flex items-center gap-0.5 ml-1">
+                            <button type="button" (click)="updateDispatchItemQty(sel.item.id, sel.qty - 1)"
+                              class="w-4 h-4 rounded flex items-center justify-center hover:bg-indigo-200 transition-colors font-bold leading-none">−</button>
+                            <span class="w-5 text-center font-bold">{{ sel.qty }}</span>
+                            <button type="button" (click)="updateDispatchItemQty(sel.item.id, sel.qty + 1)"
+                              class="w-4 h-4 rounded flex items-center justify-center hover:bg-indigo-200 transition-colors font-bold leading-none">+</button>
+                          </div>
+                          <button type="button" (click)="removeDispatchItem(sel.item.id)"
+                            class="ml-1 text-indigo-400 hover:text-indigo-700 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <textarea [(ngModel)]="dispatchForm.description" placeholder="Package contents, notes…" rows="2"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"></textarea>
+                </div>
+
+                <!-- Price + Payment -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Price ($)</label>
+                    <input [(ngModel)]="dispatchForm.budget" type="number" min="0" step="0.01"
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Payment Method</label>
+                    <select [(ngModel)]="dispatchForm.paymentMethod"
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                      <option value="CASH">Cash</option>
+                      <option value="CARD">Card</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="flex items-center justify-end gap-3 mt-6">
+              <button (click)="closeCreateDispatch()"
+                class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition-colors">
+                Cancel
+              </button>
+              <button (click)="saveDispatch()"
+                [disabled]="dispatchSaving() || !dispatchForm.pickupAddress.trim() || !dispatchForm.dropoffAddress.trim() || (dispatchForm.dispatchStrategy === 'DIRECT_ASSIGN' && !dispatchForm.driverId)"
+                class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                {{ dispatchSaving() ? 'Creating…' : 'Create Dispatch' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+  <!-- ── Quick Add Client Popup ── -->
+  @if (dispatchQuickAdd()) {
+    <div class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4" (click)="closeDispatchQuickAdd()">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transition-all"
+        [class.ring-2]="quickClientModalError()" [class.ring-red-400]="quickClientModalError()"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <h3 class="text-base font-bold text-gray-900">New Client</h3>
+            @if (dispatchClientSearch()) {
+              <p class="text-xs text-gray-400 mt-0.5">Adding "{{ dispatchClientSearch() }}"</p>
+            }
+          </div>
+          <button (click)="closeDispatchQuickAdd()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        @if (quickClientModalError()) {
+          <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-3 text-sm">
+            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>{{ quickClientModalError() }}</span>
+          </div>
+        }
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Full Name <span class="text-red-400">*</span></label>
+            <input [(ngModel)]="dispatchQuickForm.name" placeholder="e.g. John Doe"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Phone Number</label>
+            <input [(ngModel)]="dispatchQuickForm.phone" placeholder="e.g. +263 77 123 4567" type="tel"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Address</label>
+            <input appGooglePlaces (placeSelected)="onQuickClientAddressSelected($event)"
+              [(ngModel)]="dispatchQuickForm.address" placeholder="e.g. 12 Main St, Harare"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+          </div>
+        </div>
+
+        <div class="flex gap-2 mt-5">
+          <button type="button" (click)="closeDispatchQuickAdd()"
+            class="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-600 text-sm font-semibold hover:bg-gray-200 transition-colors">
+            Cancel
+          </button>
+          <button type="button" (click)="saveQuickDispatchClient()"
+            [disabled]="dispatchQuickSaving() || !dispatchQuickForm.name.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50">
+            {{ dispatchQuickSaving() ? 'Saving…' : 'Add Client' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- ── Shop Item Picker Popup ── -->
+  @if (dispatchItemPickerOpen()) {
+    <div class="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4" (click)="dispatchItemPickerOpen.set(false)">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col" style="max-height: 78vh" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
+          <h3 class="text-sm font-bold text-gray-900">Add Items from Shop</h3>
+          <button (click)="dispatchItemPickerOpen.set(false)" class="ml-auto p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Two-panel body -->
+        <div class="flex flex-1 min-h-0 divide-x divide-gray-100">
+
+          <!-- LEFT: Browse -->
+          <div class="flex flex-col w-1/2 min-h-0">
+            <!-- Search -->
+            <div class="px-3 py-2.5 border-b border-gray-100 shrink-0">
+              <div class="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-1.5">
+                <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+                </svg>
+                <input type="text" placeholder="Search items…"
+                  [ngModel]="dispatchItemSearch()"
+                  (ngModelChange)="dispatchItemSearch.set($event)"
+                  class="flex-1 text-xs bg-transparent outline-none text-gray-700 placeholder-gray-400"/>
+                @if (dispatchItemSearch()) {
+                  <button (click)="dispatchItemSearch.set('')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+            <!-- List -->
+            <div class="flex-1 overflow-y-auto">
+              @if (dispatchItemsLoading()) {
+                <p class="text-xs text-gray-400 text-center py-8">Loading…</p>
+              } @else if (dispatchShopItems().length === 0) {
+                <p class="text-xs text-gray-400 text-center py-8">{{ dispatchItemSearch() ? 'No matches' : 'No items found' }}</p>
+              } @else {
+                @for (item of dispatchShopItems(); track item.id) {
+                  <button type="button"
+                    (click)="addDispatchItem(item)"
+                    class="w-full flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 last:border-0 text-left transition-colors hover:bg-gray-50"
+                    [class.bg-indigo-50]="selectedQty(item.id) > 0"
+                    [class.hover:bg-indigo-50]="selectedQty(item.id) > 0">
+                    <!-- Check indicator -->
+                    <span class="w-4 h-4 rounded-full shrink-0 flex items-center justify-center border transition-colors"
+                      [class.bg-indigo-500]="selectedQty(item.id) > 0"
+                      [class.border-indigo-500]="selectedQty(item.id) > 0"
+                      [class.border-gray-200]="selectedQty(item.id) === 0">
+                      @if (selectedQty(item.id) > 0) {
+                        <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                        </svg>
+                      }
+                    </span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-semibold truncate"
+                         [class.text-indigo-700]="selectedQty(item.id) > 0"
+                         [class.text-gray-800]="selectedQty(item.id) === 0">{{ item.name }}</p>
+                      <div class="flex items-center gap-1.5 mt-0.5">
+                        @if (item.unit) { <span class="text-[11px] text-gray-400">{{ item.unit }}</span> }
+                        @if (item.unit && item.sku) { <span class="text-[11px] text-gray-300">·</span> }
+                        @if (item.sku)  { <span class="text-[11px] text-gray-400">{{ item.sku }}</span> }
+                      </div>
+                    </div>
+                    @if (selectedQty(item.id) > 0) {
+                      <span class="text-xs font-bold text-indigo-500 shrink-0">×{{ selectedQty(item.id) }}</span>
+                    }
+                  </button>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- RIGHT: Selected items -->
+          <div class="flex flex-col w-1/2 min-h-0">
+            <div class="px-4 py-2.5 border-b border-gray-100 shrink-0 flex items-center justify-between">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Selected</p>
+              @if (dispatchSelectedItems().length > 0) {
+                <span class="text-xs font-bold text-indigo-600">{{ dispatchSelectedItems().length }} item{{ dispatchSelectedItems().length > 1 ? 's' : '' }}</span>
+              }
+            </div>
+            <div class="flex-1 overflow-y-auto">
+              @if (dispatchSelectedItems().length === 0) {
+                <div class="flex flex-col items-center justify-center h-full text-center px-6 py-8">
+                  <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+                    <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                  </div>
+                  <p class="text-xs text-gray-400">Click items on the left to add them here</p>
+                </div>
+              } @else {
+                @for (sel of dispatchSelectedItems(); track sel.item.id) {
+                  <div class="flex items-center gap-2 px-4 py-2.5 border-b border-gray-50 last:border-0">
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-semibold text-gray-800 truncate">{{ sel.item.name }}</p>
+                      <div class="flex items-center gap-1.5 mt-0.5">
+                        @if (sel.item.unit) { <span class="text-[11px] text-gray-400">{{ sel.item.unit }}</span> }
+                        @if (sel.item.unit && sel.item.sku) { <span class="text-[11px] text-gray-300">·</span> }
+                        @if (sel.item.sku)  { <span class="text-[11px] text-gray-400">{{ sel.item.sku }}</span> }
+                      </div>
+                    </div>
+                    <!-- Qty controls -->
+                    <div class="flex items-center gap-1 shrink-0">
+                      <button type="button"
+                        (click)="updateDispatchItemQty(sel.item.id, sel.qty - 1)"
+                        class="w-6 h-6 rounded-md bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-sm font-bold transition-colors">−</button>
+                      <span class="w-6 text-center text-xs font-bold text-gray-800">{{ sel.qty }}</span>
+                      <button type="button"
+                        (click)="updateDispatchItemQty(sel.item.id, sel.qty + 1)"
+                        class="w-6 h-6 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-600 flex items-center justify-center text-sm font-bold transition-colors">+</button>
+                    </div>
+                    <!-- Remove -->
+                    <button type="button"
+                      (click)="removeDispatchItem(sel.item.id)"
+                      class="p-1 rounded text-gray-300 hover:text-red-400 transition-colors shrink-0">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="px-5 py-3 border-t border-gray-100 shrink-0 flex items-center justify-between">
+          <p class="text-xs text-gray-500">
+            @if (dispatchSelectedItems().length > 0) {
+              <span class="font-semibold text-indigo-600">{{ dispatchSelectedItems().reduce(totalQty, 0) }} units</span>
+              <span class="text-gray-400"> across {{ dispatchSelectedItems().length }} item{{ dispatchSelectedItems().length > 1 ? 's' : '' }}</span>
+            } @else {
+              <span class="text-gray-400">No items selected</span>
+            }
+          </p>
+          <button (click)="dispatchItemPickerOpen.set(false)"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors">
+            Done
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- ── Edit Dispatch Modal ── -->
+  @if (editDispatchModal()) {
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeEditDispatch()">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7 transition-all"
+        [class.ring-2]="editDispatchModalError()" [class.ring-red-400]="editDispatchModalError()"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Edit Dispatch</h3>
+            <p class="text-xs text-gray-400 mt-0.5">{{ editDispatchItem()?.clientName ?? 'No client' }} · #{{ editDispatchItem()?.id?.slice(-6) }}</p>
+          </div>
+          <button (click)="closeEditDispatch()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        @if (editDispatchModalError()) {
+          <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>{{ editDispatchModalError() }}</span>
+          </div>
+        }
+
+        <div class="space-y-4">
+
+          <!-- Status -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
+            <select [(ngModel)]="editForm.status"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white">
+              <option value="ASSIGNED">Assigned</option>
+              <option value="ACCEPTED">Accepted</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="ARRIVED">Arrived</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="DECLINED">Declined</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+
+          <!-- Pickup Address -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Pickup Address</label>
+            <input appGooglePlaces (placeSelected)="onEditPickupSelected($event)"
+              [(ngModel)]="editForm.pickupAddress" placeholder="e.g. 123 Main St"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+          </div>
+
+          <!-- Dropoff Address -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Dropoff Address</label>
+            <input appGooglePlaces (placeSelected)="onEditDropoffSelected($event)"
+              [(ngModel)]="editForm.dropoffAddress" placeholder="e.g. 456 Park Ave"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Description</label>
+            <textarea [(ngModel)]="editForm.description" placeholder="Package contents, notes…" rows="2"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"></textarea>
+          </div>
+
+          <!-- Price -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Price ($)</label>
+            <input [(ngModel)]="editForm.price" type="number" min="0" step="0.01"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+          </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end gap-3 mt-6">
+          <button (click)="closeEditDispatch()"
+            class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition-colors">
+            Cancel
+          </button>
+          <button (click)="saveEditDispatch()"
+            [disabled]="editDispatchSaving() || !editForm.pickupAddress.trim() || !editForm.dropoffAddress.trim()"
+            class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ editDispatchSaving() ? 'Saving…' : 'Save Changes' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+      <!-- ── Fleet ── -->
+      @if (activePage() === 'fleet') {
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Fleet</h1>
+              <p class="text-gray-500 text-sm mt-0.5">Bikes registered to your organisation.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                (click)="openInviteModal()"
+                class="flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+                Link Existing Bike
+              </button>
+              <button
+                (click)="openBikeModal()"
+                class="flex items-center gap-2 bg-[#4f46e5] hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Register Bike
+              </button>
+            </div>
+          </div>
+
+          <!-- Fleet tabs -->
+          <div class="flex gap-2 mb-5">
+            <button
+              (click)="fleetTab.set('bikes')"
+              [class.bg-indigo-600]="fleetTab() === 'bikes'"
+              [class.text-white]="fleetTab() === 'bikes'"
+              [class.bg-gray-100]="fleetTab() !== 'bikes'"
+              [class.text-gray-500]="fleetTab() !== 'bikes'"
+              class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors"
+            >
+              Registered Bikes
+            </button>
+            <button
+              (click)="fleetTab.set('invites'); loadInvites()"
+              [class.bg-indigo-600]="fleetTab() === 'invites'"
+              [class.text-white]="fleetTab() === 'invites'"
+              [class.bg-gray-100]="fleetTab() !== 'invites'"
+              [class.text-gray-500]="fleetTab() !== 'invites'"
+              class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2"
+            >
+              Invites
+              @if (invites().length > 0) {
+                <span class="bg-red-500 text-white rounded-full text-xs px-2 py-0.5">{{ invites().length }}</span>
+              }
+            </button>
+          </div>
+
+          <!-- Registered bikes tab -->
+          @if (fleetTab() === 'bikes') {
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              @if (bikesLoading() && bikes().length === 0) {
+                <div class="py-16 text-center text-sm text-gray-400">Loading fleet…</div>
+              } @else if (bikes().length === 0) {
+                <div class="py-16 text-center">
+                  <p class="text-gray-500 text-sm">No bikes registered yet.</p>
+                  <button (click)="openBikeModal()" class="mt-3 text-indigo-600 text-sm font-medium hover:underline">Register your first bike</button>
+                </div>
+              } @else {
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-gray-100">
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Make / Model</th>
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Plate</th>
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">VIN</th>
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Status</th>
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Assigned Rider</th>
+                      <th class="py-3 px-5"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (bike of bikes(); track bike.id) {
+                      <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                        <td class="py-3.5 px-5 text-sm font-medium text-gray-800">{{ bike.make }} {{ bike.model }}</td>
+                        <td class="py-3.5 px-5 text-sm text-gray-600">{{ bike.licensePlate }}</td>
+                        <td class="py-3.5 px-5 text-sm text-gray-400">{{ bike.vin || '—' }}</td>
+                        <td class="py-3.5 px-5">
+                          <span class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full"
+                            [class]="bike.status === 'ACTIVE' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'">
+                            {{ bike.status }}
+                          </span>
+                        </td>
+                        <td class="py-3.5 px-5">
+                          @if (bike.assignedRiderName) {
+                            <div class="flex items-center gap-2">
+                              <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-orange-100 text-orange-700 text-xs font-bold">
+                                {{ bike.assignedRiderName[0] }}
+                              </span>
+                              <span class="text-sm text-gray-700">{{ bike.assignedRiderName }}</span>
+                            </div>
+                          } @else {
+                            <span class="text-xs text-gray-400 italic">Unassigned</span>
+                          }
+                        </td>
+                        <td class="py-3.5 px-5 text-right text-sm whitespace-nowrap">
+                          @if (bikeDeletingId() === bike.id) {
+                            <span class="text-gray-500 mr-2">Sure?</span>
+                            <button (click)="deleteBike(bike.id)" class="text-red-600 font-semibold mr-2">Yes</button>
+                            <button (click)="bikeDeletingId.set(null)" class="text-gray-400">No</button>
+                          } @else {
+                            <button (click)="openPairModal(bike)" class="text-orange-600 font-medium hover:underline mr-3">
+                              {{ bike.assignedRiderName ? 'Reassign' : 'Pair Rider' }}
+                            </button>
+                            @if (bike.assignedRiderName) {
+                              <button (click)="unassignRider(bike.id)"
+                                [disabled]="unpairingSaving() === bike.id"
+                                class="text-gray-400 font-medium hover:underline mr-3 disabled:opacity-50">
+                                {{ unpairingSaving() === bike.id ? '…' : 'Unpair' }}
+                              </button>
+                            }
+                            <button (click)="openBikeModal(bike)" class="text-indigo-600 font-medium hover:underline mr-3">Edit</button>
+                            <button (click)="bikeDeletingId.set(bike.id)" class="text-red-500 font-medium hover:underline">Delete</button>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              }
+            </div>
+          }
+
+          <!-- Invites tab -->
+          @if (fleetTab() === 'invites') {
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              @if (invitesLoading()) {
+                <div class="py-16 text-center text-sm text-gray-400">Loading invites…</div>
+              } @else if (invites().length === 0) {
+                <div class="py-16 text-center">
+                  <p class="text-gray-500 text-sm">No invites sent yet.</p>
+                  <button (click)="openInviteModal()" class="mt-3 text-indigo-600 text-sm font-medium hover:underline">Link an existing bike</button>
+                </div>
+              } @else {
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-gray-100">
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Bike</th>
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Owner</th>
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Status</th>
+                      <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Sent</th>
+                      <th class="py-3 px-5"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (inv of invites(); track inv.id) {
+                      <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                        <td class="py-3.5 px-5">
+                          <p class="text-sm font-medium text-gray-800">{{ inv.bikeMake }} {{ inv.bikeModel }}</p>
+                          <p class="text-xs text-gray-400 mt-0.5">{{ inv.bikeLicensePlate }}</p>
+                        </td>
+                        <td class="py-3.5 px-5 text-sm text-gray-600">{{ inv.bikeOwnerName }}</td>
+                        <td class="py-3.5 px-5">
+                          <span class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full"
+                            [class]="inv.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' : inv.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'">
+                            {{ inv.status }}
+                          </span>
+                        </td>
+                        <td class="py-3.5 px-5 text-sm text-gray-400">{{ inv.createdAt | date:'mediumDate' }}</td>
+                        <td class="py-3.5 px-5 text-right text-sm whitespace-nowrap">
+                          @if (inv.status === 'PENDING') {
+                            @if (inviteCancellingId() === inv.id) {
+                              <span class="text-gray-500 mr-2">Sure?</span>
+                              <button (click)="cancelInvite(inv.id)" class="text-red-600 font-semibold mr-2">Yes</button>
+                              <button (click)="inviteCancellingId.set(null)" class="text-gray-400">No</button>
+                            } @else {
+                              <button (click)="inviteCancellingId.set(inv.id)" class="text-red-500 font-medium hover:underline">Cancel</button>
+                            }
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ── Clients ── -->
+      @if (activePage() === 'clients') {
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Clients</h1>
+              <p class="text-gray-500 text-sm mt-0.5">Your private client directory.</p>
+            </div>
+            <button
+              (click)="openClientModal()"
+              class="flex items-center gap-2 bg-[#4f46e5] hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Add Client
+            </button>
+          </div>
+
+          <!-- Search -->
+          <div class="mb-4">
+            <input
+              type="text"
+              [(ngModel)]="clientSearch"
+              (ngModelChange)="loadClients()"
+              placeholder="Search by name, phone or email…"
+              class="w-full max-w-sm border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            @if (clientsLoading() && clients().length === 0) {
+              <div class="py-16 text-center text-sm text-gray-400">Loading clients…</div>
+            } @else if (clients().length === 0) {
+              <div class="py-16 text-center">
+                <p class="text-gray-500 text-sm">No clients yet.</p>
+                <button (click)="openClientModal()" class="mt-3 text-indigo-600 text-sm font-medium hover:underline">Add your first client</button>
+              </div>
+            } @else {
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-gray-100">
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Name</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Phone</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Email</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Address</th>
+                    <th class="py-3 px-5"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (client of clients(); track client.id) {
+                    <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td class="py-3.5 px-5 text-sm font-medium text-gray-800">{{ client.name }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-600">{{ client.phone || '—' }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-600">{{ client.email || '—' }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-400 max-w-[180px] truncate">{{ client.address || '—' }}</td>
+                      <td class="py-3.5 px-5 text-right text-sm whitespace-nowrap">
+                        @if (clientDeletingId() === client.id) {
+                          <span class="text-gray-500 mr-2">Sure?</span>
+                          <button (click)="deleteClient(client.id)" class="text-red-600 font-semibold mr-2">Yes</button>
+                          <button (click)="clientDeletingId.set(null)" class="text-gray-400">No</button>
+                        } @else {
+                          <button (click)="openClientModal(client)" class="text-indigo-600 font-medium hover:underline mr-4">Edit</button>
+                          <button (click)="clientDeletingId.set(client.id)" class="text-red-500 font-medium hover:underline">Delete</button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ── Shop Items ── -->
+      @if (activePage() === 'items') {
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Shop Items</h1>
+              <p class="text-gray-500 text-sm mt-0.5">Product catalogue across all your shops.</p>
+            </div>
+            <button
+              (click)="openItemModal()"
+              [disabled]="shops().length === 0"
+              class="flex items-center gap-2 bg-[#4f46e5] hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
+              [title]="shops().length === 0 ? 'Create a shop first' : ''"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Add Item
+            </button>
+          </div>
+
+          @if (shops().length === 0 && !itemsLoading()) {
+            <div class="bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-xl px-4 py-3 mb-4">
+              You need at least one shop before adding items.
+              <button (click)="navigate('shops')" class="ml-2 font-semibold underline">Create a shop</button>
+            </div>
+          }
+
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            @if (itemsLoading() && shopItems().length === 0) {
+              <div class="py-16 text-center text-sm text-gray-400">Loading items…</div>
+            } @else if (shopItems().length === 0) {
+              <div class="py-16 text-center">
+                <p class="text-gray-500 text-sm">No items yet.</p>
+                @if (shops().length > 0) {
+                  <button (click)="openItemModal()" class="mt-3 text-indigo-600 text-sm font-medium hover:underline">Add your first item</button>
+                }
+              </div>
+            } @else {
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-gray-100">
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Name</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Shop</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">SKU</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Unit</th>
+                    <th class="py-3 px-5"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of shopItems(); track item.id) {
+                    <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td class="py-3.5 px-5">
+                        <p class="text-sm font-medium text-gray-800">{{ item.name }}</p>
+                        @if (item.description) {
+                          <p class="text-xs text-gray-400 mt-0.5 truncate max-w-[200px]">{{ item.description }}</p>
+                        }
+                      </td>
+                      <td class="py-3.5 px-5 text-sm text-gray-600">{{ item.shopName }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-400">{{ item.sku || '—' }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-400">{{ item.unit || '—' }}</td>
+                      <td class="py-3.5 px-5 text-right text-sm whitespace-nowrap">
+                        @if (itemDeletingId() === item.id) {
+                          <span class="text-gray-500 mr-2">Sure?</span>
+                          <button (click)="deleteItem(item)" class="text-red-600 font-semibold mr-2">Yes</button>
+                          <button (click)="itemDeletingId.set(null)" class="text-gray-400">No</button>
+                        } @else {
+                          <button (click)="openItemModal(item)" class="text-indigo-600 font-medium hover:underline mr-4">Edit</button>
+                          <button (click)="itemDeletingId.set(item.id)" class="text-red-500 font-medium hover:underline">Delete</button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ── Shops ── -->
+      @if (activePage() === 'shops') {
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Shops</h1>
+              <p class="text-gray-500 text-sm mt-0.5">Your branches and pickup locations.</p>
+            </div>
+            <button
+              (click)="openShopModal()"
+              class="flex items-center gap-2 bg-[#4f46e5] hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Add Shop
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            @if (shopsLoading() && shops().length === 0) {
+              <div class="py-16 text-center text-sm text-gray-400">Loading shops…</div>
+            } @else if (shops().length === 0) {
+              <div class="py-16 text-center">
+                <p class="text-gray-500 text-sm">No shops yet.</p>
+                <button (click)="openShopModal()" class="mt-3 text-indigo-600 text-sm font-medium hover:underline">Add your first shop</button>
+              </div>
+            } @else {
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-gray-100">
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Name</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Slug</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Address</th>
+                    <th class="text-left py-3 px-5 text-xs text-gray-400 font-semibold uppercase tracking-wider">Phone</th>
+                    <th class="py-3 px-5"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (shop of shops(); track shop.id) {
+                    <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td class="py-3.5 px-5 text-sm font-medium text-gray-800">{{ shop.name }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-400 font-mono text-xs">{{ shop.slug }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-600 max-w-[200px] truncate">{{ shop.address || '—' }}</td>
+                      <td class="py-3.5 px-5 text-sm text-gray-600">{{ shop.phone || '—' }}</td>
+                      <td class="py-3.5 px-5 text-right text-sm whitespace-nowrap">
+                        @if (shopDeletingId() === shop.id) {
+                          <span class="text-gray-500 mr-2">Sure?</span>
+                          <button (click)="deleteShop(shop.id)" class="text-red-600 font-semibold mr-2">Yes</button>
+                          <button (click)="shopDeletingId.set(null)" class="text-gray-400">No</button>
+                        } @else {
+                          <button (click)="openShopModal(shop)" class="text-indigo-600 font-medium hover:underline mr-4">Edit</button>
+                          <button (click)="shopDeletingId.set(shop.id)" class="text-red-500 font-medium hover:underline">Delete</button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ── Members ── -->
+      @if (activePage() === 'members') {
+        <div>
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Members</h1>
+              <p class="text-gray-500 text-sm mt-0.5">Riders and dispatchers in your organisation.</p>
+            </div>
+            <button (click)="openAddMember()"
+              class="flex items-center gap-2 bg-[#4f46e5] hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+              </svg>
+              Add Member
+            </button>
+          </div>
+
+          <!-- Role filter tabs -->
+          <div class="flex gap-2 mb-5">
+            @for (tab of [{val: '', label: 'All'}, {val: 'RIDER', label: 'Riders'}, {val: 'DISPATCHER', label: 'Dispatchers'}]; track tab.val) {
+              <button
+                (click)="memberRoleFilter.set(tab.val); loadMembers()"
+                [class.bg-indigo-600]="memberRoleFilter() === tab.val"
+                [class.text-white]="memberRoleFilter() === tab.val"
+                [class.bg-gray-100]="memberRoleFilter() !== tab.val"
+                [class.text-gray-500]="memberRoleFilter() !== tab.val"
+                class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors">
+                {{ tab.label }}
+              </button>
+            }
+          </div>
+
+          <!-- Table -->
+          <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            @if (membersLoading() && members().length === 0) {
+              <div class="py-16 text-center text-sm text-gray-400">Loading members…</div>
+            } @else if (members().length === 0) {
+              <div class="py-16 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-3">
+                  <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </div>
+                <p class="text-gray-500 text-sm">No members yet.</p>
+                <button (click)="openAddMember()" class="mt-3 text-indigo-600 text-sm font-medium hover:underline">Add your first member</button>
+              </div>
+            } @else {
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                    <th class="px-5 py-3 text-left">Name</th>
+                    <th class="px-5 py-3 text-left">Email</th>
+                    <th class="px-5 py-3 text-left">Phone</th>
+                    <th class="px-5 py-3 text-left">Role</th>
+                    <th class="px-5 py-3 text-left">Status</th>
+                    <th class="px-5 py-3 text-left">Joined</th>
+                    <th class="px-5 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (m of members(); track m.id) {
+                    <tr class="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
+                      <td class="px-5 py-3.5">
+                        <div class="flex items-center gap-3">
+                          <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs shrink-0">
+                            {{ m.name.charAt(0).toUpperCase() }}
+                          </div>
+                          <span class="font-semibold text-sm text-gray-800">{{ m.name }}</span>
+                        </div>
+                      </td>
+                      <td class="px-5 py-3.5 text-sm text-gray-600">{{ m.email }}</td>
+                      <td class="px-5 py-3.5 text-sm text-gray-500">{{ m.phone || '—' }}</td>
+                      <td class="px-5 py-3.5">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold"
+                          [class]="memberRoleColor(m.role)">
+                          {{ m.role | titlecase }}
+                        </span>
+                      </td>
+                      <td class="px-5 py-3.5">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                          [class]="memberStatusColor(m.status)">
+                          {{ m.status | titlecase }}
+                        </span>
+                      </td>
+                      <td class="px-5 py-3.5 text-xs text-gray-400">{{ m.createdAt | date:'MMM d, yyyy' }}</td>
+                      <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                        @if (memberRemovingId() === m.id) {
+                          <span class="text-gray-500 text-sm mr-2">Remove?</span>
+                          <button (click)="removeMember(m.id)" class="text-red-600 font-semibold text-sm mr-2">Yes</button>
+                          <button (click)="memberRemovingId.set(null)" class="text-gray-400 text-sm">No</button>
+                        } @else {
+                          <button (click)="openEditMember(m)" class="text-indigo-600 font-medium text-sm hover:underline mr-4">Edit</button>
+                          <button (click)="memberRemovingId.set(m.id)" class="text-red-500 font-medium text-sm hover:underline">Remove</button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ── Settings ── -->
+      @if (activePage() === 'settings' && isOrgAdmin) {
+        <div class="flex flex-col items-center justify-center h-full text-center">
+          <div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Organisation Settings</h2>
+          <p class="text-gray-500 text-sm mt-1">Manage your org profile, members, and billing.</p>
+          <span class="mt-4 inline-block bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">Coming next</span>
+        </div>
+      }
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Bike modal -->
+@if (bikeModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeBikeModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transition-all"
+      [class.ring-2]="bikeModalError()" [class.ring-red-400]="bikeModalError()"
+      (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 mb-5">{{ bikeEditing() ? 'Edit Bike' : 'Register Bike' }}</h3>
+      @if (bikeModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ bikeModalError() }}</span>
+        </div>
+      }
+      <form (ngSubmit)="saveBike()" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Make *</label>
+            <input type="text" [(ngModel)]="bikeForm.make" name="make" required placeholder="Honda"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Model *</label>
+            <input type="text" [(ngModel)]="bikeForm.model" name="model" required placeholder="CB150"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">License Plate *</label>
+          <input type="text" [(ngModel)]="bikeForm.licensePlate" name="licensePlate" required placeholder="ABC 1234"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">VIN <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="text" [(ngModel)]="bikeForm.vin" name="vin" placeholder="VIN number"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="closeBikeModal()" class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium">Cancel</button>
+          <button type="submit"
+            [disabled]="bikesLoading() || !bikeForm.make.trim() || !bikeForm.model.trim() || !bikeForm.licensePlate.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold">
+            {{ bikeEditing() ? 'Save Changes' : 'Register' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Pair rider to bike modal -->
+@if (pairModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closePairModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transition-all"
+      [class.ring-2]="pairModalError()" [class.ring-red-400]="pairModalError()"
+      (click)="$event.stopPropagation()">
+      <h2 class="text-lg font-bold text-gray-900 mb-1">Pair Rider to Bike</h2>
+      <p class="text-sm text-gray-500 mb-3">{{ pairBike()?.make }} {{ pairBike()?.model }} — {{ pairBike()?.licensePlate }}</p>
+      @if (pairModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ pairModalError() }}</span>
+        </div>
+      }
+      <div class="mb-5">
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Select Rider *</label>
+        @if (ridersLoading()) {
+          <div class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-400">Loading riders…</div>
+        } @else if (orgRiders().length === 0) {
+          <div class="w-full border border-orange-200 bg-orange-50 rounded-xl px-3 py-2.5 text-sm text-orange-600">
+            No riders in your organisation yet. Add riders under Members first.
+          </div>
+        } @else {
+          <select [ngModel]="pairRiderId()" (ngModelChange)="pairRiderId.set($event)" name="pairRider"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            <option value="">— Choose a rider —</option>
+            @for (r of orgRiders(); track r.id) {
+              <option [value]="r.id">{{ r.name }}{{ r.phone ? ' · ' + r.phone : '' }}</option>
+            }
+          </select>
+        }
+      </div>
+      <div class="flex gap-3">
+        <button type="button" (click)="closePairModal()" class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium">Cancel</button>
+        <button type="button" (click)="saveRiderPairing()"
+          [disabled]="pairSaving() || !pairRiderId()"
+          class="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white text-sm font-semibold">
+          {{ pairSaving() ? 'Saving…' : 'Pair Rider' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Shop modal -->
+@if (shopModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeShopModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transition-all"
+      [class.ring-2]="shopModalError()" [class.ring-red-400]="shopModalError()"
+      (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 mb-5">{{ shopEditing() ? 'Edit Shop' : 'Add Shop' }}</h3>
+      @if (shopModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ shopModalError() }}</span>
+        </div>
+      }
+      <form (ngSubmit)="saveShop()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Shop Name *</label>
+          <input type="text" [(ngModel)]="shopForm.name" name="name" required placeholder="Main Branch"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Address <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="text" appGooglePlaces (placeSelected)="onShopAddressSelected($event)"
+            [(ngModel)]="shopForm.address" name="address" placeholder="123 Main St, Harare"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="tel" [(ngModel)]="shopForm.phone" name="phone" placeholder="+263 77 123 4567"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="closeShopModal()" class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium">Cancel</button>
+          <button type="submit"
+            [disabled]="shopsLoading() || !shopForm.name.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold">
+            {{ shopEditing() ? 'Save Changes' : 'Create Shop' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Shop item modal -->
+@if (itemModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeItemModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transition-all"
+      [class.ring-2]="itemModalError()" [class.ring-red-400]="itemModalError()"
+      (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 mb-5">{{ itemEditing() ? 'Edit Item' : 'Add Item' }}</h3>
+      @if (itemModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ itemModalError() }}</span>
+        </div>
+      }
+      <form (ngSubmit)="saveItem()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Shop *</label>
+          <select [(ngModel)]="itemForm.shopId" name="shopId" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="" disabled>Select a shop</option>
+            @for (shop of shops(); track shop.id) {
+              <option [value]="shop.id">{{ shop.name }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Item Name *</label>
+          <input type="text" [(ngModel)]="itemForm.name" name="name" required placeholder="Paracetamol 500mg"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">SKU <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="text" [(ngModel)]="itemForm.sku" name="sku" placeholder="SKU-001"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Unit <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="text" [(ngModel)]="itemForm.unit" name="unit" placeholder="box / kg / each"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Description <span class="text-gray-400 font-normal">(optional)</span></label>
+          <textarea [(ngModel)]="itemForm.description" name="description" rows="2" placeholder="Brief description…"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="closeItemModal()" class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium">Cancel</button>
+          <button type="submit"
+            [disabled]="itemsLoading() || !itemForm.shopId || !itemForm.name.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold">
+            {{ itemEditing() ? 'Save Changes' : 'Add Item' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Invite (Link Existing Bike) modal -->
+@if (inviteModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeInviteModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 mb-1">Link Existing Bike</h3>
+      <p class="text-sm text-gray-500 mb-5">Search by license plate or VIN. The bike owner will receive an invite to accept.</p>
+
+      <div class="flex gap-2 mb-4">
+        <input
+          type="text"
+          [(ngModel)]="inviteSearch"
+          (keyup.enter)="searchBikesForInvite()"
+          placeholder="e.g. ABC 1234 or VIN number"
+          class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <button
+          (click)="searchBikesForInvite()"
+          [disabled]="inviteSearching()"
+          class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
+        >
+          {{ inviteSearching() ? 'Searching…' : 'Search' }}
+        </button>
+      </div>
+
+      @if (inviteResults().length > 0) {
+        <div class="border border-gray-100 rounded-xl overflow-hidden mb-4">
+          @for (bike of inviteResults(); track bike.id) {
+            <div class="flex items-center justify-between px-4 py-3.5 border-b border-gray-50 last:border-0">
+              <div>
+                <p class="text-sm font-medium text-gray-800">{{ bike.make }} {{ bike.model }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ bike.licensePlate }}{{ bike.ownerName ? ' · Owner: ' + bike.ownerName : '' }}</p>
+                @if (bike.organisationId) {
+                  <p class="text-xs text-amber-500 mt-0.5">Already in an organisation</p>
+                }
+              </div>
+              @if (!bike.organisationId) {
+                <button
+                  (click)="sendInvite(bike.id)"
+                  [disabled]="inviteSendingId() === bike.id"
+                  class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                >
+                  {{ inviteSendingId() === bike.id ? 'Sending…' : 'Send Invite' }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      } @else if (!inviteSearching() && inviteSearch.trim()) {
+        <p class="text-center text-sm text-gray-400 py-4 mb-4">No bikes found matching "{{ inviteSearch }}"</p>
+      }
+
+      <div class="flex justify-end">
+        <button (click)="closeInviteModal()" class="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium transition-colors">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Member modal -->
+@if (memberModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeMemberModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transition-all"
+      [class.ring-2]="memberModalError()" [class.ring-red-400]="memberModalError()"
+      (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 mb-1">
+        {{ memberEditing() ? 'Edit Member' : 'Add Member' }}
+      </h3>
+      <p class="text-sm text-gray-500 mb-3">
+        {{ memberEditing() ? 'Update this member\'s details or role.' : 'Create an account and automatically assign them to your organisation.' }}
+      </p>
+      @if (memberModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ memberModalError() }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="saveMember()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Full Name *</label>
+          <input type="text" [(ngModel)]="memberForm.name" name="name" required placeholder="e.g. John Banda"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+
+        @if (!memberEditing()) {
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email *</label>
+            <input type="email" [(ngModel)]="memberForm.email" name="email" required placeholder="john@example.com"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+        }
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="tel" [(ngModel)]="memberForm.phone" name="phone" placeholder="+263 77 123 4567"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Role *</label>
+          <select [(ngModel)]="memberForm.role" name="role" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="RIDER">Rider</option>
+            <option value="DISPATCHER">Dispatcher</option>
+          </select>
+        </div>
+
+        @if (!memberEditing()) {
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Password *</label>
+            <div class="relative">
+              <input
+                [type]="showMemberPassword() ? 'text' : 'password'"
+                [(ngModel)]="memberForm.password" name="password" required placeholder="Min 8 characters"
+                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"/>
+              <button type="button" (click)="showMemberPassword.set(!showMemberPassword())"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                @if (showMemberPassword()) {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Share this password with the member after creation.</p>
+          </div>
+        }
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="closeMemberModal()"
+            class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium">Cancel</button>
+          <button type="submit"
+            [disabled]="memberSaving() || !memberForm.name.trim() || !memberForm.role || (!memberEditing() && (!memberForm.email.trim() || !memberForm.password.trim()))"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold">
+            {{ memberSaving() ? 'Saving…' : (memberEditing() ? 'Save Changes' : 'Add Member') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Client modal -->
+@if (clientModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeClientModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transition-all"
+      [class.ring-2]="clientModalError()"
+      [class.ring-red-400]="clientModalError()"
+      (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 mb-5">{{ clientEditing() ? 'Edit Client' : 'Add Client' }}</h3>
+      @if (clientModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>{{ clientModalError() }}</span>
+        </div>
+      }
+      <form (ngSubmit)="saveClient()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Name *</label>
+          <input type="text" [(ngModel)]="clientForm.name" name="name" required placeholder="John Doe"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="tel" [(ngModel)]="clientForm.phone" name="phone" placeholder="+263 77 …"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="email" [(ngModel)]="clientForm.email" name="email" placeholder="client@email.com"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Address <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="text" appGooglePlaces (placeSelected)="onClientAddressSelected($event)"
+            [(ngModel)]="clientForm.address" name="address" placeholder="Delivery address"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Notes <span class="text-gray-400 font-normal">(optional)</span></label>
+          <textarea [(ngModel)]="clientForm.notes" name="notes" rows="2" placeholder="Any notes about this client…"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="closeClientModal()" class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium">Cancel</button>
+          <button type="submit"
+            [disabled]="clientsLoading() || !clientForm.name.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold">
+            {{ clientEditing() ? 'Save Changes' : 'Add Client' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

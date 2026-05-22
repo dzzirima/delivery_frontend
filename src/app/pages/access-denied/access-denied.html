@@ -1,0 +1,41 @@
+<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6">
+
+  <!-- Logo -->
+  <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mb-8">
+    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  </div>
+
+  <!-- Card -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 w-full max-w-md text-center">
+
+    <!-- Icon -->
+    <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+      </svg>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+    <p class="text-gray-500 text-sm leading-relaxed mb-8">
+      This portal is for operators only — organisation admins and dispatchers.<br>
+      If you're a rider or customer, please use the <strong class="text-gray-700">Thi mobile app</strong> instead.
+    </p>
+
+    <div class="flex flex-col gap-3">
+      <a routerLink="/signin"
+        class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-colors">
+        Back to Sign In
+      </a>
+      <a routerLink="/"
+        class="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors">
+        Go to Home
+      </a>
+    </div>
+  </div>
+
+  <p class="mt-8 text-xs text-gray-400">&copy; {{ year }} Thi. All rights reserved.</p>
+</div>

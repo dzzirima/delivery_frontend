@@ -11,6 +11,7 @@ export interface User {
   address: string;
   status: string;
   role: string;
+  organisationId?: string;
 }
 
 export interface UserListParams {

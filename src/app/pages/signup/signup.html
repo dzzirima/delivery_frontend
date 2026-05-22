@@ -2,126 +2,193 @@
 
   <!-- Logo -->
   <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-200">
-    <svg class="w-9 h-9 text-white" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 7c0-1.1-.9-2-2-2h-3l-2-2H8L6 5H3C1.9 5 1 5.9 1 7v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7zm-9 11c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
-      <circle cx="10" cy="13" r="3"/>
+    <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M13 10V3L4 14h7v7l9-11h-7z" />
     </svg>
   </div>
 
-  <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Create your account</h1>
-  <p class="text-gray-500 mb-8">Start managing deliveries in minutes</p>
+  <h1 class="text-3xl font-extrabold text-gray-900 mb-1">Get started with Thi</h1>
+  <p class="text-gray-500 mb-8 text-sm">Set up your operator account in two quick steps</p>
+
+  <!-- Step indicator -->
+  <div class="flex items-center gap-3 mb-6">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+        [class]="step() >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'">1</div>
+      <span class="text-xs font-medium" [class]="step() === 1 ? 'text-indigo-600' : 'text-gray-400'">Your account</span>
+    </div>
+    <div class="w-8 h-px" [class]="step() >= 2 ? 'bg-indigo-400' : 'bg-gray-200'"></div>
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+        [class]="step() >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'">2</div>
+      <span class="text-xs font-medium" [class]="step() === 2 ? 'text-indigo-600' : 'text-gray-400'">Your organisation</span>
+    </div>
+  </div>
 
   <!-- Card -->
   <div class="bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 w-full max-w-md p-8">
-    <form class="space-y-5" (ngSubmit)="register()">
 
-      <!-- Full Name -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
-        <input
-          type="text"
-          [(ngModel)]="fullName"
-          name="fullName"
-          placeholder="John Doe"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
-        />
-      </div>
+    <!-- ── Step 1: Account ─────────────────────────────────────────────── -->
+    @if (step() === 1) {
+      <form class="space-y-5" (ngSubmit)="nextStep()">
 
-      <!-- Email -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
-        <input
-          type="email"
-          [(ngModel)]="email"
-          name="email"
-          placeholder="you@example.com"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
-        />
-      </div>
-
-      <!-- Password -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
-        <div class="relative">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
           <input
-            [type]="showPassword() ? 'text' : 'password'"
-            [(ngModel)]="password"
-            name="password"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            type="text"
+            [(ngModel)]="adminName"
+            name="adminName"
+            placeholder="John Doe"
+            autocomplete="name"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
           />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
+          <input
+            type="email"
+            [(ngModel)]="adminEmail"
+            name="adminEmail"
+            placeholder="you@example.com"
+            autocomplete="email"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+          <div class="relative">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              [(ngModel)]="adminPassword"
+              name="adminPassword"
+              placeholder="Min. 6 characters"
+              autocomplete="new-password"
+              class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            />
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              @if (showPassword()) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        @if (error()) {
+          <p class="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2.5 border border-red-100">{{ error() }}</p>
+        }
+
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 mt-2 flex items-center justify-center gap-2"
+        >
+          Continue
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+      </form>
+    }
+
+    <!-- ── Step 2: Organisation ─────────────────────────────────────────── -->
+    @if (step() === 2) {
+      <form class="space-y-5" (ngSubmit)="register()">
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Organisation Name</label>
+          <input
+            type="text"
+            [(ngModel)]="orgName"
+            name="orgName"
+            placeholder="Green Pharmacy"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Contact Phone</label>
+          <input
+            type="tel"
+            [(ngModel)]="orgContactPhone"
+            name="orgContactPhone"
+            placeholder="+263 77 123 4567"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Business Email
+            <span class="text-gray-400 font-normal ml-1">(optional — defaults to your account email)</span>
+          </label>
+          <input
+            type="email"
+            [(ngModel)]="orgContactEmail"
+            name="orgContactEmail"
+            placeholder="info@greenbusiness.co.zw"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Registration Number
+            <span class="text-gray-400 font-normal ml-1">(optional)</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="businessRegistrationNumber"
+            name="businessRegistrationNumber"
+            placeholder="BP12345"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+          />
+        </div>
+
+        @if (error()) {
+          <p class="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2.5 border border-red-100">{{ error() }}</p>
+        }
+
+        <div class="flex gap-3 mt-2">
           <button
             type="button"
-            (click)="togglePassword()"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            (click)="back()"
+            [disabled]="loading()"
+            class="flex-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-60 text-gray-700 font-semibold py-3.5 rounded-xl transition-colors text-sm"
           >
-            @if (showPassword()) {
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-              </svg>
-            } @else {
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            }
+            Back
+          </button>
+          <button
+            type="submit"
+            [disabled]="loading()"
+            class="flex-2 flex-grow bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200"
+          >
+            {{ loading() ? 'Creating account…' : 'Create Account' }}
           </button>
         </div>
-      </div>
 
-      <!-- Phone Number -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
-        <input
-          type="tel"
-          [(ngModel)]="phone"
-          name="phone"
-          placeholder="+263 77 123 4567"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
-        />
-      </div>
+      </form>
+    }
 
-      <!-- Business Address -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Business Address</label>
-        <textarea
-          [(ngModel)]="address"
-          name="address"
-          rows="3"
-          placeholder="123 Main St, Harare"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm resize-none"
-        ></textarea>
-      </div>
-
-      <!-- Terms -->
-      <div class="flex items-start gap-2">
-        <input type="checkbox" id="terms" class="w-4 h-4 mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 flex-shrink-0" />
-        <label for="terms" class="text-sm text-gray-500">
-          I agree to the <a href="#" class="text-indigo-600 font-medium hover:underline">Terms of Service</a> and
-          <a href="#" class="text-indigo-600 font-medium hover:underline">Privacy Policy</a>
-        </label>
-      </div>
-
-      <!-- Error -->
-      @if (error()) {
-        <p class="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2.5 border border-red-100">{{ error() }}</p>
-      }
-
-      <!-- Submit -->
-      <button
-        type="submit"
-        [disabled]="loading()"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 mt-2"
-      >
-        {{ loading() ? 'Creating account…' : 'Create Account' }}
-      </button>
-
-    </form>
   </div>
 
-  <!-- Signin link -->
+  <!-- Sign-in link -->
   <p class="text-sm text-gray-500 mt-6">
     Already have an account?
     <a routerLink="/signin" class="text-indigo-600 font-semibold hover:text-indigo-700">Sign in</a>
