@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { GooglePlacesDirective, PlaceResult } from '../../core/directives/google-places.directive';
 import * as L from 'leaflet';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +15,9 @@ import { OrgDashboardService, OrgDashboardStats } from '../../features/org-dashb
 import { BikeOrgInviteService, BikeOrgInvite } from '../../features/bike-org-invites/services/bike-org-invite.service';
 import { OrgDispatchService, DispatchItem, DispatchStats, OrgRider } from '../../features/org-dispatch/services/org-dispatch.service';
 import { OrgMemberService, OrgMember } from '../../features/org-members/services/org-member.service';
+import { DeliveryWebSocketService } from '../../core/delivery-websocket.service';
+import { DeliveryRequestService, DriverBid } from '../../features/delivery/services/delivery-request.service';
+import { ToastService } from '../../core/toast.service';
 
 export type OrgPage =
   | 'dashboard'
@@ -703,8 +707,30 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
     dropoffAddress: '', dropoffLat: null as number | null, dropoffLng: null as number | null,
     description: '', budget: null as number | null,
     driverId: '', orgClientId: '', paymentMethod: 'CASH',
-    shopId: '',
+    shopId: '', packageSizeCategory: 'MEDIUM',
   };
+
+  // ── Public dispatch bidding flow ──────────────────────────────────────────
+  publicDispatchState   = signal<'form' | 'awaiting'>('form');
+  publicRequestId       = signal<string | null>(null);
+  publicBids            = signal<DriverBid[]>([]);
+  publicAcceptingId     = signal<string | null>(null);
+  wsConnected           = computed(() => this.deliveryWsService.connected());
+
+  // Reprice
+  repriceValue          = signal(0);
+  repriceLoading        = signal(false);
+  repriceCooldown       = signal(0);
+  private repriceCooldownTimer: ReturnType<typeof setInterval> | null = null;
+
+  // Cancel reason
+  cancelReasonOpen      = signal(false);
+  cancelReasonSelected  = signal<string | null>(null);
+  cancelReasonCustom    = '';
+  cancelLoading         = signal(false);
+  readonly cancelReasonPresets = ['Changed my mind', 'Price too high', 'Wrong address', 'Emergency'];
+
+  private wsSubscription: Subscription | null = null;
 
   // Client search inside dispatch form
   dispatchClientSearch   = signal('');
@@ -931,7 +957,7 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
       dropoffAddress: '', dropoffLat: null, dropoffLng: null,
       description: '', budget: this.randomPrice(),
       driverId: '', orgClientId: '', paymentMethod: 'CASH',
-      shopId: '',
+      shopId: '', packageSizeCategory: 'MEDIUM',
     };
     this.dispatchClientSearch.set('');
     this.dispatchClientFocused.set(false);
@@ -945,24 +971,56 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
     this.dispatchSelectedItems.set([]);
     this.dispatchShopId.set('');
     this.dispatchModalError.set('');
+    // Reset bidding state
+    this.publicDispatchState.set('form');
+    this.publicRequestId.set(null);
+    this.publicBids.set([]);
+    this.publicAcceptingId.set(null);
+    this.cancelReasonOpen.set(false);
+    this.cancelReasonSelected.set(null);
+    this.cancelReasonCustom = '';
+    this.repriceValue.set(0);
+    this.repriceCooldown.set(0);
     this.loadOrgRiders();
     if (this.clients().length === 0) this.loadClients();
     if (this.shops().length === 0) this.loadShops();
     this.loadDispatchItems();
     this.createDispatchModal.set(true);
   }
-  closeCreateDispatch() { this.dispatchModalError.set(''); this.createDispatchModal.set(false); }
+
+  /** Close only from the form state (backdrop click / Cancel button in form). */
+  closeCreateDispatch() {
+    if (this.publicDispatchState() === 'awaiting') return;
+    this.dispatchModalError.set('');
+    this.createDispatchModal.set(false);
+  }
+
+  /** Tear down bid subscription, clear all bidding state, and close the modal. */
+  private finalCloseModal() {
+    this.wsSubscription?.unsubscribe();
+    this.wsSubscription = null;
+    // Do NOT disconnect the WS — it stays alive for the full dashboard session.
+    if (this.repriceCooldownTimer) { clearInterval(this.repriceCooldownTimer); this.repriceCooldownTimer = null; }
+    this.toastService.dismissAllBids();
+    this.dispatchModalError.set('');
+    this.publicDispatchState.set('form');
+    this.publicRequestId.set(null);
+    this.publicBids.set([]);
+    this.publicAcceptingId.set(null);
+    this.cancelReasonOpen.set(false);
+    this.createDispatchModal.set(false);
+  }
 
   switchDispatchTab(tab: 'PUBLIC' | 'INTERNAL') {
     this.dispatchTab.set(tab);
     this.dispatchModalError.set('');
     this.dispatchForm = {
-      dispatchStrategy: tab === 'PUBLIC' ? 'DIRECT_ASSIGN' : 'INTERNAL_BID',
+      dispatchStrategy: tab === 'PUBLIC' ? 'PUBLIC_BID' : 'INTERNAL_BID',
       pickupAddress: '', pickupLat: null, pickupLng: null,
       dropoffAddress: '', dropoffLat: null, dropoffLng: null,
       description: '', budget: this.randomPrice(),
       driverId: '', orgClientId: '', paymentMethod: 'CASH',
-      shopId: '',
+      shopId: '', packageSizeCategory: 'MEDIUM',
     };
     this.dispatchClientSearch.set('');
     this.dispatchClientFocused.set(false);
@@ -978,6 +1036,165 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   saveDispatch() {
+    if (this.dispatchTab() === 'PUBLIC') {
+      this.savePublicDispatch();
+    } else {
+      this.saveInternalDispatch();
+    }
+  }
+
+  // ── Public dispatch — hits /delivery/request (same flow as mobile) ────────
+
+  savePublicDispatch() {
+    const f = this.dispatchForm;
+    this.dispatchSaving.set(true);
+    this.dispatchModalError.set('');
+
+    const body: Record<string, unknown> = {
+      pickupAddress:       f.pickupAddress,
+      dropoffAddress:      f.dropoffAddress,
+      price:               f.budget ?? 0,
+      priority:            'NORMAL',
+      packageSizeCategory: f.packageSizeCategory || 'MEDIUM',
+    };
+    if (f.pickupLat  != null) body['pickupLat']  = f.pickupLat;
+    if (f.pickupLng  != null) body['pickupLng']  = f.pickupLng;
+    if (f.dropoffLat != null) body['dropoffLat'] = f.dropoffLat;
+    if (f.dropoffLng != null) body['dropoffLng'] = f.dropoffLng;
+    if (f.description)        body['description'] = f.description;
+    if (f.orgClientId)        body['orgClientId'] = f.orgClientId;
+
+    this.deliveryRequestService.createRequest(body).subscribe({
+      next: r => {
+        const requestId = r.data?.requestId;
+        if (!requestId) {
+          this.dispatchSaving.set(false);
+          this.dispatchModalError.set('No request ID returned from server.');
+          return;
+        }
+        this.publicRequestId.set(requestId);
+        this.repriceValue.set(f.budget ?? 0);
+        this.publicBids.set([]);
+        this.dispatchSaving.set(false);
+
+        // Subscribe to driver bid events (WS already connected at ngOnInit)
+        this.wsSubscription?.unsubscribe();
+        this.wsSubscription = this.deliveryWsService.events$.subscribe(evt => {
+          if (evt.type === 'driverOfferEvent') {
+            this.onBidReceived(evt.data as unknown as DriverBid);
+          }
+        });
+
+        this.publicDispatchState.set('awaiting');
+        this.startRepriceCooldown();
+      },
+      error: e => {
+        this.dispatchSaving.set(false);
+        this.dispatchModalError.set(e?.error?.message ?? 'Failed to create request.');
+      },
+    });
+  }
+
+  onBidReceived(data: DriverBid) {
+    if (this.publicDispatchState() !== 'awaiting') return;
+    // Accumulate (deduplicate by driverId — driver may re-bid)
+    this.publicBids.update(list => [data, ...list.filter(b => b.driverId !== data.driverId)]);
+    // Show toast with Accept / Decline
+    this.toastService.bid(data, (bid, toastId) => {
+      this.toastService.dismiss(toastId);
+      this.acceptBid(bid);
+    });
+  }
+
+  acceptBid(bid: DriverBid) {
+    const requestId = this.publicRequestId();
+    if (!requestId || this.publicAcceptingId()) return;
+    this.publicAcceptingId.set(bid.driverId);
+    this.toastService.dismissAllBids();
+
+    this.deliveryRequestService.acceptBid(requestId, bid.driverId).subscribe({
+      next: () => {
+        this.finalCloseModal();
+        this.loadDispatch();
+        this.flash('ok', `Dispatch accepted — ${bid.driverName} is on the way.`);
+      },
+      error: e => {
+        this.publicAcceptingId.set(null);
+        this.flash('err', e?.error?.message ?? 'Failed to accept bid.');
+      },
+    });
+  }
+
+  // ── Reprice ───────────────────────────────────────────────────────────────
+
+  adjustReprice(delta: number) {
+    const updated = Math.max(0.5, parseFloat((this.repriceValue() + delta).toFixed(2)));
+    this.repriceValue.set(updated);
+  }
+
+  submitReprice() {
+    const requestId = this.publicRequestId();
+    if (!requestId || this.repriceLoading() || this.repriceCooldown() > 0) return;
+    this.repriceLoading.set(true);
+
+    this.deliveryRequestService.repriceRequest(requestId, this.repriceValue()).subscribe({
+      next: () => {
+        this.repriceLoading.set(false);
+        this.startRepriceCooldown();
+        this.flash('ok', 'Price updated — drivers notified.');
+      },
+      error: e => {
+        this.repriceLoading.set(false);
+        if (e?.status === 404) {
+          this.flash('err', 'Request expired — no drivers responded in time.');
+          this.finalCloseModal();
+        } else {
+          this.flash('err', e?.error?.message ?? 'Failed to update price.');
+        }
+      },
+    });
+  }
+
+  startRepriceCooldown() {
+    if (this.repriceCooldownTimer) clearInterval(this.repriceCooldownTimer);
+    this.repriceCooldown.set(30);
+    this.repriceCooldownTimer = setInterval(() => {
+      this.repriceCooldown.update(v => {
+        if (v <= 1) { clearInterval(this.repriceCooldownTimer!); this.repriceCooldownTimer = null; return 0; }
+        return v - 1;
+      });
+    }, 1000);
+  }
+
+  // ── Cancel flow ───────────────────────────────────────────────────────────
+
+  startCancelFlow() {
+    this.cancelReasonSelected.set(null);
+    this.cancelReasonCustom = '';
+    this.cancelReasonOpen.set(true);
+  }
+
+  toggleCancelReason(reason: string) {
+    this.cancelReasonSelected.update(v => v === reason ? null : reason);
+    if (this.cancelReasonSelected()) this.cancelReasonCustom = '';
+  }
+
+  confirmCancel(skipReason = false) {
+    const reason = skipReason ? undefined
+      : (this.cancelReasonCustom.trim() || this.cancelReasonSelected() || undefined);
+    const requestId = this.publicRequestId();
+    if (!requestId) { this.finalCloseModal(); return; }
+    this.cancelLoading.set(true);
+
+    this.deliveryRequestService.cancelRequest(requestId, reason).subscribe({
+      next:  () => { this.cancelLoading.set(false); this.finalCloseModal(); this.flash('ok', 'Request cancelled.'); },
+      error: () => { this.cancelLoading.set(false); this.finalCloseModal(); },
+    });
+  }
+
+  // ── Internal dispatch — hits /org/{id}/delivery (unchanged logic) ─────────
+
+  saveInternalDispatch() {
     const orgId = this.orgId();
     if (!orgId) return;
     const f = this.dispatchForm;
@@ -999,7 +1216,7 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
 
     this.orgDispatchService.createDispatch(orgId, body).subscribe({
       next: () => { this.dispatchSaving.set(false); this.closeCreateDispatch(); this.loadDispatch(); this.flash('ok', 'Dispatch created.'); },
-      error: (e) => { this.dispatchSaving.set(false); this.dispatchModalError.set(e?.error?.message ?? 'Failed to create dispatch.'); },
+      error: e => { this.dispatchSaving.set(false); this.dispatchModalError.set(e?.error?.message ?? 'Failed to create dispatch.'); },
     });
   }
 
@@ -1155,18 +1372,21 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   constructor(
-    private router:               Router,
-    private route:                ActivatedRoute,
-    private authService:          AuthService,
-    private userService:          UserService,
-    private bikeService:          BikeService,
-    private shopService:          ShopService,
-    private shopItemService:      ShopItemService,
-    private clientService:        ClientService,
-    private orgDashboardService:  OrgDashboardService,
-    private bikeOrgInviteService: BikeOrgInviteService,
-    private orgDispatchService:   OrgDispatchService,
-    private orgMemberService:     OrgMemberService,
+    private router:                 Router,
+    private route:                  ActivatedRoute,
+    private authService:            AuthService,
+    private userService:            UserService,
+    private bikeService:            BikeService,
+    private shopService:            ShopService,
+    private shopItemService:        ShopItemService,
+    private clientService:          ClientService,
+    private orgDashboardService:    OrgDashboardService,
+    private bikeOrgInviteService:   BikeOrgInviteService,
+    private orgDispatchService:     OrgDispatchService,
+    private orgMemberService:       OrgMemberService,
+    private deliveryWsService:      DeliveryWebSocketService,
+    private deliveryRequestService: DeliveryRequestService,
+    private toastService:           ToastService,
   ) {}
 
   ngOnInit() {
@@ -1178,6 +1398,10 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
       next: () => { this.loadPage(initial); },
       error: () => {},
     });
+
+    // Keep the WebSocket alive for the entire dashboard session so we never
+    // miss a driverOfferEvent (Spring drops events with no active WS session).
+    this.deliveryWsService.connect();
   }
 
   ngAfterViewInit() {
@@ -1206,6 +1430,9 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.destroyDashboardMap();
+    this.wsSubscription?.unsubscribe();
+    this.deliveryWsService.disconnect();
+    if (this.repriceCooldownTimer) { clearInterval(this.repriceCooldownTimer); this.repriceCooldownTimer = null; }
   }
 
   navigate(page: string) {

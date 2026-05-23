@@ -40,3 +40,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Environment secrets — never commit the real .env
+.env
+# Generated from .env — never commit, always regenerate via `node scripts/set-env.js`
+/src/environments/environment.ts

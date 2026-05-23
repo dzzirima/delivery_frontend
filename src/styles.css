@@ -9,3 +9,8 @@
 .animate-slide-in {
   animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+::placeholder {
+  color: #9ca3af; /* gray-400 — dimmed hint text */
+  opacity: 1;
+}

@@ -44,7 +44,7 @@ export class GooglePlacesDirective implements OnInit, OnDestroy {
       }
       const script = document.createElement('script');
       script.id = 'google-maps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.google_api}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleApiKey}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();
