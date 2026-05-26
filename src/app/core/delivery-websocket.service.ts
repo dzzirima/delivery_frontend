@@ -9,9 +9,12 @@ export interface DeliveryWsEvent {
   data: Record<string, unknown>;
 }
 
+const PING_INTERVAL_MS = 30_000; // 30 s — keeps user:online:web:{id} alive within the 60 s TTL
+
 @Injectable({ providedIn: 'root' })
 export class DeliveryWebSocketService {
   private client: Client | null = null;
+  private pingTimer: ReturnType<typeof setInterval> | null = null;
   private readonly _events = new Subject<DeliveryWsEvent>();
 
   readonly events$ = this._events.asObservable();
@@ -28,7 +31,7 @@ export class DeliveryWebSocketService {
     const brokerURL = environment.wsUrl
       .replace('https://', 'wss://')
       .replace('http://', 'ws://')
-      + `/ws?token=${encodeURIComponent(token)}`;
+      + `/ws?token=${encodeURIComponent(token)}&clientType=web`;
 
     this.client = new Client({
       brokerURL,
@@ -43,18 +46,41 @@ export class DeliveryWebSocketService {
             this._events.next(event);
           } catch { /* ignore malformed frames */ }
         });
+        // Keep user:online:web:{id} alive in Redis
+        this.startPing();
       },
-      onDisconnect:  () => this.connected.set(false),
-      onStompError:  () => this.connected.set(false),
-      onWebSocketError: () => this.connected.set(false),
+      onDisconnect:  () => { this.connected.set(false); this.stopPing(); },
+      onStompError:  () => { this.connected.set(false); this.stopPing(); },
+      onWebSocketError: () => { this.connected.set(false); this.stopPing(); },
     });
 
     this.client.activate();
   }
 
   disconnect(): void {
+    this.stopPing();
     this.client?.deactivate();
     this.client = null;
     this.connected.set(false);
+  }
+
+  private startPing(): void {
+    this.stopPing();
+    // Send immediately so the key is refreshed right after connect, then every 30 s
+    this.sendPing();
+    this.pingTimer = setInterval(() => this.sendPing(), PING_INTERVAL_MS);
+  }
+
+  private stopPing(): void {
+    if (this.pingTimer !== null) {
+      clearInterval(this.pingTimer);
+      this.pingTimer = null;
+    }
+  }
+
+  private sendPing(): void {
+    if (this.client?.connected) {
+      this.client.publish({ destination: '/app/ping' });
+    }
   }
 }

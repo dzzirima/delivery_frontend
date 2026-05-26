@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { DriverBid } from '../features/delivery/services/delivery-request.service';
 
-export type ToastType = 'success' | 'error' | 'info' | 'bid';
+export type ToastType = 'success' | 'error' | 'info' | 'warning' | 'bid';
 
 export interface Toast {
   id:       number;
@@ -27,6 +27,7 @@ export class ToastService {
   success(title: string, message?: string) { this.show('success', title, message); }
   error(title: string, message?: string)   { this.show('error',   title, message); }
   info(title: string, message?: string)    { this.show('info',    title, message); }
+  warning(title: string, message?: string) { this.show('warning', title, message, 5000); }
 
   /** Show a driver-bid toast with Accept / Decline actions. Auto-dismisses after 60 s. */
   bid(bid: DriverBid, onAccept: (bid: DriverBid, toastId: number) => void, duration = 60_000): number {

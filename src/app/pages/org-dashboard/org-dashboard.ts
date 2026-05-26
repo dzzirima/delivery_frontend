@@ -1082,6 +1082,12 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
         this.wsSubscription = this.deliveryWsService.events$.subscribe(evt => {
           if (evt.type === 'driverOfferEvent') {
             this.onBidReceived(evt.data as unknown as DriverBid);
+          } else if (evt.type === 'requestCancelledEvent') {
+            this.finalCloseModal();
+            this.toastService.warning('Request Cancelled', 'Your delivery request has been cancelled.');
+          } else if (evt.type === 'requestExpiredEvent') {
+            this.finalCloseModal();
+            this.toastService.warning('Request Expired', 'No drivers responded in time.');
           }
         });
 
@@ -1116,11 +1122,11 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         this.finalCloseModal();
         this.loadDispatch();
-        this.flash('ok', `Dispatch accepted — ${bid.driverName} is on the way.`);
+        this.toastService.success('Bid Accepted', `${bid.driverName} is on the way.`);
       },
       error: e => {
         this.publicAcceptingId.set(null);
-        this.flash('err', e?.error?.message ?? 'Failed to accept bid.');
+        this.toastService.error('Failed to Accept Bid', e?.error?.message ?? 'Something went wrong.');
       },
     });
   }
@@ -1187,7 +1193,7 @@ export class OrgDashboard implements OnInit, AfterViewInit, OnDestroy {
     this.cancelLoading.set(true);
 
     this.deliveryRequestService.cancelRequest(requestId, reason).subscribe({
-      next:  () => { this.cancelLoading.set(false); this.finalCloseModal(); this.flash('ok', 'Request cancelled.'); },
+      next:  () => { this.cancelLoading.set(false); this.finalCloseModal(); this.toastService.warning('Request Cancelled', 'Your delivery request has been cancelled.'); },
       error: () => { this.cancelLoading.set(false); this.finalCloseModal(); },
     });
   }
