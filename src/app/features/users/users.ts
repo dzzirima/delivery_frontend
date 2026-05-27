@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UserService, User } from './services/user.service';
 import { UserEdit } from './ui/user-edit/user-edit';
+import { ToastService } from '../../core/toast.service';
 
 @Component({
   selector: 'app-users',
@@ -11,7 +12,6 @@ import { UserEdit } from './ui/user-edit/user-edit';
 export class Users implements OnInit {
   users = signal<User[]>([]);
   loading = signal(false);
-  error = signal('');
   search = '';
   totalElements = signal(0);
   page = signal(0);
@@ -32,7 +32,7 @@ export class Users implements OnInit {
   });
   selectedUserId = signal<string | null>(null);
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -40,7 +40,6 @@ export class Users implements OnInit {
 
   loadUsers(page = 0) {
     this.loading.set(true);
-    this.error.set('');
     this.page.set(page);
     this.userService.getAll({ search: this.search || undefined, page, size: this.pageSize() }).subscribe({
       next: res => {
@@ -49,7 +48,7 @@ export class Users implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Failed to load users.');
+        this.toast.error('Load failed', 'Failed to load users.');
         this.loading.set(false);
       },
     });
@@ -72,8 +71,11 @@ export class Users implements OnInit {
   deleteUser(id: string) {
     if (!confirm('Delete this user?')) return;
     this.userService.delete(id).subscribe({
-      next: () => this.users.update(list => list.filter(u => u.id !== id)),
-      error: () => this.error.set('Failed to delete user.'),
+      next: () => {
+        this.users.update(list => list.filter(u => u.id !== id));
+        this.toast.success('User deleted', 'The user has been removed.');
+      },
+      error: () => this.toast.error('Delete failed', 'Could not delete the user. Please try again.'),
     });
   }
 }

@@ -1,0 +1,474 @@
+<div>
+
+  <!-- Back + breadcrumb -->
+  <div class="flex items-center gap-2 mb-6">
+    <button (click)="goBack()"
+      class="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 font-medium transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Shops
+    </button>
+    @if (shop()) {
+      <span class="text-gray-300">/</span>
+      <span class="text-sm font-semibold text-gray-700">{{ shop()!.name }}</span>
+    }
+  </div>
+
+  @if (shopLoading() && !shop()) {
+    <div class="py-16 flex flex-col items-center gap-3">
+      <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+      <span class="text-sm text-gray-400">Loading shop…</span>
+    </div>
+  } @else if (!shop()) {
+    <div class="bg-white rounded-2xl border border-gray-100 py-16 flex flex-col items-center gap-3">
+      <p class="text-sm text-gray-500">Shop not found.</p>
+      <button (click)="goBack()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">← Back to Shops</button>
+    </div>
+  } @else {
+
+    <!-- Shop header card -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 mb-6 flex items-start justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22V12h6v10"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">{{ shop()!.name }}</h1>
+          <div class="flex flex-wrap items-center gap-4 mt-1">
+            @if (shop()!.address) {
+              <span class="flex items-center gap-1 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                {{ shop()!.address }}
+              </span>
+            }
+            @if (shop()!.phone) {
+              <span class="flex items-center gap-1 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                </svg>
+                {{ shop()!.phone }}
+              </span>
+            }
+            @if (shop()!.slug) {
+              <span class="text-xs font-mono text-gray-300">{{ shop()!.slug }}</span>
+            }
+          </div>
+        </div>
+      </div>
+      <button (click)="openShopModal()"
+        class="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-xl transition-colors shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        Edit Shop
+      </button>
+    </div>
+
+    <!-- Items header + search + add -->
+    <div class="flex items-center justify-between gap-4 mb-3">
+      <div>
+        <h2 class="text-lg font-bold text-gray-900">Items</h2>
+        <p class="text-xs text-gray-400 mt-0.5">
+          @if (searchQuery() && isSearchMode()) {
+            {{ displayTotal() }} result{{ displayTotal() === 1 ? '' : 's' }} from server for "{{ searchQuery() }}"
+          } @else if (searchQuery()) {
+            {{ displayTotal() }} local match{{ displayTotal() === 1 ? '' : 'es' }} for "{{ searchQuery() }}"
+          } @else {
+            {{ totalItems() }} item{{ totalItems() === 1 ? '' : 's' }} · page {{ currentPage() + 1 }} of {{ totalPages() }}
+          }
+        </p>
+      </div>
+      <button (click)="openItemModal()"
+        class="flex items-center gap-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200 shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Add Item
+      </button>
+    </div>
+
+    <!-- Search bar -->
+    <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2.5 mb-4">
+      @if (searchLoading()) {
+        <svg class="w-4 h-4 text-indigo-400 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+      } @else {
+        <svg class="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+        </svg>
+      }
+      <input type="text" placeholder="Search by name, SKU, unit…"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearch($event)"
+        class="flex-1 text-sm text-gray-700 placeholder-gray-300 outline-none bg-transparent"/>
+      @if (searchQuery()) {
+        <button (click)="clearSearch()" class="text-gray-300 hover:text-gray-500 transition-colors" title="Clear search">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      }
+    </div>
+
+    <!-- Table card -->
+    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      @if (itemsLoading() && items().length === 0) {
+        <div class="py-16 flex flex-col items-center gap-3">
+          <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span class="text-sm text-gray-400">Loading items…</span>
+        </div>
+      } @else if (totalItems() === 0 && !searchQuery()) {
+        <!-- Truly empty shop -->
+        <div class="py-16 flex flex-col items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
+            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <p class="text-sm font-semibold text-gray-700">No items yet</p>
+            <p class="text-xs text-gray-400 mt-0.5">Add products and stock to this shop.</p>
+          </div>
+          <button (click)="openItemModal()"
+            class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            Add first item →
+          </button>
+        </div>
+      } @else if (displayItems().length === 0 && !searchLoading()) {
+        <!-- No search results -->
+        <div class="py-12 flex flex-col items-center gap-2">
+          <svg class="w-8 h-8 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+          </svg>
+          <p class="text-sm font-semibold text-gray-700">No results found</p>
+          <p class="text-xs text-gray-400">No items match "{{ searchQuery() }}"</p>
+          <button (click)="clearSearch()"
+            class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            Clear search
+          </button>
+        </div>
+      } @else {
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50/60">
+              <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Item</th>
+              <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">SKU</th>
+              <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
+              <th class="py-3 px-5"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50" [class.opacity-50]="itemsLoading()">
+            @for (item of displayItems(); track item.id) {
+              <tr class="hover:bg-gray-50/70 transition-colors">
+
+                <td class="py-4 px-5">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center shrink-0">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">{{ item.name }}</p>
+                      @if (item.description) {
+                        <p class="text-xs text-gray-400 mt-0.5">{{ item.description }}</p>
+                      }
+                    </div>
+                  </div>
+                </td>
+
+                <td class="py-4 px-5">
+                  @if (item.sku) {
+                    <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">{{ item.sku }}</span>
+                  } @else {
+                    <span class="text-gray-300 text-sm">—</span>
+                  }
+                </td>
+
+                <td class="py-4 px-5 text-sm text-gray-500">{{ item.unit || '—' }}</td>
+
+                <td class="py-4 px-5">
+                  <div class="flex items-center justify-end gap-1">
+                    <button (click)="openItemModal(item)"
+                      class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                      title="Edit item">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <button (click)="itemDeletingId.set(item.id)"
+                      class="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                      title="Delete item">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- Pagination footer -->
+        @if (totalPages() > 1 && !searchQuery()) {
+          <div class="px-5 py-3 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-xs text-gray-400">
+              {{ currentPage() * pageSize + 1 }}–{{ rangeEnd(currentPage(), totalItems()) }}
+              of {{ totalItems() }} items
+            </p>
+            <div class="flex items-center gap-1">
+              <!-- Prev -->
+              <button (click)="setPage(currentPage() - 1)"
+                [disabled]="currentPage() === 0"
+                class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+              </button>
+
+              <!-- First page if not visible -->
+              @if (pageNumbers()[0] > 0) {
+                <button (click)="setPage(0)"
+                  class="w-8 h-8 rounded-lg text-xs font-semibold text-gray-500 hover:bg-gray-100 transition-colors">
+                  1
+                </button>
+                @if (pageNumbers()[0] > 1) {
+                  <span class="text-gray-300 text-xs px-1">…</span>
+                }
+              }
+
+              <!-- Page numbers -->
+              @for (n of pageNumbers(); track n) {
+                <button (click)="setPage(n)"
+                  class="w-8 h-8 rounded-lg text-xs font-semibold transition-colors"
+                  [class.bg-indigo-600]="n === currentPage()"
+                  [class.text-white]="n === currentPage()"
+                  [class.text-gray-500]="n !== currentPage()"
+                  [class.hover:bg-gray-100]="n !== currentPage()">
+                  {{ n + 1 }}
+                </button>
+              }
+
+              <!-- Last page if not visible -->
+              @if (pageNumbers()[pageNumbers().length - 1] < totalPages() - 1) {
+                @if (pageNumbers()[pageNumbers().length - 1] < totalPages() - 2) {
+                  <span class="text-gray-300 text-xs px-1">…</span>
+                }
+                <button (click)="setPage(totalPages() - 1)"
+                  class="w-8 h-8 rounded-lg text-xs font-semibold text-gray-500 hover:bg-gray-100 transition-colors">
+                  {{ totalPages() }}
+                </button>
+              }
+
+              <!-- Next -->
+              <button (click)="setPage(currentPage() + 1)"
+                [disabled]="currentPage() >= totalPages() - 1"
+                class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Search results footer (server search, no page nav) -->
+        @if (isSearchMode() && totalPages() > 1) {
+          <div class="px-5 py-3 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-xs text-gray-400">
+              {{ currentPage() * pageSize + 1 }}–{{ rangeEnd(currentPage(), displayTotal()) }}
+              of {{ displayTotal() }} results
+            </p>
+            <div class="flex items-center gap-1">
+              <button (click)="setPage(currentPage() - 1)"
+                [disabled]="currentPage() === 0"
+                class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+              </button>
+              <span class="text-xs text-gray-500 px-2">{{ currentPage() + 1 }} / {{ totalPages() }}</span>
+              <button (click)="setPage(currentPage() + 1)"
+                [disabled]="currentPage() >= totalPages() - 1"
+                class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+  }
+
+</div>
+
+<!-- ── Delete Item Confirmation Modal ── -->
+@if (itemDeletingId()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="itemDeletingId.set(null)">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Delete item?</h3>
+          <p class="text-sm text-gray-500 mt-1">This will permanently remove the item from this shop.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button (click)="itemDeletingId.set(null)"
+          class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-colors">
+          Cancel
+        </button>
+        <button (click)="deleteItem()"
+          class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Add / Edit Item Modal ── -->
+@if (itemModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeItemModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
+      [class.ring-2]="itemModalError()" [class.ring-red-400]="itemModalError()"
+      (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-base font-bold text-gray-900">{{ itemEditing() ? 'Edit Item' : 'Add Item' }}</h3>
+        <button (click)="closeItemModal()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (itemModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>{{ itemModalError() }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="saveItem()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Item Name <span class="text-red-400">*</span></label>
+          <input type="text" [(ngModel)]="itemForm.name" name="name" required placeholder="e.g. Medium Box"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Description <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="text" [(ngModel)]="itemForm.description" name="description" placeholder="Brief description"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">SKU <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="text" [(ngModel)]="itemForm.sku" name="sku" placeholder="e.g. BOX-M"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Unit <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="text" [(ngModel)]="itemForm.unit" name="unit" placeholder="e.g. kg, pcs"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+          </div>
+        </div>
+        <div class="flex gap-3 pt-1">
+          <button type="button" (click)="closeItemModal()"
+            class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-colors">
+            Cancel
+          </button>
+          <button type="submit"
+            [disabled]="itemsLoading() || !itemForm.name.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            {{ itemEditing() ? 'Save Changes' : 'Add Item' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ── Edit Shop Modal ── -->
+@if (shopModal()) {
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeShopModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
+      [class.ring-2]="shopModalError()" [class.ring-red-400]="shopModalError()"
+      (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-base font-bold text-gray-900">Edit Shop</h3>
+        <button (click)="closeShopModal()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (shopModalError()) {
+        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>{{ shopModalError() }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="saveShop()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Shop Name <span class="text-red-400">*</span></label>
+          <input type="text" [(ngModel)]="shopForm.name" name="name" required placeholder="Main Branch"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Address</label>
+          <input type="text" appGooglePlaces (placeSelected)="onShopAddressSelected($event)"
+            [(ngModel)]="shopForm.address" name="address" placeholder="123 Main St, Harare"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone</label>
+          <input type="tel" [(ngModel)]="shopForm.phone" name="phone" placeholder="+263 77 123 4567"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+        </div>
+        <div class="flex gap-3 pt-1">
+          <button type="button" (click)="closeShopModal()"
+            class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-colors">
+            Cancel
+          </button>
+          <button type="submit"
+            [disabled]="!shopForm.name.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
