@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrgMemberService, OrgMember } from './members.service';
-import { UserService } from '../../users/services/user.service';
+import { UserService } from '../../../core/user.service';
 import { ToastService } from '../../../core/toast.service';
 
 @Component({

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ShopItemService, ShopItem, ShopItemReq } from './shop-items.service';
 import { ShopService, Shop } from '../shops/shops.service';
-import { UserService } from '../../users/services/user.service';
+import { UserService } from '../../../core/user.service';
 import { ToastService } from '../../../core/toast.service';
 
 @Component({

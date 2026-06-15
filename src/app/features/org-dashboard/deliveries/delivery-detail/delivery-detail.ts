@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, TitleCasePipe, CurrencyPipe, DecimalPipe } from '@angular/common';
 import * as L from 'leaflet';
 import { OrgDeliveryService, DeliveryDetail as DeliveryDetailData } from '../deliveries.service';
-import { UserService } from '../../../users/services/user.service';
+import { UserService } from '../../../../core/user.service';
 
 @Component({
   selector: 'app-delivery-detail',

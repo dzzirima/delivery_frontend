@@ -1,0 +1,369 @@
+<!-- KYC Review — split: queue list (left) + review panel (right) -->
+<div class="-m-6 flex h-full overflow-hidden">
+
+  <!-- ══ LEFT — Queue ══ -->
+  <div class="w-96 shrink-0 flex flex-col bg-white border-r border-gray-100 overflow-hidden">
+
+    <!-- Header + tabs -->
+    <div class="px-5 pt-5 pb-3 shrink-0 border-b border-gray-100">
+      <h1 class="text-sm font-bold text-gray-900 mb-3">KYC Review Queue</h1>
+      <div class="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+        <button
+          (click)="switchTab('driver')"
+          class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          [class.bg-white]="activeTab() === 'driver'"
+          [class.text-gray-900]="activeTab() === 'driver'"
+          [class.shadow-sm]="activeTab() === 'driver'"
+          [class.text-gray-500]="activeTab() !== 'driver'"
+        >
+          Driver KYC
+          <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+            [class.bg-indigo-100]="activeTab() === 'driver'"
+            [class.text-indigo-700]="activeTab() === 'driver'"
+            [class.bg-gray-200]="activeTab() !== 'driver'"
+            [class.text-gray-500]="activeTab() !== 'driver'"
+          >{{ totalElements() }}</span>
+        </button>
+        <button
+          (click)="switchTab('bike')"
+          class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          [class.bg-white]="activeTab() === 'bike'"
+          [class.text-gray-900]="activeTab() === 'bike'"
+          [class.shadow-sm]="activeTab() === 'bike'"
+          [class.text-gray-500]="activeTab() !== 'bike'"
+        >
+          Bike KYC
+          <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+            [class.bg-indigo-100]="activeTab() === 'bike'"
+            [class.text-indigo-700]="activeTab() === 'bike'"
+            [class.bg-gray-200]="activeTab() !== 'bike'"
+            [class.text-gray-500]="activeTab() !== 'bike'"
+          >{{ totalElements() }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Queue list -->
+    <div class="flex-1 overflow-y-auto">
+      @if (loadingQueue()) {
+        <div class="flex items-center justify-center py-20">
+          <svg class="w-5 h-5 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+
+      } @else if (submissions().length === 0) {
+        <div class="flex flex-col items-center justify-center py-20 text-center px-4">
+          <svg class="w-10 h-10 text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          <p class="text-sm font-semibold text-gray-500">Queue is empty</p>
+          <p class="text-xs text-gray-400 mt-1">No submissions awaiting review</p>
+        </div>
+
+      } @else {
+        @for (sub of submissions(); track sub.id) {
+          <button
+            (click)="openSubmission(sub.id)"
+            class="w-full text-left px-5 py-4 border-b border-gray-50 last:border-0
+                   hover:bg-indigo-50 transition-colors"
+            [class.bg-indigo-50]="selectedSubmission()?.id === sub.id"
+            [class.border-l-2]="selectedSubmission()?.id === sub.id"
+            [class.border-l-indigo-500]="selectedSubmission()?.id === sub.id"
+          >
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-gray-400 font-mono">
+                #{{ sub.id.slice(-8).toUpperCase() }}
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                [class]="submissionStatusClass(sub.status)">
+                {{ sub.status.replace('_', ' ') }}
+              </span>
+            </div>
+            <p class="text-xs font-semibold text-gray-700">
+              Version {{ sub.version }} · {{ sub.documents.length }} document{{ sub.documents.length !== 1 ? 's' : '' }}
+            </p>
+            <p class="text-[11px] text-gray-400 mt-0.5">{{ formatDate(sub.submittedAt) }}</p>
+          </button>
+        }
+      }
+    </div>
+
+    <!-- Queue pagination -->
+    @if (totalPages() > 1) {
+      <div class="px-5 py-3 border-t border-gray-100 flex items-center justify-between shrink-0">
+        <p class="text-xs text-gray-400">{{ page() + 1 }} / {{ totalPages() }}</p>
+        <div class="flex gap-1">
+          <button (click)="goToPage(page() - 1)" [disabled]="page() === 0"
+            class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200
+                   hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >Prev</button>
+          <button (click)="goToPage(page() + 1)" [disabled]="page() >= totalPages() - 1"
+            class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200
+                   hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >Next</button>
+        </div>
+      </div>
+    }
+  </div>
+
+
+  <!-- ══ RIGHT — Review Panel ══ -->
+  <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+
+    @if (!selectedSubmission() && !loadingSubmission()) {
+      <!-- Empty state -->
+      <div class="flex flex-col items-center justify-center h-full text-center px-12">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center mb-4">
+          <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <p class="text-sm font-bold text-gray-700">Select a submission to review</p>
+        <p class="text-xs text-gray-400 mt-1">Click any item in the queue to open the document review panel</p>
+      </div>
+
+    } @else if (loadingSubmission()) {
+      <div class="flex items-center justify-center h-full">
+        <svg class="w-6 h-6 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+      </div>
+
+    } @else if (selectedSubmission(); as sub) {
+
+      <!-- Panel header -->
+      <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+        <div>
+          <p class="text-sm font-bold text-gray-900">
+            Submission Review
+            <span class="text-gray-400 font-normal">· v{{ sub.version }} · #{{ sub.id.slice(-8).toUpperCase() }}</span>
+          </p>
+          <p class="text-xs text-gray-400 mt-0.5">Submitted {{ formatDate(sub.submittedAt) }}</p>
+        </div>
+        <button (click)="closePanel()"
+          class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Documents -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-4">
+        @for (doc of sub.documents; track doc.id) {
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+            <!-- Doc header -->
+            <div class="px-5 py-4 flex items-center justify-between border-b border-gray-50">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">{{ formatDocType(doc.docType) }}</p>
+                  @if (doc.expiresAt) {
+                    <p class="text-xs text-gray-400">Expires {{ doc.expiresAt }}</p>
+                  }
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs px-2.5 py-1 rounded-full font-semibold"
+                  [class]="docStatusClass(doc.status)">
+                  {{ doc.status }}
+                </span>
+                <!-- View document button -->
+                <button
+                  (click)="openViewUrl(doc.id)"
+                  class="flex items-center gap-1.5 text-xs font-semibold text-indigo-600
+                         hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5
+                         rounded-lg transition-colors"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                  View
+                </button>
+              </div>
+            </div>
+
+            <!-- Verdict controls -->
+            <div class="px-5 py-4">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Verdict</p>
+
+              <div class="flex items-center gap-2 mb-3">
+                <!-- Approve -->
+                <button
+                  (click)="setApproved(doc)"
+                  class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold
+                         border-2 transition-all"
+                  [class.border-green-500]="getVerdict(doc.id)?.approved === true"
+                  [class.bg-green-50]="getVerdict(doc.id)?.approved === true"
+                  [class.text-green-700]="getVerdict(doc.id)?.approved === true"
+                  [class.border-gray-200]="getVerdict(doc.id)?.approved !== true"
+                  [class.text-gray-500]="getVerdict(doc.id)?.approved !== true"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Approve
+                </button>
+                <!-- Reject -->
+                <button
+                  (click)="setRejected(doc)"
+                  class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold
+                         border-2 transition-all"
+                  [class.border-red-500]="getVerdict(doc.id)?.approved === false"
+                  [class.bg-red-50]="getVerdict(doc.id)?.approved === false"
+                  [class.text-red-700]="getVerdict(doc.id)?.approved === false"
+                  [class.border-gray-200]="getVerdict(doc.id)?.approved !== false"
+                  [class.text-gray-500]="getVerdict(doc.id)?.approved !== false"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Reject
+                </button>
+              </div>
+
+              <!-- Rejection details (shown when rejected) -->
+              @if (getVerdict(doc.id)?.approved === false) {
+                <div class="space-y-2 mt-3 pl-1">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Rejection Reason</label>
+                    <select
+                      [ngModel]="getVerdict(doc.id)?.rejectionCode"
+                      (ngModelChange)="setRejectionCode(doc.id, $event)"
+                      class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
+                             focus:outline-none focus:ring-2 focus:ring-red-500/20 bg-white"
+                    >
+                      @for (code of rejectionCodes; track code) {
+                        <option [value]="code">{{ code.replace('_', ' ') }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">
+                      Note to driver <span class="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <textarea
+                      [ngModel]="getVerdict(doc.id)?.rejectionReason"
+                      (ngModelChange)="setRejectionReason(doc.id, $event)"
+                      placeholder="Explain what is wrong so the driver knows exactly what to fix…"
+                      rows="2"
+                      class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
+                             focus:outline-none focus:ring-2 focus:ring-red-500/20 resize-none"
+                    ></textarea>
+                  </div>
+                </div>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+
+      <!-- Submit footer -->
+      <div class="bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+        <p class="text-xs text-gray-500">
+          @if (allReviewed()) {
+            All {{ sub.documents.length }} documents reviewed — ready to submit.
+          } @else {
+            {{ sub.documents.length - (verdicts() | keyvalue).length }} document{{ (sub.documents.length - (verdicts() | keyvalue).length) !== 1 ? 's' : '' }} remaining.
+          }
+        </p>
+        <button
+          (click)="submitReview()"
+          [disabled]="!allReviewed() || submitting()"
+          class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold
+                 rounded-xl hover:bg-indigo-700 transition-colors
+                 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          @if (submitting()) {
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Submitting…
+          } @else {
+            Submit Review
+          }
+        </button>
+      </div>
+    }
+  </div>
+
+</div>
+
+
+<!-- ══ View URL Modal ══ -->
+@if (viewUrlDocId()) {
+  <div
+    class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    (click)="closeViewUrl()"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <p class="text-sm font-bold text-gray-900">Document Preview</p>
+        <button (click)="closeViewUrl()"
+          class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-6">
+        @if (loadingViewUrl()) {
+          <div class="flex items-center justify-center py-10">
+            <svg class="w-6 h-6 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+          </div>
+
+        } @else if (viewUrlData(); as urlData) {
+          <!-- Image preview -->
+          <div class="mb-4 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center min-h-48">
+            <img
+              [src]="urlData.viewUrl"
+              alt="KYC document"
+              class="max-w-full max-h-80 object-contain"
+              (error)="$any($event.target).style.display='none'"
+            />
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400">
+              URL expires {{ urlData.expiresAt | date:'HH:mm' }}
+            </p>
+            <a
+              [href]="urlData.viewUrl"
+              target="_blank"
+              class="flex items-center gap-1.5 text-xs font-semibold text-indigo-600
+                     hover:text-indigo-700 transition-colors"
+            >
+              Open in new tab
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

@@ -34,7 +34,31 @@ export const routes: Routes = [
   {
     path: 'admin',
     canActivate: [authGuard, roleGuard(['ADMIN'])],
-    loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard),
+    resolve: { profile: profileResolver },
+    loadComponent: () => import('./features/system-admin/system-admin').then(m => m.SystemAdmin),
+    children: [
+      { path: '', redirectTo: 'overview', pathMatch: 'full' },
+      {
+        path: 'overview',
+        loadComponent: () => import('./features/system-admin/overview/overview').then(m => m.SystemOverview),
+      },
+      {
+        path: 'kyc',
+        loadComponent: () => import('./features/system-admin/kyc/kyc').then(m => m.AdminKyc),
+      },
+      {
+        path: 'riders',
+        loadComponent: () => import('./features/system-admin/riders/riders').then(m => m.AdminRiders),
+      },
+      {
+        path: 'organisations',
+        loadComponent: () => import('./features/system-admin/organisations/organisations').then(m => m.AdminOrganisations),
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/system-admin/users/users').then(m => m.AdminUsers),
+      },
+    ],
   },
 
   // ── Org operator (ORG_ADMIN + DISPATCHER) ───────────────────────────────────
@@ -86,14 +110,6 @@ export const routes: Routes = [
         loadComponent: () => import('./features/org-dashboard/profile/profile').then(m => m.Profile),
       },
     ],
-  },
-
-  // ── Legacy redirect ─────────────────────────────────────────────────────────
-  // Keep old /dashboard URL alive — guards will sort the role
-  {
-    path: 'dashboard',
-    canActivate: [authGuard, roleGuard(['ADMIN'])],
-    loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard),
   },
 
   // ── Catch-all ───────────────────────────────────────────────────────────────

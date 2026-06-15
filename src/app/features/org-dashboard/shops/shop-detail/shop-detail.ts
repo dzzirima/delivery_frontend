@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ShopService, Shop, ShopReq } from '../shops.service';
 import { ShopItemService, ShopItem, ShopItemReq } from '../../shop-items/shop-items.service';
-import { UserService } from '../../../users/services/user.service';
+import { UserService } from '../../../../core/user.service';
 import { ToastService } from '../../../../core/toast.service';
 import { GooglePlacesDirective, PlaceResult } from '../../../../core/directives/google-places.directive';
 

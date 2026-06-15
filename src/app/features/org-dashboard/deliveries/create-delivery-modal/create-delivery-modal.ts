@@ -4,14 +4,14 @@ import { TitleCasePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { GooglePlacesDirective, PlaceResult } from '../../../../core/directives/google-places.directive';
 import { OrgDeliveryService } from '../deliveries.service';
-import { OrgRider, NearbyRider } from '../../../users/services/user.service';
+import { OrgRider, NearbyRider } from '../../../../core/user.service';
 import { ClientService, OrgClient, OrgClientReq } from '../../clients/clients.service';
 import { ShopItemService, ShopItem } from '../../shop-items/shop-items.service';
 import { ShopService, Shop } from '../../shops/shops.service';
-import { DeliveryRequestService, DriverBid } from '../../../delivery/services/delivery-request.service';
+import { DeliveryRequestService, DriverBid } from '../../../../core/delivery-request.service';
 import { DeliveryWebSocketService } from '../../../../core/delivery-websocket.service';
 import { ToastService } from '../../../../core/toast.service';
-import { UserService } from '../../../users/services/user.service';
+import { UserService } from '../../../../core/user.service';
 import { DeliveryUiService } from '../deliveries-ui.service';
 
 @Component({

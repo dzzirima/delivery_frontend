@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { DriverBid } from '../features/delivery/services/delivery-request.service';
+import { DriverBid } from './delivery-request.service';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning' | 'bid';
 

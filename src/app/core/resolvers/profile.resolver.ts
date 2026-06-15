@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
-import { UserService, User } from '../../features/users/services/user.service';
+import { UserService, User } from '../user.service';
 
 /**
  * Guarantees `UserService.profile()` is populated before any org-dashboard

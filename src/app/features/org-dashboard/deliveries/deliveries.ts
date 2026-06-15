@@ -3,7 +3,7 @@ import { DatePipe, TitleCasePipe, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrgDeliveryService, DeliveryItem } from './deliveries.service';
 import { ToastService } from '../../../core/toast.service';
-import { UserService } from '../../users/services/user.service';
+import { UserService } from '../../../core/user.service';
 import { DeliveryUiService } from './deliveries-ui.service';
 
 @Component({

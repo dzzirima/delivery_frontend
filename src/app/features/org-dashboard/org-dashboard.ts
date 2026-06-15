@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
-import { UserService } from '../users/services/user.service';
+import { UserService } from '../../core/user.service';
 import { DeliveryWebSocketService } from '../../core/delivery-websocket.service';
 import { CreateDeliveryModal } from './deliveries/create-delivery-modal/create-delivery-modal';
 

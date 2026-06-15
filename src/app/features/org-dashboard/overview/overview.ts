@@ -9,7 +9,7 @@ import { GooglePlacesDirective, PlaceResult } from '../../../core/directives/goo
 import { OrgDashboardService, OrgDashboardStats } from './overview.service';
 import { OrgDeliveryService, DeliveryItem } from '../deliveries/deliveries.service';
 import { ShopService, Shop } from '../shops/shops.service';
-import { UserService } from '../../users/services/user.service';
+import { UserService } from '../../../core/user.service';
 import { ToastService } from '../../../core/toast.service';
 import { DeliveryUiService } from '../deliveries/deliveries-ui.service';
 

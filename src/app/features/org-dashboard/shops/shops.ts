@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { GooglePlacesDirective, PlaceResult } from '../../../core/directives/google-places.directive';
 import { ShopService, Shop, ShopReq } from './shops.service';
-import { UserService } from '../../users/services/user.service';
+import { UserService } from '../../../core/user.service';
 import { ToastService } from '../../../core/toast.service';
 
 @Component({

@@ -4,7 +4,7 @@ import { DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BikeService, Bike, BikeReq } from './fleet.service';
 import { BikeOrgInviteService, BikeOrgInvite } from './bike-invite.service';
-import { UserService, OrgRider } from '../../users/services/user.service';
+import { UserService, OrgRider } from '../../../core/user.service';
 import { ToastService } from '../../../core/toast.service';
 
 @Component({
