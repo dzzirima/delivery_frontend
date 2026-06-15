@@ -1,92 +1,95 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col items-center justify-center px-4 py-12">
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
 
-  <!-- Logo -->
-  <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-200">
-    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-  </div>
-
-  <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Welcome back</h1>
-  <p class="text-gray-500 mb-8">Sign in to your Thi account</p>
-
-  <!-- Card -->
-  <div class="bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 w-full max-w-md p-8">
-    <form class="space-y-5" (ngSubmit)="login()">
-
-      <!-- Email or phone -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email or phone number</label>
-        <input
-          type="text"
-          [(ngModel)]="identifier"
-          name="identifier"
-          placeholder="you@example.com or +263 77 123 4567"
-          autocomplete="username"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
-        />
+    <!-- Logo block -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-green-600 shadow-lg mb-4">
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
       </div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Welcome back</h1>
+      <p class="text-sm text-gray-500 mt-1">Sign in to your Thi account</p>
+    </div>
 
-      <!-- Password -->
-      <div>
-        <div class="flex items-center justify-between mb-1.5">
-          <label class="block text-sm font-semibold text-gray-700">Password / PIN</label>
-          <a routerLink="/forgot-password" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Forgot password?</a>
-        </div>
-        <div class="relative">
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+      <form class="space-y-5" (ngSubmit)="login()">
+
+        <!-- Email or phone -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email or phone number</label>
           <input
-            [type]="showPassword() ? 'text' : 'password'"
-            [(ngModel)]="password"
-            name="password"
-            placeholder="Enter your password"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            type="text"
+            [(ngModel)]="identifier"
+            name="identifier"
+            placeholder="you@example.com or +263 77 123 4567"
+            autocomplete="username"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"
           />
-          <button
-            type="button"
-            (click)="togglePassword()"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            @if (showPassword()) {
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-              </svg>
-            } @else {
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            }
-          </button>
         </div>
-      </div>
 
-      <!-- Remember me -->
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="remember" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-        <label for="remember" class="text-sm text-gray-600">Remember me for 30 days</label>
-      </div>
+        <!-- Password -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-sm font-medium text-gray-700">Password / PIN</label>
+            <a routerLink="/forgot-password" class="text-xs text-green-600 hover:text-green-700 font-medium transition-colors">Forgot password?</a>
+          </div>
+          <div class="relative">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter your password"
+              class="w-full px-3.5 py-2.5 pr-12 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                     focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"
+            />
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              @if (showPassword()) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
 
+        <!-- Remember me -->
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="remember"
+            class="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+          <label for="remember" class="text-sm text-gray-600">Remember me for 30 days</label>
+        </div>
 
-      <!-- Submit -->
-      <button
-        type="submit"
-        [disabled]="loading()"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 mt-2"
-      >
-        {{ loading() ? 'Signing in…' : 'Sign in' }}
-      </button>
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm shadow-sm mt-2"
+        >
+          {{ loading() ? 'Signing in…' : 'Sign in' }}
+        </button>
 
-    </form>
+      </form>
+    </div>
+
+    <!-- Signup link -->
+    <p class="text-sm text-gray-500 mt-6 text-center">
+      Don't have an account?
+      <a routerLink="/signup" class="text-green-600 font-semibold hover:text-green-700 transition-colors">Create one free</a>
+    </p>
+
   </div>
-
-  <!-- Signup link -->
-  <p class="text-sm text-gray-500 mt-6">
-    Don't have an account?
-    <a routerLink="/signup" class="text-indigo-600 font-semibold hover:text-indigo-700">Create one free</a>
-  </p>
-
 </div>

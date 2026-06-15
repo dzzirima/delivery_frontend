@@ -1,67 +1,43 @@
-<div class="flex h-screen overflow-hidden bg-[#f1f5f9]">
+<div class="flex h-screen overflow-hidden bg-gray-50">
 
   <!-- ── SIDEBAR ── -->
   <aside
     [class.w-64]="!collapsed()"
-    [class.w-[72px]]="collapsed()"
-    class="flex flex-col bg-[#131929] transition-all duration-300 ease-in-out shrink-0 overflow-hidden"
+    [class.w-16]="collapsed()"
+    class="flex flex-col bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shrink-0 overflow-hidden"
   >
-    <!-- Brand / Profile -->
-    <div class="flex items-center gap-3 px-4 py-5 bg-[#4f46e5] shrink-0 min-h-[72px]">
-
-      <!-- Avatar + name — clicks to profile -->
-      <a
-        [routerLink]="['/org', 'profile']"
-        [class.flex-1]="!collapsed()"
-        [class.min-w-0]="!collapsed()"
-        class="flex items-center gap-3 min-w-0 group"
-        [title]="collapsed() ? 'My Profile' : ''"
-      >
-        <div class="relative shrink-0">
-          <div class="w-10 h-10 rounded-xl bg-white/20 group-hover:bg-white/30 flex items-center justify-center font-bold text-white text-sm transition-colors duration-150">
-            {{ initials() }}
-          </div>
-          <!-- Pencil badge -->
-          <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white flex items-center justify-center shadow group-hover:bg-indigo-100 transition-colors duration-150">
-            <svg class="w-2.5 h-2.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H8v-2.414a2 2 0 01.586-1.414z"/>
-            </svg>
-          </div>
-        </div>
-        @if (!collapsed()) {
-          <div class="overflow-hidden min-w-0">
-            <p class="text-white font-bold text-sm leading-tight whitespace-nowrap truncate group-hover:text-indigo-100 transition-colors duration-150">
-              {{ currentUser()?.name ?? 'My Organisation' }}
-            </p>
-            <p class="text-indigo-200 text-xs whitespace-nowrap capitalize">
-              {{ isOrgAdmin ? 'Org Admin' : 'Dispatcher' }}
-            </p>
-          </div>
-        }
-      </a>
-
-      <!-- Notification bell (expanded only — shown in bottom strip when collapsed) -->
+    <!-- Logo / Header -->
+    <div class="h-16 px-4 flex items-center border-b border-gray-200 shrink-0"
+      [class.justify-between]="!collapsed()"
+      [class.justify-center]="collapsed()">
       @if (!collapsed()) {
-        <button
-          class="relative shrink-0 p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/15 transition-all duration-150"
-          title="Notifications"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-          </svg>
-          <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-[#4f46e5]"></span>
-        </button>
+        <span class="text-xl font-bold text-green-600 tracking-tight">GM</span>
       }
+      <button
+        (click)="toggleCollapsed()"
+        [title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+        class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+      >
+        @if (collapsed()) {
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        } @else {
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        }
+      </button>
     </div>
 
     <!-- Nav -->
-    <nav class="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
+    <nav class="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
       @for (item of navItems; track item.id) {
         <a
           [routerLink]="['/org', item.route]"
-          routerLinkActive="bg-[#4f46e5] text-white"
+          routerLinkActive="bg-green-50 text-green-700 font-semibold"
           [class.justify-center]="collapsed()"
-          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-sm font-medium text-gray-400 hover:bg-white/10 hover:text-white"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
           [title]="collapsed() ? item.label : ''"
         >
           @if (item.icon === 'home') {
@@ -114,68 +90,69 @@
       }
     </nav>
 
-    <!-- Bottom actions -->
-    <div class="px-2 pb-3 pt-3 shrink-0 border-t border-white/10">
-      <div class="flex items-center gap-1" [class.justify-center]="collapsed()">
-
-        <!-- Notification bell (collapsed only — shown in header when expanded) -->
-        @if (collapsed()) {
-          <button
-            class="relative flex-1 flex items-center justify-center p-2 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-150"
-            title="Notifications"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
-            <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-          </button>
-        }
-
-        <!-- Sign out -->
-        <button
-          (click)="signOut()"
-          [class.flex-1]="collapsed()"
-          [class.w-full]="!collapsed()"
-          class="flex items-center justify-center gap-2 p-2 rounded-xl text-gray-400 hover:bg-white/10 hover:text-red-400 transition-all duration-150"
-          title="Sign Out"
+    <!-- Bottom user section -->
+    <div class="px-4 py-3 border-t border-gray-200 shrink-0">
+      @if (!collapsed()) {
+        <a
+          [routerLink]="['/org', 'profile']"
+          class="flex items-center gap-3 mb-3 group"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-          </svg>
-          @if (!collapsed()) {
-            <span class="text-sm font-medium">Sign out</span>
-          }
-        </button>
-      </div>
+          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs shrink-0">
+            {{ initials() }}
+          </div>
+          <div class="overflow-hidden min-w-0 flex-1">
+            <p class="text-xs font-medium text-gray-900 truncate group-hover:text-green-700 transition-colors">
+              {{ currentUser()?.name ?? 'My Organisation' }}
+            </p>
+            <p class="text-xs text-gray-500 capitalize">
+              {{ isOrgAdmin ? 'Org Admin' : 'Dispatcher' }}
+            </p>
+          </div>
+        </a>
+      } @else {
+        <a [routerLink]="['/org', 'profile']" class="flex justify-center mb-3">
+          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs">
+            {{ initials() }}
+          </div>
+        </a>
+      }
+      <button
+        (click)="signOut()"
+        class="w-full flex items-center gap-2 text-xs text-gray-500 hover:text-red-600 transition-colors font-medium py-1"
+        [class.justify-center]="collapsed()"
+        title="Sign Out"
+      >
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        @if (!collapsed()) {
+          <span>Sign out</span>
+        }
+      </button>
     </div>
   </aside>
 
-  <!-- ── EDGE TOGGLE TAB ── -->
-  <div class="relative z-20 flex items-center w-0">
-    <button
-      (click)="toggleCollapsed()"
-      [title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-      class="absolute left-0 -translate-x-1/2 top-1/2 -translate-y-1/2
-             w-5 h-10 rounded-full
-             bg-[#1e2d45] border border-white/10
-             flex items-center justify-center
-             text-gray-400 hover:text-white hover:bg-[#4f46e5]
-             shadow-lg transition-colors duration-150"
-    >
-      @if (collapsed()) {
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-        </svg>
-      } @else {
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-        </svg>
-      }
-    </button>
-  </div>
-
   <!-- ── MAIN ── -->
   <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Topbar -->
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
+      <p class="text-sm font-semibold text-gray-800">{{ currentUser()?.name ?? 'GM Operations' }}</p>
+      <div class="flex items-center gap-2">
+        <button
+          class="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+          title="Notifications"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+        </button>
+        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs">
+          {{ initials() }}
+        </div>
+      </div>
+    </header>
+
     <main class="flex-1 overflow-y-auto p-6">
       <router-outlet />
     </main>

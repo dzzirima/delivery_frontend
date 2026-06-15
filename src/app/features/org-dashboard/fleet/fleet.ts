@@ -4,8 +4,7 @@ import { DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BikeService, Bike, BikeReq } from './fleet.service';
 import { BikeOrgInviteService, BikeOrgInvite } from './bike-invite.service';
-import { OrgDeliveryService, OrgRider } from '../deliveries/deliveries.service';
-import { UserService } from '../../users/services/user.service';
+import { UserService, OrgRider } from '../../users/services/user.service';
 import { ToastService } from '../../../core/toast.service';
 
 @Component({
@@ -180,7 +179,7 @@ export class Fleet implements OnInit {
     const orgId = this.orgId();
     if (!orgId || this.orgRiders().length > 0) return;
     this.ridersLoading.set(true);
-    this.orgDeliveryService.getRiders(orgId).subscribe({
+    this.userService.getRiders().subscribe({
       next:  r => { this.orgRiders.set(Array.isArray(r.data) ? r.data : []); this.ridersLoading.set(false); },
       error: () => { this.ridersLoading.set(false); },
     });
@@ -189,7 +188,6 @@ export class Fleet implements OnInit {
   constructor(
     private bikeService:          BikeService,
     private bikeOrgInviteService: BikeOrgInviteService,
-    private orgDeliveryService:   OrgDeliveryService,
     private userService:          UserService,
     private toast:                ToastService,
   ) {}

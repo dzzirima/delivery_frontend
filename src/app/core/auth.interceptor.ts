@@ -6,8 +6,8 @@ import { AuthService } from './auth.service';
 
 /** Paths that must never carry an Authorization header */
 const PUBLIC_PATHS = [
-  '/user/signin',
-  '/user/signup',
+  '/users/signin',
+  '/users/signup',
   '/org/register',
   '/reset-password/',
   '/health/',

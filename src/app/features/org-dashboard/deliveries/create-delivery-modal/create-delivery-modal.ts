@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { TitleCasePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { GooglePlacesDirective, PlaceResult } from '../../../../core/directives/google-places.directive';
-import { OrgDeliveryService, OrgRider } from '../deliveries.service';
+import { OrgDeliveryService } from '../deliveries.service';
+import { OrgRider, NearbyRider } from '../../../users/services/user.service';
 import { ClientService, OrgClient, OrgClientReq } from '../../clients/clients.service';
 import { ShopItemService, ShopItem } from '../../shop-items/shop-items.service';
 import { ShopService, Shop } from '../../shops/shops.service';
@@ -42,7 +43,7 @@ export class CreateDeliveryModal implements OnDestroy {
   openCreateDelivery() {
     this.deliveryTab.set('PUBLIC');
     this.deliveryForm = {
-      dispatchStrategy: 'DIRECT_ASSIGN',
+      dispatchStrategy: 'PUBLIC_BID',
       pickupAddress: '', pickupLat: null, pickupLng: null,
       dropoffAddress: '', dropoffLat: null, dropoffLng: null,
       description: '', budget: this.randomPrice(),
@@ -61,6 +62,12 @@ export class CreateDeliveryModal implements OnDestroy {
     this.deliverySelectedItems.set([]);
     this.deliveryShopId.set('');
     this.deliveryModalError.set('');
+    // Reset nearby riders + payment toggle
+    this.nearbyRiders.set([]);
+    this.nearbyRidersLoading.set(false);
+    this.nearbyRidersLoaded.set(false);
+    this.osrmAvailable.set(true);
+    this.paymentDetailsOpen.set(false);
     // Reset bidding state
     this.publicDeliveryState.set('form');
     this.publicRequestId.set(null);
@@ -71,9 +78,9 @@ export class CreateDeliveryModal implements OnDestroy {
     this.cancelReasonCustom = '';
     this.repriceValue.set(0);
     this.repriceCooldown.set(0);
-    this.loadOrgRiders();
     if (this.clients().length === 0) this.loadClients();
     if (this.shops().length === 0) this.loadShops();
+    if (this.deliveryTab() === 'INTERNAL') this.maybeFetchNearbyRiders();
     this.loadDeliveryItems();
     this.createDeliveryModal.set(true);
   }
@@ -103,7 +110,7 @@ export class CreateDeliveryModal implements OnDestroy {
     this.deliveryTab.set(tab);
     this.deliveryModalError.set('');
     this.deliveryForm = {
-      dispatchStrategy: tab === 'PUBLIC' ? 'PUBLIC_BID' : 'INTERNAL_BID',
+      dispatchStrategy: tab === 'PUBLIC' ? 'PUBLIC_BID' : 'DIRECT_ASSIGN',
       pickupAddress: '', pickupLat: null, pickupLng: null,
       dropoffAddress: '', dropoffLat: null, dropoffLng: null,
       description: '', budget: this.randomPrice(),
@@ -121,6 +128,13 @@ export class CreateDeliveryModal implements OnDestroy {
     this.deliveryItemSearch.set('');
     this.deliverySelectedItems.set([]);
     this.deliveryShopId.set('');
+    this.nearbyRiders.set([]);
+    this.nearbyRidersLoading.set(false);
+    this.nearbyRidersLoaded.set(false);
+    this.osrmAvailable.set(true);
+    this.paymentDetailsOpen.set(false);
+    // Load riders immediately when switching to Direct Assign
+    if (tab === 'INTERNAL') this.maybeFetchNearbyRiders();
   }
 
   saveDelivery() {
@@ -145,6 +159,7 @@ export class CreateDeliveryModal implements OnDestroy {
     this.deliveryModalError.set('');
 
     const body: Record<string, unknown> = {
+      dispatchStrategy:    'PUBLIC_BID',
       pickupAddress:       f.pickupAddress,
       dropoffAddress:      f.dropoffAddress,
       price:               f.budget ?? 0,
@@ -160,13 +175,13 @@ export class CreateDeliveryModal implements OnDestroy {
 
     this.deliveryRequestService.createRequest(body).subscribe({
       next: r => {
-        const requestId = r.data?.requestId;
-        if (!requestId) {
+        const deliveryId = r.data?.id;
+        if (!deliveryId) {
           this.deliverySaving.set(false);
-          this.deliveryModalError.set('No request ID returned from server.');
+          this.deliveryModalError.set('No delivery ID returned from server.');
           return;
         }
-        this.publicRequestId.set(requestId);
+        this.publicRequestId.set(deliveryId);
         this.repriceValue.set(f.budget ?? 0);
         this.publicBids.set([]);
         this.deliverySaving.set(false);
@@ -312,14 +327,14 @@ export class CreateDeliveryModal implements OnDestroy {
       dropoffAddress: f.dropoffAddress,
       dropoffLat:     f.dropoffLat ?? 0,
       dropoffLng:     f.dropoffLng ?? 0,
-      budget:         f.budget     ?? 0,
+      price:          f.budget     ?? 0,
       paymentMethod:  f.paymentMethod || 'CASH',
     };
     if (f.description)                                           body['description'] = f.description;
     if (f.dispatchStrategy === 'DIRECT_ASSIGN' && f.driverId)   body['driverId']     = f.driverId;
     if (f.orgClientId)                                           body['orgClientId']  = f.orgClientId;
 
-    this.orgDeliveryService.createDelivery(orgId, body).subscribe({
+    this.orgDeliveryService.createDelivery(body).subscribe({
       next: () => {
         this.deliverySaving.set(false);
         this.closeCreateDelivery();
@@ -330,18 +345,89 @@ export class CreateDeliveryModal implements OnDestroy {
     });
   }
 
-  // ── Org riders ───────────────────────────────────────────────────────────────
-  orgRiders     = signal<OrgRider[]>([]);
-  ridersLoading = signal(false);
+  // ── Direct Assign UI ─────────────────────────────────────────────────────────
+  paymentDetailsOpen  = signal(false);
 
-  loadOrgRiders() {
+  // ── Nearby riders (Direct Assign) ────────────────────────────────────────────
+  nearbyRiders        = signal<NearbyRider[]>([]);
+  nearbyRidersLoading = signal(false);
+  nearbyRidersLoaded  = signal(false);
+  osrmAvailable       = signal(true);
+  onlineRiderCount    = computed(() => this.nearbyRiders().filter(r => r.online).length);
+
+  /**
+   * Fetches org riders for the Direct Assign tab.
+   * Passes pickup coordinates when available — backend returns riders sorted by road distance.
+   * Without coordinates — backend returns all riders sorted online-first.
+   * Always shows the spinner so the dispatcher sees the list refreshing.
+   */
+  maybeFetchNearbyRiders() {
+    if (this.deliveryTab() !== 'INTERNAL') return;
     const orgId = this.orgId();
-    if (!orgId || this.orgRiders().length > 0) return;
-    this.ridersLoading.set(true);
-    this.orgDeliveryService.getRiders(orgId).subscribe({
-      next:  r => { this.orgRiders.set(Array.isArray(r.data) ? r.data : []); this.ridersLoading.set(false); },
-      error: () => { this.ridersLoading.set(false); },
+    if (!orgId) return;
+
+    const { pickupLat, pickupLng } = this.deliveryForm;
+    this.nearbyRidersLoading.set(true);
+    this.nearbyRidersLoaded.set(false);
+    this.userService.getNearbyRiders(pickupLat, pickupLng).subscribe({
+      next: r => {
+        this.nearbyRiders.set(r.data?.riders ?? []);
+        this.osrmAvailable.set(r.data?.osrmAvailable ?? true);
+        this.nearbyRidersLoading.set(false);
+        this.nearbyRidersLoaded.set(true);
+      },
+      error: () => {
+        this.nearbyRiders.set([]);
+        this.osrmAvailable.set(true); // HTTP error ≠ OSRM down, don't show the banner
+        this.nearbyRidersLoading.set(false);
+        this.nearbyRidersLoaded.set(true);
+      },
     });
+  }
+
+  formatRiderLabel(r: NearbyRider): string {
+    let label = r.name;
+    if (r.distanceKm != null)        label += ` · ${r.distanceKm.toFixed(1)} km`;
+    if (r.durationMinutes != null)   label += ` · ~${Math.round(r.durationMinutes)} min`;
+    if (!r.hasLocation)              label += ' · no location';
+    else if (!r.online)              label += ' · offline';
+    return label;
+  }
+
+  // ── Address shortcut helpers (call maybeFetchNearbyRiders after setting coords) ──
+
+  useClientAsPickup() {
+    const c = this.deliverySelectedClient();
+    if (!c) return;
+    this.deliveryForm.pickupAddress = c.address;
+    this.deliveryForm.pickupLat     = c.latitude;
+    this.deliveryForm.pickupLng     = c.longitude;
+    this.maybeFetchNearbyRiders();
+  }
+
+  useClientAsDropoff() {
+    const c = this.deliverySelectedClient();
+    if (!c) return;
+    this.deliveryForm.dropoffAddress = c.address;
+    this.deliveryForm.dropoffLat     = c.latitude;
+    this.deliveryForm.dropoffLng     = c.longitude;
+  }
+
+  useShopAsPickup(shop: Shop) {
+    this.deliveryForm.pickupAddress = shop.address;
+    this.deliveryForm.pickupLat     = shop.latitude;
+    this.deliveryForm.pickupLng     = shop.longitude;
+    this.deliveryForm.shopId        = shop.id;
+    this.deliveryShopId.set(shop.id);
+    this.deliveryShopPickerOpen.set(false);
+    this.maybeFetchNearbyRiders();
+  }
+
+  useShopAsDropoff(shop: Shop) {
+    this.deliveryForm.dropoffAddress = shop.address;
+    this.deliveryForm.dropoffLat     = shop.latitude;
+    this.deliveryForm.dropoffLng     = shop.longitude;
+    this.deliveryShopPickerDropoffOpen.set(false);
   }
 
   // ── Client search in delivery form ───────────────────────────────────────────
@@ -507,6 +593,7 @@ export class CreateDeliveryModal implements OnDestroy {
     this.deliveryForm.pickupAddress = p.address;
     this.deliveryForm.pickupLat     = p.lat;
     this.deliveryForm.pickupLng     = p.lng;
+    this.maybeFetchNearbyRiders();
   }
 
   onDropoffPlaceSelected(p: PlaceResult) {

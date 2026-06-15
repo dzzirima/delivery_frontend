@@ -4,10 +4,10 @@
   <div class="flex items-center justify-between mb-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Members</h1>
-      <p class="text-gray-400 text-sm mt-0.5">Riders and dispatchers in your organisation.</p>
+      <p class="text-sm text-gray-500 mt-0.5">Riders and dispatchers in your organisation.</p>
     </div>
     <button (click)="openAddMember()"
-      class="flex items-center gap-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200">
+      class="flex items-center gap-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2.5 rounded-xl transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
       </svg>
@@ -35,10 +35,10 @@
   </div>
 
   <!-- Table -->
-  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+  <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
     @if (membersLoading() && members().length === 0) {
       <div class="py-16 flex flex-col items-center gap-3">
-        <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 text-green-500 animate-spin" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
@@ -46,60 +46,56 @@
       </div>
     } @else if (members().length === 0) {
       <div class="py-16 flex flex-col items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
-          <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </div>
+        <svg class="w-10 h-10 text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
         <div class="text-center">
           <p class="text-sm font-semibold text-gray-700">No members yet</p>
           <p class="text-xs text-gray-400 mt-0.5">Add riders and dispatchers to your organisation.</p>
         </div>
         <button (click)="openAddMember()"
-          class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+          class="mt-1 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors">
           Add your first member →
         </button>
       </div>
     } @else {
-      <table class="w-full">
-        <thead>
-          <tr class="border-b border-gray-100 bg-gray-50/60">
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Member</th>
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Contact</th>
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Role</th>
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Joined</th>
-            <th class="py-3 px-5"></th>
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Member</th>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
+            <th class="py-3 px-6"></th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50">
+        <tbody class="divide-y divide-gray-100 bg-white">
           @for (m of members(); track m.id) {
-            <tr class="hover:bg-gray-50/70 transition-colors">
+            <tr class="hover:bg-gray-50 transition-colors">
 
               <!-- Member identity -->
-              <td class="py-4 px-5">
+              <td class="py-3.5 px-6">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-green-100 text-green-700 text-xs font-semibold flex items-center justify-center shrink-0">
                     {{ m.name.charAt(0).toUpperCase() }}
                   </div>
                   <div>
-                    <p class="text-sm font-semibold text-gray-900">{{ m.name }}</p>
+                    <p class="font-medium text-gray-900">{{ m.name }}</p>
                     <p class="text-xs text-gray-400">{{ m.email }}</p>
                   </div>
                 </div>
               </td>
 
               <!-- Contact -->
-              <td class="py-4 px-5">
-                <span class="text-sm text-gray-500">{{ m.phone || '—' }}</span>
-              </td>
+              <td class="py-3.5 px-6 text-gray-500">{{ m.phone || '—' }}</td>
 
               <!-- Role -->
-              <td class="py-4 px-5">
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
-                  [class.bg-blue-50]="m.role === 'RIDER'"
+              <td class="py-3.5 px-6">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                  [class.bg-blue-100]="m.role === 'RIDER'"
                   [class.text-blue-700]="m.role === 'RIDER'"
-                  [class.bg-purple-50]="m.role === 'DISPATCHER'"
+                  [class.bg-purple-100]="m.role === 'DISPATCHER'"
                   [class.text-purple-700]="m.role === 'DISPATCHER'"
                 >
                   {{ m.role | titlecase }}
@@ -107,13 +103,13 @@
               </td>
 
               <!-- Status -->
-              <td class="py-4 px-5">
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold"
-                  [class.text-emerald-600]="m.status === 'ACTIVE'"
+              <td class="py-3.5 px-6">
+                <span class="inline-flex items-center gap-1.5 text-xs font-medium"
+                  [class.text-green-700]="m.status === 'ACTIVE'"
                   [class.text-gray-400]="m.status !== 'ACTIVE'"
                 >
                   <span class="w-1.5 h-1.5 rounded-full shrink-0"
-                    [class.bg-emerald-500]="m.status === 'ACTIVE'"
+                    [class.bg-green-500]="m.status === 'ACTIVE'"
                     [class.bg-gray-300]="m.status !== 'ACTIVE'"
                   ></span>
                   {{ m.status | titlecase }}
@@ -121,23 +117,28 @@
               </td>
 
               <!-- Joined -->
-              <td class="py-4 px-5 text-xs text-gray-400">{{ m.createdAt | date:'MMM d, y' }}</td>
+              <td class="py-3.5 px-6 text-xs text-gray-400">{{ m.createdAt | date:'MMM d, y' }}</td>
 
               <!-- Actions -->
-              <td class="py-4 px-5">
+              <td class="py-3.5 px-6">
                 <div class="flex items-center justify-end gap-1">
                   <button (click)="openEditMember(m)"
                     class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                    title="Edit member"
-                  >
+                    title="Edit member">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                   </button>
+                  <button (click)="openResetPassword(m)"
+                    class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                    title="Reset password">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                  </button>
                   <button (click)="memberRemovingId.set(m.id)"
                     class="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
-                    title="Remove member"
-                  >
+                    title="Remove member">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
@@ -154,28 +155,95 @@
 
 </div>
 
+<!-- ── Reset Password Modal ── -->
+@if (resetPasswordTarget()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" (click)="closeResetPassword()"></div>
+    <div class="relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
+      [class.ring-2]="resetPasswordError()" [class.ring-red-400]="resetPasswordError()"
+      (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-base font-semibold text-gray-900">Reset Password</h3>
+          <p class="text-xs text-gray-500 mt-0.5">{{ resetPasswordTarget()!.name }}</p>
+        </div>
+        <button (click)="closeResetPassword()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (resetPasswordError()) {
+        <div class="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>{{ resetPasswordError() }}</span>
+        </div>
+      }
+
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">New Password <span class="text-red-400">*</span></label>
+        <div class="relative">
+          <input
+            [type]="showResetPassword() ? 'text' : 'password'"
+            [(ngModel)]="resetPasswordValue"
+            placeholder="Min 8 characters"
+            class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
+          <button type="button" (click)="showResetPassword.set(!showResetPassword())"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+            @if (showResetPassword()) {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+              </svg>
+            } @else {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            }
+          </button>
+        </div>
+        <p class="text-xs text-gray-400 mt-1.5">Share the new password with the member after saving.</p>
+      </div>
+
+      <div class="flex gap-3">
+        <button (click)="closeResetPassword()"
+          class="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+          Cancel
+        </button>
+        <button (click)="saveResetPassword()"
+          [disabled]="resetPasswordSaving() || resetPasswordValue.trim().length < 8"
+          class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl transition-colors">
+          {{ resetPasswordSaving() ? 'Saving…' : 'Reset Password' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
 <!-- ── Remove Member Confirmation Modal ── -->
 @if (memberRemovingId()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="memberRemovingId.set(null)">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
-      <div class="flex items-start gap-4">
-        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="text-base font-bold text-gray-900">Remove member?</h3>
-          <p class="text-sm text-gray-500 mt-1">This will remove them from your organisation. Their account will remain active.</p>
-        </div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" (click)="memberRemovingId.set(null)"></div>
+    <div class="relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/>
+        </svg>
       </div>
-      <div class="flex gap-3 mt-6">
+      <h3 class="text-base font-semibold text-gray-900 text-center">Remove member?</h3>
+      <p class="text-sm text-gray-500 text-center mt-1">This will remove them from your organisation. Their account will remain active.</p>
+      <div class="mt-6 flex gap-3">
         <button (click)="memberRemovingId.set(null)"
-          class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-colors">
+          class="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
           Cancel
         </button>
         <button (click)="removeMember(memberRemovingId()!)"
-          class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors">
+          class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors">
           Yes, Remove
         </button>
       </div>
@@ -185,17 +253,18 @@
 
 <!-- ── Add / Edit Member Modal ── -->
 @if (memberModal()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeMemberModal()">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" (click)="closeMemberModal()"></div>
+    <div class="relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
       [class.ring-2]="memberModalError()" [class.ring-red-400]="memberModalError()"
       (click)="$event.stopPropagation()">
 
       <div class="flex items-center justify-between mb-5">
         <div>
-          <h3 class="text-base font-bold text-gray-900">
+          <h3 class="text-base font-semibold text-gray-900">
             {{ memberEditing() ? 'Edit Member' : 'Add Member' }}
           </h3>
-          <p class="text-xs text-gray-400 mt-0.5">
+          <p class="text-xs text-gray-500 mt-0.5">
             {{ memberEditing() ? 'Update details or role.' : 'Creates an account and assigns them to your organisation.' }}
           </p>
         </div>
@@ -207,7 +276,7 @@
       </div>
 
       @if (memberModalError()) {
-        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+        <div class="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
           <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
@@ -217,29 +286,33 @@
 
       <form (ngSubmit)="saveMember()" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Full Name <span class="text-red-400">*</span></label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-red-400">*</span></label>
           <input type="text" [(ngModel)]="memberForm.name" name="name" required placeholder="e.g. John Banda"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
         </div>
 
         @if (!memberEditing()) {
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email <span class="text-red-400">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-400">*</span></label>
             <input type="email" [(ngModel)]="memberForm.email" name="email" required placeholder="john@example.com"
-              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                     focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
           </div>
         }
 
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone <span class="text-gray-400 font-normal">(optional)</span></label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
           <input type="tel" [(ngModel)]="memberForm.phone" name="phone" placeholder="+263 77 123 4567"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Role <span class="text-red-400">*</span></label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Role <span class="text-red-400">*</span></label>
           <select [(ngModel)]="memberForm.role" name="role" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors bg-white">
             <option value="RIDER">Rider</option>
             <option value="DISPATCHER">Dispatcher</option>
           </select>
@@ -247,12 +320,13 @@
 
         @if (!memberEditing()) {
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Password <span class="text-red-400">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Password <span class="text-red-400">*</span></label>
             <div class="relative">
               <input
                 [type]="showMemberPassword() ? 'text' : 'password'"
                 [(ngModel)]="memberForm.password" name="password" required placeholder="Min 8 characters"
-                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-10"/>
+                class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                       focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
               <button type="button" (click)="showMemberPassword.set(!showMemberPassword())"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
                 @if (showMemberPassword()) {
@@ -267,18 +341,18 @@
                 }
               </button>
             </div>
-            <p class="text-xs text-gray-400 mt-1">Share this with the member after creation.</p>
+            <p class="text-xs text-gray-400 mt-1.5">Share this with the member after creation.</p>
           </div>
         }
 
         <div class="flex gap-3 pt-1">
           <button type="button" (click)="closeMemberModal()"
-            class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-colors">
+            class="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
             Cancel
           </button>
           <button type="submit"
             [disabled]="memberSaving() || !memberForm.name.trim() || !memberForm.role || (!memberEditing() && (!memberForm.email.trim() || !memberForm.password.trim()))"
-            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl transition-colors">
             {{ memberSaving() ? 'Saving…' : (memberEditing() ? 'Save Changes' : 'Add Member') }}
           </button>
         </div>

@@ -1,0 +1,263 @@
+<div class="flex overflow-hidden -m-6" style="height:100vh">
+
+  <!-- ── LEFT: detail panel ── -->
+  <div class="w-[420px] shrink-0 flex flex-col overflow-hidden bg-white border-r border-gray-100">
+
+    <!-- Sticky header -->
+    <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
+      <button (click)="goBack()"
+        class="p-1.5 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <div class="flex-1 min-w-0">
+        <h1 class="text-sm font-bold text-gray-900">Delivery Detail</h1>
+        @if (delivery()) {
+          <p class="text-xs text-gray-400 font-mono">#{{ delivery()!.id.slice(-8).toUpperCase() }}</p>
+        }
+      </div>
+      @if (delivery()) {
+        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold shrink-0"
+          [style.background]="statusColor(delivery()!.status) + '20'"
+          [style.color]="statusColor(delivery()!.status)">
+          {{ delivery()!.status | titlecase }}
+        </span>
+      }
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto">
+
+      @if (loading()) {
+        <div class="py-20 text-center text-sm text-gray-400">Loading…</div>
+      }
+
+      @else if (error()) {
+        <div class="m-5 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 text-sm">
+          {{ error() }}
+        </div>
+      }
+
+      @else if (delivery()) {
+
+        <!-- Route -->
+        <div class="px-5 py-5 border-b border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Route</p>
+          <div class="flex items-start gap-3">
+            <div class="flex flex-col items-center mt-1 shrink-0">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="w-px h-7 bg-gray-200 my-1"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+            </div>
+            <div class="flex-1 min-w-0 space-y-3">
+              <div>
+                <p class="text-sm font-semibold text-gray-900 leading-snug">{{ delivery()!.route.pickupAddress }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">Pickup</p>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900 leading-snug">{{ delivery()!.route.dropoffAddress }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">Dropoff</p>
+                @if (delivery()!.route.dropoffInstructions) {
+                  <p class="text-xs text-gray-500 mt-1 italic">{{ delivery()!.route.dropoffInstructions }}</p>
+                }
+              </div>
+            </div>
+          </div>
+          @if (delivery()!.route.distanceKm || delivery()!.route.estimatedDurationMinutes) {
+            <div class="flex items-center gap-3 mt-3 pt-3 border-t border-gray-50">
+              @if (delivery()!.route.distanceKm) {
+                <span class="flex items-center gap-1.5 text-xs text-gray-500">
+                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                  </svg>
+                  {{ delivery()!.route.distanceKm | number:'1.1-1' }} km
+                </span>
+              }
+              @if (delivery()!.route.estimatedDurationMinutes) {
+                <span class="flex items-center gap-1.5 text-xs text-gray-500">
+                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  {{ delivery()!.route.estimatedDurationMinutes }} min
+                </span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Driver -->
+        <div class="px-5 py-5 border-b border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Driver</p>
+          @if (delivery()!.driver) {
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-green-100 text-green-700 font-bold text-sm flex items-center justify-center shrink-0">
+                {{ delivery()!.driver!.name.charAt(0).toUpperCase() }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900">{{ delivery()!.driver!.name }}</p>
+                <p class="text-xs text-gray-400">{{ delivery()!.driver!.phone ?? '—' }}</p>
+              </div>
+            </div>
+            @if (delivery()!.driver!.bikeMake) {
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50">
+                <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                <span class="text-xs text-gray-500">{{ delivery()!.driver!.bikeMake }} {{ delivery()!.driver!.bikeModel }}</span>
+                @if (delivery()!.driver!.licensePlate) {
+                  <span class="ml-auto text-xs font-mono font-semibold text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
+                    {{ delivery()!.driver!.licensePlate }}
+                  </span>
+                }
+              </div>
+            }
+          } @else {
+            <p class="text-sm text-gray-400">No driver assigned yet.</p>
+          }
+        </div>
+
+        <!-- Client -->
+        <div class="px-5 py-5 border-b border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Client</p>
+          @if (delivery()!.client) {
+            <p class="text-sm font-semibold text-gray-900">{{ delivery()!.client!.name }}</p>
+            @if (delivery()!.client!.phone) {
+              <p class="text-xs text-gray-500 mt-1">{{ delivery()!.client!.phone }}</p>
+            }
+            @if (delivery()!.client!.address) {
+              <p class="text-xs text-gray-400 mt-0.5">{{ delivery()!.client!.address }}</p>
+            }
+          } @else {
+            <p class="text-sm text-gray-400">No client recorded.</p>
+          }
+        </div>
+
+        <!-- Package -->
+        <div class="px-5 py-5 border-b border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Package</p>
+          @if (delivery()!.packageDetails.description) {
+            <p class="text-sm text-gray-800 mb-2">{{ delivery()!.packageDetails.description }}</p>
+          }
+          <div class="flex flex-wrap gap-1.5">
+            @if (delivery()!.packageDetails.sizeCategory) {
+              <span class="text-xs bg-gray-100 text-gray-600 font-medium px-2.5 py-1 rounded-lg">
+                {{ delivery()!.packageDetails.sizeCategory | titlecase }}
+              </span>
+            }
+            @if (delivery()!.packageDetails.priority) {
+              <span class="text-xs bg-gray-100 text-gray-600 font-medium px-2.5 py-1 rounded-lg">
+                {{ delivery()!.packageDetails.priority | titlecase }}
+              </span>
+            }
+            @if (delivery()!.packageDetails.weight) {
+              <span class="text-xs bg-gray-100 text-gray-600 font-medium px-2.5 py-1 rounded-lg">
+                {{ delivery()!.packageDetails.weight }} kg
+              </span>
+            }
+          </div>
+          @if (!delivery()!.packageDetails.description && !delivery()!.packageDetails.sizeCategory) {
+            <p class="text-sm text-gray-400">No package details.</p>
+          }
+        </div>
+
+        <!-- Financials -->
+        <div class="px-5 py-5 border-b border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Financials</p>
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-500">Price</span>
+              <span class="text-base font-bold text-gray-900">
+                {{ delivery()!.financials.price | currency:'USD':'symbol':'1.2-2' }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-500">Payment</span>
+              <span class="text-xs font-medium text-gray-700">
+                {{ delivery()!.financials.paymentMethod ?? '—' | titlecase }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-500">Status</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                [class.bg-green-50]="delivery()!.financials.paymentStatus === 'PAID'"
+                [class.text-green-700]="delivery()!.financials.paymentStatus === 'PAID'"
+                [class.bg-amber-50]="delivery()!.financials.paymentStatus !== 'PAID'"
+                [class.text-amber-700]="delivery()!.financials.paymentStatus !== 'PAID'">
+                {{ delivery()!.financials.paymentStatus ?? 'Pending' | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="px-5 py-5" [class.border-b]="delivery()!.cancellationReason" [class.border-gray-100]="delivery()!.cancellationReason">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Timeline</p>
+          <div class="space-y-3">
+            @for (event of [
+              { label: 'Created',   time: delivery()!.timeline.createdAt,   done: true },
+              { label: 'Picked up', time: delivery()!.timeline.pickedUpAt,  done: !!delivery()!.timeline.pickedUpAt },
+              { label: 'Delivered', time: delivery()!.timeline.deliveredAt, done: !!delivery()!.timeline.deliveredAt },
+              { label: 'Cancelled', time: delivery()!.timeline.cancelledAt, done: !!delivery()!.timeline.cancelledAt }
+            ]; track event.label) {
+              @if (event.label !== 'Cancelled' || event.done) {
+                <div class="flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-full shrink-0"
+                    [class.bg-green-500]="event.done"
+                    [class.bg-gray-200]="!event.done">
+                  </span>
+                  <span class="text-xs w-20 shrink-0"
+                    [class.font-semibold]="event.done"
+                    [class.text-gray-800]="event.done"
+                    [class.text-gray-400]="!event.done">
+                    {{ event.label }}
+                  </span>
+                  <span class="text-xs text-gray-400">
+                    {{ event.time ? (event.time | date:'MMM d, y · HH:mm') : '—' }}
+                  </span>
+                </div>
+              }
+            }
+          </div>
+          @if (delivery()!.assignedBy) {
+            <p class="text-xs text-gray-400 mt-4 pt-3 border-t border-gray-50">
+              Assigned by <span class="font-medium text-gray-600">{{ delivery()!.assignedBy }}</span>
+            </p>
+          }
+        </div>
+
+        <!-- Cancellation reason -->
+        @if (delivery()!.cancellationReason) {
+          <div class="px-5 py-5">
+            <p class="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-2">Cancellation Reason</p>
+            <p class="text-sm text-red-700">{{ delivery()!.cancellationReason }}</p>
+          </div>
+        }
+
+      }
+    </div>
+  </div>
+
+  <!-- ── RIGHT: map (always rendered) ── -->
+  <div class="flex-1 relative bg-gray-200">
+
+    <div #detailMap class="absolute inset-0"></div>
+
+    <!-- Pin legend -->
+    <div class="absolute top-4 left-4 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl shadow-md px-3 py-2 flex items-center gap-3 text-xs text-gray-600">
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0"></span>Pickup</span>
+      <span class="w-px h-3 bg-gray-200"></span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></span>Dropoff</span>
+    </div>
+
+    <!-- No coordinates notice -->
+    @if (delivery() && !delivery()!.route.pickupLat && !delivery()!.route.pickupLng) {
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg px-5 py-3 text-center pointer-events-none">
+        <p class="text-sm font-semibold text-gray-600">No location data</p>
+        <p class="text-xs text-gray-400 mt-0.5">Coordinates not recorded for this delivery</p>
+      </div>
+    }
+
+  </div>
+
+</div>

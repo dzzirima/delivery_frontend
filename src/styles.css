@@ -1,16 +1,38 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
+/* ── Design tokens ── */
+@theme {
+  --color-brand-50:  #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+}
+
+/* ── Base ── */
+html, body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ── Animations ── */
 @keyframes slide-in {
   from { opacity: 0; transform: translateX(100%); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
 .animate-slide-in {
   animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 ::placeholder {
-  color: #9ca3af; /* gray-400 — dimmed hint text */
+  color: #9ca3af;
   opacity: 1;
 }

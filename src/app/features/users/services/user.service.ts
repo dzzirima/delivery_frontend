@@ -37,9 +37,26 @@ export interface UpdateUserPayload {
   address?: string;
 }
 
+export interface OrgRider {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+}
+
+export interface NearbyRider {
+  id: string;
+  name: string;
+  phone: string | null;
+  online: boolean;
+  hasLocation: boolean;
+  distanceKm: number | null;
+  durationMinutes: number | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly base = `${environment.apiUrl}/user`;
+  private readonly base = `${environment.apiUrl}/users`;
 
   readonly profile = signal<User | null>(null);
 
@@ -73,6 +90,20 @@ export class UserService {
 
   delete(id: string) {
     return this.http.delete<{ data: User }>(`${this.base}/${id}`);
+  }
+
+  getRiders() {
+    let params = new HttpParams().set('role', 'RIDER');
+    return this.http.get<{ data: OrgRider[] }>(this.base, { params });
+  }
+
+  getNearbyRiders(pickupLat?: number | null, pickupLng?: number | null) {
+    let params = new HttpParams().set('role', 'RIDER');
+    if (pickupLat != null) params = params.set('lat', String(pickupLat));
+    if (pickupLng != null) params = params.set('lng', String(pickupLng));
+    return this.http.get<{ data: { riders: NearbyRider[]; osrmAvailable: boolean } }>(
+      this.base, { params }
+    );
   }
 
   forgotPassword(email: string) {

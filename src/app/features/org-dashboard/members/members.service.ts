@@ -48,6 +48,10 @@ export class OrgMemberService {
       `${this.base}/org/${orgId}/members/${userId}`, req);
   }
 
+  resetPassword(orgId: string, userId: string, password: string) {
+    return this.http.patch(`${this.base}/org/${orgId}/members/${userId}/password`, { password });
+  }
+
   remove(orgId: string, userId: string) {
     return this.http.delete(`${this.base}/org/${orgId}/members/${userId}`);
   }

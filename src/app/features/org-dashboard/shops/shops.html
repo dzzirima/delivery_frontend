@@ -4,10 +4,10 @@
   <div class="flex items-center justify-between mb-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Shops</h1>
-      <p class="text-gray-400 text-sm mt-0.5">Your branches and pickup locations.</p>
+      <p class="text-sm text-gray-500 mt-0.5">Your branches and pickup locations.</p>
     </div>
     <button (click)="openShopModal()"
-      class="flex items-center gap-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200">
+      class="flex items-center gap-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2.5 rounded-xl transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
       </svg>
@@ -16,10 +16,10 @@
   </div>
 
   <!-- Table -->
-  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+  <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
     @if (shopsLoading() && shops().length === 0) {
       <div class="py-16 flex flex-col items-center gap-3">
-        <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 text-green-500 animate-spin" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
@@ -27,62 +27,60 @@
       </div>
     } @else if (shops().length === 0) {
       <div class="py-16 flex flex-col items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
-          <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22V12h6v10"/>
-          </svg>
-        </div>
+        <svg class="w-10 h-10 text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 22V12h6v10"/>
+        </svg>
         <div class="text-center">
           <p class="text-sm font-semibold text-gray-700">No shops yet</p>
           <p class="text-xs text-gray-400 mt-0.5">Add your branches and pickup locations.</p>
         </div>
         <button (click)="openShopModal()"
-          class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+          class="mt-1 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors">
           Add your first shop →
         </button>
       </div>
     } @else {
-      <table class="w-full">
-        <thead>
-          <tr class="border-b border-gray-100 bg-gray-50/60">
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Shop</th>
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Address</th>
-            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</th>
-            <th class="py-3 px-5"></th>
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Shop</th>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</th>
+            <th class="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
+            <th class="py-3 px-6"></th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50">
+        <tbody class="divide-y divide-gray-100 bg-white">
           @for (shop of shops(); track shop.id) {
             <tr [routerLink]="['/org/shops', shop.id]"
-              class="hover:bg-indigo-50/40 cursor-pointer transition-colors">
+              class="hover:bg-gray-50 cursor-pointer transition-colors">
 
               <!-- Shop identity -->
-              <td class="py-4 px-5">
+              <td class="py-3.5 px-6">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <div class="w-8 h-8 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22V12h6v10"/>
                     </svg>
                   </div>
                   <div>
-                    <p class="text-sm font-semibold text-gray-900">{{ shop.name }}</p>
+                    <p class="font-medium text-gray-900">{{ shop.name }}</p>
                     @if (shop.slug) {
-                      <p class="text-xs text-gray-300 font-mono">{{ shop.slug }}</p>
+                      <p class="text-xs text-gray-400 font-mono">{{ shop.slug }}</p>
                     }
                   </div>
                 </div>
               </td>
 
               <!-- Address -->
-              <td class="py-4 px-5 text-sm text-gray-500 max-w-[220px] truncate">{{ shop.address || '—' }}</td>
+              <td class="py-3.5 px-6 text-gray-500 max-w-[220px] truncate">{{ shop.address || '—' }}</td>
 
               <!-- Phone -->
-              <td class="py-4 px-5 text-sm text-gray-500">{{ shop.phone || '—' }}</td>
+              <td class="py-3.5 px-6 text-gray-500">{{ shop.phone || '—' }}</td>
 
               <!-- Actions -->
-              <td class="py-4 px-5" (click)="$event.stopPropagation()">
+              <td class="py-3.5 px-6" (click)="$event.stopPropagation()">
                 <div class="flex items-center justify-end gap-1">
                   <button (click)="openShopModal(shop)"
                     class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
@@ -112,26 +110,23 @@
 
 <!-- ── Delete Shop Confirmation Modal ── -->
 @if (shopDeletingId()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="shopDeletingId.set(null)">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
-      <div class="flex items-start gap-4">
-        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="text-base font-bold text-gray-900">Delete shop?</h3>
-          <p class="text-sm text-gray-500 mt-1">This will permanently remove the shop and its associated data.</p>
-        </div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" (click)="shopDeletingId.set(null)"></div>
+    <div class="relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
       </div>
-      <div class="flex gap-3 mt-6">
+      <h3 class="text-base font-semibold text-gray-900 text-center">Delete shop?</h3>
+      <p class="text-sm text-gray-500 text-center mt-1">This will permanently remove the shop and its associated data.</p>
+      <div class="mt-6 flex gap-3">
         <button (click)="shopDeletingId.set(null)"
-          class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-colors">
+          class="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
           Cancel
         </button>
         <button (click)="deleteShop(shopDeletingId()!)"
-          class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors">
+          class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors">
           Yes, Delete
         </button>
       </div>
@@ -141,13 +136,14 @@
 
 <!-- ── Add / Edit Shop Modal ── -->
 @if (shopModal()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeShopModal()">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" (click)="closeShopModal()"></div>
+    <div class="relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
       [class.ring-2]="shopModalError()" [class.ring-red-400]="shopModalError()"
       (click)="$event.stopPropagation()">
 
       <div class="flex items-center justify-between mb-5">
-        <h3 class="text-base font-bold text-gray-900">{{ shopEditing() ? 'Edit Shop' : 'Add Shop' }}</h3>
+        <h3 class="text-base font-semibold text-gray-900">{{ shopEditing() ? 'Edit Shop' : 'Add Shop' }}</h3>
         <button (click)="closeShopModal()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -156,7 +152,7 @@
       </div>
 
       @if (shopModalError()) {
-        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+        <div class="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
           <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
@@ -166,29 +162,32 @@
 
       <form (ngSubmit)="saveShop()" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Shop Name <span class="text-red-400">*</span></label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Shop Name <span class="text-red-400">*</span></label>
           <input type="text" [(ngModel)]="shopForm.name" name="name" required placeholder="Main Branch"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Address <span class="text-gray-400 font-normal">(optional)</span></label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Address <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
           <input type="text" appGooglePlaces (placeSelected)="onShopAddressSelected($event)"
             [(ngModel)]="shopForm.address" name="address" placeholder="123 Main St, Harare"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone <span class="text-gray-400 font-normal">(optional)</span></label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
           <input type="tel" [(ngModel)]="shopForm.phone" name="phone" placeholder="+263 77 123 4567"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
+                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
         </div>
         <div class="flex gap-3 pt-1">
           <button type="button" (click)="closeShopModal()"
-            class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-colors">
+            class="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
             Cancel
           </button>
           <button type="submit"
             [disabled]="shopsLoading() || !shopForm.name.trim()"
-            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl transition-colors">
             {{ shopEditing() ? 'Save Changes' : 'Create Shop' }}
           </button>
         </div>

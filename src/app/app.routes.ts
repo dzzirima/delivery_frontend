@@ -54,6 +54,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/org-dashboard/deliveries/deliveries').then(m => m.Deliveries),
       },
       {
+        path: 'deliveries/:id',
+        loadComponent: () => import('./features/org-dashboard/deliveries/delivery-detail/delivery-detail').then(m => m.DeliveryDetail),
+      },
+      {
         path: 'fleet',
         loadComponent: () => import('./features/org-dashboard/fleet/fleet').then(m => m.Fleet),
       },

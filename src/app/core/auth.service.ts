@@ -98,7 +98,7 @@ export class AuthService {
 
   signin(payload: SigninPayload) {
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/user/signin`, payload)
+      .post<AuthResponse>(`${environment.apiUrl}/users/signin`, payload)
       .pipe(
         tap(res => this.storeToken(res.data.token))
       );
@@ -106,7 +106,7 @@ export class AuthService {
 
   signup(payload: SignupPayload) {
     return this.http.post<{ data: { id: string } }>(
-      `${environment.apiUrl}/user/signup`, payload
+      `${environment.apiUrl}/users/signup`, payload
     );
   }
 

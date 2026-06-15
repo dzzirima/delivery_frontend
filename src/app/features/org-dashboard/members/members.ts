@@ -26,6 +26,43 @@ export class Members implements OnInit {
   memberForm        = { name: '', email: '', phone: '', password: '', role: 'RIDER' as 'RIDER' | 'DISPATCHER' };
   showMemberPassword = signal(false);
 
+  // ── Password reset ──────────────────────────────────────────────────────────
+  resetPasswordTarget  = signal<OrgMember | null>(null);
+  resetPasswordValue   = '';
+  showResetPassword    = signal(false);
+  resetPasswordSaving  = signal(false);
+  resetPasswordError   = signal('');
+
+  openResetPassword(m: OrgMember) {
+    this.resetPasswordTarget.set(m);
+    this.resetPasswordValue = '';
+    this.showResetPassword.set(false);
+    this.resetPasswordError.set('');
+  }
+
+  closeResetPassword() {
+    this.resetPasswordTarget.set(null);
+    this.resetPasswordError.set('');
+  }
+
+  saveResetPassword() {
+    const orgId  = this.orgId();
+    const member = this.resetPasswordTarget();
+    if (!orgId || !member || !this.resetPasswordValue.trim()) return;
+    this.resetPasswordSaving.set(true);
+    this.orgMemberService.resetPassword(orgId, member.id, this.resetPasswordValue).subscribe({
+      next: () => {
+        this.resetPasswordSaving.set(false);
+        this.closeResetPassword();
+        this.toast.success('Success', `Password reset for ${member.name}.`);
+      },
+      error: (e) => {
+        this.resetPasswordSaving.set(false);
+        this.resetPasswordError.set(e?.error?.message ?? 'Failed to reset password.');
+      },
+    });
+  }
+
   loadMembers() {
     const orgId = this.orgId();
     if (!orgId) return;

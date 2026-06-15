@@ -2,6 +2,32 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
+export interface DeliveryDetail {
+  id: string;
+  status: string;
+  dispatchStrategy: string | null;
+  requestScope: string | null;
+  route: {
+    pickupAddress: string;
+    pickupLat: number | null;
+    pickupLng: number | null;
+    dropoffAddress: string;
+    dropoffLat: number | null;
+    dropoffLng: number | null;
+    dropoffInstructions: string | null;
+    distanceKm: number | null;
+    estimatedDurationMinutes: number | null;
+  };
+  client: { name: string; phone: string | null; address: string | null; } | null;
+  driver: { id: string; name: string; phone: string | null; bikeMake: string | null; bikeModel: string | null; licensePlate: string | null; } | null;
+  packageDetails: { description: string | null; sizeCategory: string | null; priority: string | null; weight: number | null; };
+  financials: { price: number; paymentMethod: string | null; paymentStatus: string | null; };
+  timeline: { createdAt: string; pickedUpAt: string | null; deliveredAt: string | null; cancelledAt: string | null; };
+  assignedBy: string | null;
+  notes: string | null;
+  cancellationReason: string | null;
+}
+
 export interface DeliveryItem {
   id: string;
   status: string;
@@ -31,13 +57,6 @@ export interface DeliveryItem {
   actualDeliveryTime: string | null;
 }
 
-export interface OrgRider {
-  id: string;
-  name: string;
-  phone: string | null;
-  email: string | null;
-}
-
 export interface DeliveryStats {
   assigned: number;
   accepted: number;
@@ -52,41 +71,40 @@ export interface DeliveryStats {
 
 @Injectable({ providedIn: 'root' })
 export class OrgDeliveryService {
-  private base = environment.apiUrl;
+  private base = `${environment.apiUrl}/deliveries`;
   constructor(private http: HttpClient) {}
 
-  getBoard(orgId: string, status?: string, page = 0, size = 30) {
+  getBoard(status?: string, page = 0, size = 30) {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) params = params.set('status', status);
-    return this.http.get<{ data: DeliveryItem[]; length: number }>(
-      `${this.base}/org/${orgId}/dispatch`, { params });
+    return this.http.get<{ data: DeliveryItem[]; length: number }>(this.base, { params });
   }
 
-  getRiders(orgId: string) {
-    return this.http.get<{ data: OrgRider[] }>(`${this.base}/org/${orgId}/dispatch/riders`);
+  getStats() {
+    return this.http.get<{ data: DeliveryStats }>(`${this.base}/stats`);
   }
 
-  getStats(orgId: string) {
-    return this.http.get<{ data: DeliveryStats }>(`${this.base}/org/${orgId}/dispatch/stats`);
+  cancel(id: string) {
+    return this.http.patch(`${this.base}/${id}/cancel`, {});
   }
 
-  cancel(orgId: string, id: string) {
-    return this.http.patch(`${this.base}/org/${orgId}/dispatch/${id}/cancel`, {});
+  reassign(id: string, driverId: string) {
+    return this.http.patch(`${this.base}/${id}/reassign`, { driverId });
   }
 
-  reassign(orgId: string, id: string, driverId: string) {
-    return this.http.patch(`${this.base}/org/${orgId}/dispatch/${id}/reassign`, { driverId });
+  publish(id: string) {
+    return this.http.patch(`${this.base}/${id}/publish`, {});
   }
 
-  publish(orgId: string, id: string) {
-    return this.http.patch(`${this.base}/org/${orgId}/dispatch/${id}/publish`, {});
+  createDelivery(body: object) {
+    return this.http.post<{ data: DeliveryItem }>(this.base, body);
   }
 
-  createDelivery(orgId: string, body: object) {
-    return this.http.post<{ data: DeliveryItem }>(`${this.base}/org/${orgId}/delivery`, body);
+  getDetail(id: string) {
+    return this.http.get<{ data: DeliveryDetail }>(`${this.base}/${id}`);
   }
 
-  updateDelivery(orgId: string, id: string, body: object) {
-    return this.http.patch<{ data: DeliveryItem }>(`${this.base}/org/${orgId}/dispatch/${id}`, body);
+  updateDelivery(id: string, body: object) {
+    return this.http.patch<{ data: DeliveryItem }>(`${this.base}/${id}`, body);
   }
 }

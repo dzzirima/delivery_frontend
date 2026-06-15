@@ -17,33 +17,46 @@ export interface DriverBid {
 
 @Injectable({ providedIn: 'root' })
 export class DeliveryRequestService {
-  private base = environment.apiUrl;
+  private base = `${environment.apiUrl}/deliveries`;
 
   constructor(private http: HttpClient) {}
 
+  // Creates a delivery (PUBLIC_BID flow). Returns the DB delivery record — use `data.id` as the deliveryId.
   createRequest(body: object) {
-    return this.http.post<{ data: { requestId: string } }>(
-      `${this.base}/delivery/request`, body
+    return this.http.post<{ data: { id: string; [key: string]: unknown } }>(
+      this.base, body
     );
   }
 
-  acceptBid(requestId: string, driverId: string) {
-    return this.http.post<{ data: { deliveryId: string; agreedPrice: number } }>(
-      `${this.base}/delivery/request/${requestId}/accept`, { driverId }
+  placeBid(deliveryId: string, body: object) {
+    return this.http.post<{ data: unknown }>(
+      `${this.base}/${deliveryId}/bids`, body
     );
   }
 
-  repriceRequest(requestId: string, price: number) {
-    return this.http.post<{ data: { requestId: string; price: number } }>(
-      `${this.base}/delivery/request/${requestId}/reprice`, { price }
+  acceptBid(deliveryId: string, driverId: string) {
+    return this.http.patch<{ data: { id: string; agreedPrice: number } }>(
+      `${this.base}/${deliveryId}/bids/accept`, { driverId }
     );
   }
 
-  cancelRequest(requestId: string, reason?: string) {
+  repriceRequest(deliveryId: string, price: number) {
+    return this.http.patch<{ data: { id: string; price: number } }>(
+      `${this.base}/${deliveryId}/reprice`, { price }
+    );
+  }
+
+  cancelRequest(deliveryId: string, reason?: string) {
     const body: Record<string, string> = {};
     if (reason) body['reason'] = reason;
-    return this.http.post(
-      `${this.base}/delivery/request/${requestId}/cancel`, body
+    return this.http.patch(
+      `${this.base}/${deliveryId}/cancel`, body
+    );
+  }
+
+  getJobMarket(minAgeMinutes = 1) {
+    return this.http.get<{ data: unknown[] }>(
+      `${this.base}/market`, { params: { minAgeMinutes: String(minAgeMinutes) } }
     );
   }
 }

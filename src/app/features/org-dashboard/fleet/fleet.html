@@ -18,7 +18,7 @@
       </button>
       <button
         (click)="openBikeModal()"
-        class="flex items-center gap-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200"
+        class="flex items-center gap-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-green-200"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -65,7 +65,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       @if (bikesLoading() && bikes().length === 0) {
         <div class="py-16 flex flex-col items-center gap-3">
-          <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-green-500 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
@@ -73,8 +73,8 @@
         </div>
       } @else if (bikes().length === 0) {
         <div class="py-16 flex flex-col items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
-            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/>
             </svg>
@@ -84,7 +84,7 @@
             <p class="text-xs text-gray-400 mt-0.5">Register your first bike to get started.</p>
           </div>
           <button (click)="openBikeModal()"
-            class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            class="mt-1 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors">
             Register a bike →
           </button>
         </div>
@@ -131,7 +131,7 @@
                 <td class="py-4 px-5">
                   @if (bike.assignedRiderName) {
                     <div class="flex items-center gap-2">
-                      <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">
+                      <div class="w-7 h-7 rounded-full bg-green-100 text-green-700 text-xs font-bold flex items-center justify-center shrink-0">
                         {{ bike.assignedRiderName[0].toUpperCase() }}
                       </div>
                       <span class="text-sm text-gray-700 font-medium">{{ bike.assignedRiderName }}</span>
@@ -151,8 +151,8 @@
                       <!-- Pair / Reassign rider -->
                       <button (click)="openPairModal(bike)"
                         class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                        [class.text-indigo-600]="!bike.assignedRiderName"
-                        [class.hover:bg-indigo-50]="!bike.assignedRiderName"
+                        [class.text-green-600]="!bike.assignedRiderName"
+                        [class.hover:bg-green-50]="!bike.assignedRiderName"
                         [class.text-amber-600]="!!bike.assignedRiderName"
                         [class.hover:bg-amber-50]="!!bike.assignedRiderName"
                         [title]="bike.assignedRiderName ? 'Reassign rider' : 'Pair a rider'"
@@ -222,7 +222,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       @if (invitesLoading()) {
         <div class="py-16 flex flex-col items-center gap-3">
-          <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-green-500 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
@@ -240,7 +240,7 @@
             <p class="text-xs text-gray-400 mt-0.5">Link an existing bike by searching its plate or VIN.</p>
           </div>
           <button (click)="openInviteModal()"
-            class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            class="mt-1 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors">
             Link a bike →
           </button>
         </div>
@@ -304,7 +304,7 @@
 
 <!-- ── Register / Edit Bike Modal ── -->
 @if (bikeModal()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeBikeModal()">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" (click)="closeBikeModal()">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
       [class.ring-2]="bikeModalError()" [class.ring-red-400]="bikeModalError()"
       (click)="$event.stopPropagation()">
@@ -334,25 +334,25 @@
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Make <span class="text-red-400">*</span></label>
             <input type="text" [(ngModel)]="bikeForm.make" name="make" placeholder="Honda"
-              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"/>
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Model <span class="text-red-400">*</span></label>
             <input type="text" [(ngModel)]="bikeForm.model" name="model" placeholder="CB150"
-              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"/>
           </div>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1.5">License Plate <span class="text-red-400">*</span></label>
           <input type="text" [(ngModel)]="bikeForm.licensePlate" name="licensePlate" placeholder="ABC 1234"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1.5">
             VIN <span class="text-gray-400 font-normal">(optional)</span>
           </label>
           <input type="text" [(ngModel)]="bikeForm.vin" name="vin" placeholder="Vehicle identification number"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"/>
         </div>
         <div class="flex gap-3 pt-1">
           <button type="button" (click)="closeBikeModal()"
@@ -361,7 +361,7 @@
           </button>
           <button type="submit"
             [disabled]="bikesLoading() || !bikeForm.make.trim() || !bikeForm.model.trim() || !bikeForm.licensePlate.trim()"
-            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            class="flex-1 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
             {{ bikesLoading() ? 'Saving…' : bikeEditing() ? 'Save Changes' : 'Register' }}
           </button>
         </div>
@@ -372,7 +372,7 @@
 
 <!-- ── Pair Rider Modal ── -->
 @if (pairModal()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closePairModal()">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" (click)="closePairModal()">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
       [class.ring-2]="pairModalError()" [class.ring-red-400]="pairModalError()"
       (click)="$event.stopPropagation()">
@@ -411,7 +411,7 @@
           </div>
         } @else {
           <select [ngModel]="pairRiderId()" (ngModelChange)="pairRiderId.set($event)"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
             <option value="">— Choose a rider —</option>
             @for (r of orgRiders(); track r.id) {
               <option [value]="r.id">{{ r.name }}{{ r.phone ? ' · ' + r.phone : '' }}</option>
@@ -427,7 +427,7 @@
         </button>
         <button type="button" (click)="saveRiderPairing()"
           [disabled]="pairSaving() || !pairRiderId()"
-          class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+          class="flex-1 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
           {{ pairSaving() ? 'Saving…' : 'Confirm' }}
         </button>
       </div>
@@ -437,7 +437,7 @@
 
 <!-- ── Delete Bike Confirmation Modal ── -->
 @if (bikeDeletingId()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="bikeDeletingId.set(null)">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" (click)="bikeDeletingId.set(null)">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
       <div class="flex items-start gap-4">
         <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
@@ -466,7 +466,7 @@
 
 <!-- ── Cancel Invite Confirmation Modal ── -->
 @if (inviteCancellingId()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="inviteCancellingId.set(null)">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" (click)="inviteCancellingId.set(null)">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
       <div class="flex items-start gap-4">
         <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
@@ -495,7 +495,7 @@
 
 <!-- ── Link Existing Bike Modal ── -->
 @if (inviteModal()) {
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeInviteModal()">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" (click)="closeInviteModal()">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6" (click)="$event.stopPropagation()">
 
       <div class="flex items-center justify-between mb-1">
@@ -514,12 +514,12 @@
           [(ngModel)]="inviteSearch"
           (keyup.enter)="searchBikesForInvite()"
           placeholder="e.g. ABC 1234 or VIN"
-          class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <button
           (click)="searchBikesForInvite()"
           [disabled]="inviteSearching()"
-          class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
+          class="bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
         >
           {{ inviteSearching() ? 'Searching…' : 'Search' }}
         </button>
@@ -546,7 +546,7 @@
                 <button
                   (click)="sendInvite(bike.id)"
                   [disabled]="inviteSendingId() === bike.id"
-                  class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors shrink-0"
+                  class="bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors shrink-0"
                 >
                   {{ inviteSendingId() === bike.id ? 'Sending…' : 'Send Invite' }}
                 </button>
