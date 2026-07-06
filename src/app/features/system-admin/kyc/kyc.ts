@@ -1,6 +1,8 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe, KeyValuePipe } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {
   KycService, KycSubmission, KycDocument,
   DocReview, RejectionCode, ViewUrlResponse,
@@ -9,19 +11,36 @@ import { ToastService } from '../../../core/toast.service';
 
 type QueueTab = 'driver' | 'bike';
 
-const REJECTION_CODES: RejectionCode[] = [
-  'BLURRY', 'EXPIRED_DOC', 'WRONG_DOCUMENT', 'UNREADABLE', 'MISMATCH', 'INCOMPLETE', 'OTHER',
+const REJECTION_CODES: { code: RejectionCode; label: string }[] = [
+  { code: 'BLURRY',         label: 'Image is blurry'       },
+  { code: 'EXPIRED_DOC',    label: 'Document is expired'   },
+  { code: 'WRONG_DOCUMENT', label: 'Wrong document type'   },
+  { code: 'UNREADABLE',     label: 'Document is unreadable'},
+  { code: 'MISMATCH',       label: 'Information mismatch'  },
+  { code: 'INCOMPLETE',     label: 'Incomplete document'   },
+  { code: 'OTHER',          label: 'Other reason'          },
 ];
 
+// Doc types that form the driver identity grid rows
+const DRIVER_IDENTITY_ROW  = ['NATIONAL_ID_FRONT', 'NATIONAL_ID_BACK', 'SELFIE'];
+const DRIVER_LICENSE_ROW   = ['DRIVERS_LICENSE_FRONT', 'DRIVERS_LICENSE_BACK'];
+
+export interface DocImageState {
+  loading: boolean;
+  url:     string | null;
+  error:   boolean;
+}
+
 @Component({
-  selector: 'app-admin-kyc',
-  standalone: true,
-  imports: [FormsModule, DatePipe, KeyValuePipe],
+  selector:    'app-admin-kyc',
+  standalone:  true,
+  imports:     [FormsModule, NgTemplateOutlet],
   templateUrl: './kyc.html',
+  styleUrl:    './kyc.css',
 })
 export class AdminKyc implements OnInit {
 
-  // ── Queue state ───────────────────────────────────────────────────────────
+  // ── Queue ─────────────────────────────────────────────────────────────────
   activeTab     = signal<QueueTab>('driver');
   submissions   = signal<KycSubmission[]>([]);
   loadingQueue  = signal(false);
@@ -32,13 +51,16 @@ export class AdminKyc implements OnInit {
 
   readonly rejectionCodes = REJECTION_CODES;
 
-  // ── Review panel state ────────────────────────────────────────────────────
+  // ── Review panel ──────────────────────────────────────────────────────────
   selectedSubmission = signal<KycSubmission | null>(null);
   loadingSubmission  = signal(false);
   submitting         = signal(false);
 
-  /** Per-document verdicts: documentId → DocReview draft */
+  /** Per-document verdicts keyed by documentId */
   verdicts = signal<Record<string, DocReview>>({});
+
+  /** Inline image states keyed by documentId */
+  docImages = signal<Record<string, DocImageState>>({});
 
   allReviewed = computed(() => {
     const sub = this.selectedSubmission();
@@ -47,10 +69,27 @@ export class AdminKyc implements OnInit {
     return sub.documents.every(d => v[d.id] !== undefined);
   });
 
-  // ── View URL modal ────────────────────────────────────────────────────────
-  viewUrlData    = signal<ViewUrlResponse | null>(null);
-  loadingViewUrl = signal(false);
-  viewUrlDocId   = signal<string | null>(null);
+  /** Driver submissions: group documents into visual rows */
+  identityRow = computed<KycDocument[]>(() => {
+    const sub = this.selectedSubmission();
+    if (!sub || this.activeTab() !== 'driver') return [];
+    return DRIVER_IDENTITY_ROW
+      .map(t => sub.documents.find(d => d.docType === t))
+      .filter((d): d is KycDocument => !!d);
+  });
+
+  licenseRow = computed<KycDocument[]>(() => {
+    const sub = this.selectedSubmission();
+    if (!sub || this.activeTab() !== 'driver') return [];
+    return DRIVER_LICENSE_ROW
+      .map(t => sub.documents.find(d => d.docType === t))
+      .filter((d): d is KycDocument => !!d);
+  });
+
+  /** Bike / fallback: all docs in order */
+  allDocs = computed<KycDocument[]>(() => {
+    return this.selectedSubmission()?.documents ?? [];
+  });
 
   constructor(
     private kycService: KycService,
@@ -59,17 +98,18 @@ export class AdminKyc implements OnInit {
 
   ngOnInit() { this.loadQueue(); }
 
-  // ── Tab switch ─────────────────────────────────────────────────────────────
+  // ── Tab ───────────────────────────────────────────────────────────────────
 
   switchTab(tab: QueueTab) {
     this.activeTab.set(tab);
     this.page.set(0);
     this.selectedSubmission.set(null);
     this.verdicts.set({});
+    this.docImages.set({});
     this.loadQueue();
   }
 
-  // ── Queue ──────────────────────────────────────────────────────────────────
+  // ── Queue ─────────────────────────────────────────────────────────────────
 
   loadQueue() {
     this.loadingQueue.set(true);
@@ -84,7 +124,10 @@ export class AdminKyc implements OnInit {
         this.totalPages.set(r.totalPages);
         this.loadingQueue.set(false);
       },
-      error: () => { this.toast.error('Error', 'Failed to load queue.'); this.loadingQueue.set(false); },
+      error: () => {
+        this.toast.error('Error', 'Failed to load queue.');
+        this.loadingQueue.set(false);
+      },
     });
   }
 
@@ -94,11 +137,13 @@ export class AdminKyc implements OnInit {
     this.loadQueue();
   }
 
-  // ── Open submission for review ─────────────────────────────────────────────
+  // ── Open submission ───────────────────────────────────────────────────────
 
   openSubmission(submissionId: string) {
     this.loadingSubmission.set(true);
     this.verdicts.set({});
+    this.docImages.set({});
+
     const call = this.activeTab() === 'driver'
       ? this.kycService.getDriverSubmission(submissionId)
       : this.kycService.getBikeSubmission(submissionId);
@@ -106,7 +151,8 @@ export class AdminKyc implements OnInit {
     call.subscribe({
       next: sub => {
         this.selectedSubmission.set(sub);
-        // Pre-fill already-reviewed docs
+
+        // Pre-fill any already-reviewed verdicts
         const v: Record<string, DocReview> = {};
         for (const doc of sub.documents) {
           if (doc.status === 'APPROVED') {
@@ -122,17 +168,54 @@ export class AdminKyc implements OnInit {
         }
         this.verdicts.set(v);
         this.loadingSubmission.set(false);
+
+        // Parallel-fetch all document view URLs
+        this._preloadImages(sub);
       },
-      error: () => { this.toast.error('Error', 'Failed to load submission.'); this.loadingSubmission.set(false); },
+      error: () => {
+        this.toast.error('Error', 'Failed to load submission.');
+        this.loadingSubmission.set(false);
+      },
+    });
+  }
+
+  private _preloadImages(sub: KycSubmission) {
+    // Mark all as loading
+    const initial: Record<string, DocImageState> = {};
+    for (const doc of sub.documents) {
+      initial[doc.id] = { loading: true, url: null, error: false };
+    }
+    this.docImages.set(initial);
+
+    // Fire all view-URL requests in parallel
+    const calls = sub.documents.map(doc => {
+      const req = this.activeTab() === 'driver'
+        ? this.kycService.getDriverDocViewUrl(doc.id)
+        : this.kycService.getBikeDocViewUrl(doc.id);
+      return req.pipe(catchError(() => of(null)));
+    });
+
+    forkJoin(calls).subscribe(results => {
+      const updated: Record<string, DocImageState> = {};
+      sub.documents.forEach((doc, i) => {
+        const res = results[i] as ViewUrlResponse | null;
+        updated[doc.id] = {
+          loading: false,
+          url:     res?.viewUrl ?? null,
+          error:   res === null,
+        };
+      });
+      this.docImages.set(updated);
     });
   }
 
   closePanel() {
     this.selectedSubmission.set(null);
     this.verdicts.set({});
+    this.docImages.set({});
   }
 
-  // ── Verdict setters ────────────────────────────────────────────────────────
+  // ── Verdicts ──────────────────────────────────────────────────────────────
 
   setApproved(doc: KycDocument) {
     this.verdicts.update(v => ({
@@ -144,7 +227,11 @@ export class AdminKyc implements OnInit {
   setRejected(doc: KycDocument) {
     this.verdicts.update(v => ({
       ...v,
-      [doc.id]: { documentId: doc.id, approved: false, rejectionCode: 'BLURRY' },
+      [doc.id]: {
+        documentId:    doc.id,
+        approved:      false,
+        rejectionCode: 'BLURRY',
+      },
     }));
   }
 
@@ -166,7 +253,11 @@ export class AdminKyc implements OnInit {
     return this.verdicts()[docId];
   }
 
-  // ── Submit review ──────────────────────────────────────────────────────────
+  getImage(docId: string): DocImageState {
+    return this.docImages()[docId] ?? { loading: false, url: null, error: false };
+  }
+
+  // ── Submit review with local eviction ─────────────────────────────────────
 
   submitReview() {
     const sub = this.selectedSubmission();
@@ -183,8 +274,20 @@ export class AdminKyc implements OnInit {
       next: () => {
         this.toast.success('Done', 'Submission reviewed successfully.');
         this.submitting.set(false);
-        this.closePanel();
-        this.loadQueue();
+
+        // Evict from local queue and auto-advance
+        const list    = this.submissions();
+        const idx     = list.findIndex(s => s.id === sub.id);
+        const newList = list.filter(s => s.id !== sub.id);
+        this.submissions.set(newList);
+        this.totalElements.update(n => Math.max(0, n - 1));
+
+        if (newList.length > 0) {
+          const nextIdx = Math.min(idx, newList.length - 1);
+          this.openSubmission(newList[nextIdx].id);
+        } else {
+          this.closePanel();
+        }
       },
       error: e => {
         this.toast.error('Error', e?.error?.message ?? 'Review failed.');
@@ -193,60 +296,37 @@ export class AdminKyc implements OnInit {
     });
   }
 
-  // ── View URL ───────────────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
-  openViewUrl(docId: string) {
-    this.viewUrlDocId.set(docId);
-    this.loadingViewUrl.set(true);
-    this.viewUrlData.set(null);
-
-    const call = this.activeTab() === 'driver'
-      ? this.kycService.getDriverDocViewUrl(docId)
-      : this.kycService.getBikeDocViewUrl(docId);
-
-    call.subscribe({
-      next: r => { this.viewUrlData.set(r); this.loadingViewUrl.set(false); },
-      error: () => { this.toast.error('Error', 'Could not load document URL.'); this.loadingViewUrl.set(false); },
-    });
-  }
-
-  closeViewUrl() {
-    this.viewUrlData.set(null);
-    this.viewUrlDocId.set(null);
-  }
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
-
-  docStatusClass(status: string): string {
-    const map: Record<string, string> = {
-      PENDING:  'bg-gray-100 text-gray-600',
-      APPROVED: 'bg-green-100 text-green-700',
-      REJECTED: 'bg-red-100 text-red-700',
-      EXPIRED:  'bg-orange-100 text-orange-700',
-    };
-    return map[status] ?? 'bg-gray-100 text-gray-500';
-  }
-
-  submissionStatusClass(status: string): string {
-    const map: Record<string, string> = {
-      UNDER_REVIEW:       'bg-blue-100 text-blue-700',
-      APPROVED:           'bg-green-100 text-green-700',
-      PARTIALLY_REJECTED: 'bg-amber-100 text-amber-700',
-      REJECTED:           'bg-red-100 text-red-700',
-    };
-    return map[status] ?? 'bg-gray-100 text-gray-500';
+  formatDocType(raw: string): string {
+    return raw.replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, c => c.toUpperCase());
   }
 
   formatDate(iso: string): string {
-    return new Date(iso).toLocaleString();
+    return new Date(iso).toLocaleString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
   }
 
-  formatDocType(raw: string): string {
-    return raw.replace(/_/g, ' ').toLowerCase()
-      .replace(/\b\w/g, c => c.toUpperCase());
+  timeAgo(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60)  return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs  < 24)  return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
   }
 
   pages(): number[] {
     return Array.from({ length: this.totalPages() }, (_, i) => i);
+  }
+
+  pendingCount(): number {
+    const sub = this.selectedSubmission();
+    if (!sub) return 0;
+    return sub.documents.length - Object.keys(this.verdicts()).length;
   }
 }

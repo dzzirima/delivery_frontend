@@ -33,7 +33,7 @@ export const routes: Routes = [
   // ── System admin (TIH team only) ────────────────────────────────────────────
   {
     path: 'admin',
-    canActivate: [authGuard, roleGuard(['ADMIN'])],
+    canActivate: [authGuard, roleGuard(['SYSTEM_ADMIN'])],
     resolve: { profile: profileResolver },
     loadComponent: () => import('./features/system-admin/system-admin').then(m => m.SystemAdmin),
     children: [

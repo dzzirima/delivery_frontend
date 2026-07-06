@@ -6,14 +6,14 @@ import { environment } from '../../environments/environment';
 
 // ── Role constants ─────────────────────────────────────────────────────────────
 export type UserRole =
-  | 'ADMIN'
+  | 'SYSTEM_ADMIN'
   | 'ORG_ADMIN'
   | 'DISPATCHER'
   | 'RIDER'
   | 'CUSTOMER';
 
 // Roles that are allowed to access this web dashboard
-export const WEB_ROLES: UserRole[] = ['ADMIN', 'ORG_ADMIN', 'DISPATCHER'];
+export const WEB_ROLES: UserRole[] = ['SYSTEM_ADMIN', 'ORG_ADMIN', 'DISPATCHER'];
 
 // ── JWT payload shape ──────────────────────────────────────────────────────────
 export interface TokenPayload {
@@ -142,7 +142,7 @@ export class AuthService {
    */
   resolveHomeRoute(): string | null {
     switch (this.role()) {
-      case 'ADMIN':      return '/admin';
+      case 'SYSTEM_ADMIN': return '/admin';
       case 'ORG_ADMIN':
       case 'DISPATCHER': return '/org';
       default:           return null;   // RIDER / CUSTOMER — block

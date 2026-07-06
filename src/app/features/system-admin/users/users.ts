@@ -4,7 +4,7 @@ import { DatePipe, KeyValuePipe } from '@angular/common';
 import { AdminUsersService, PlatformUser } from './users.service';
 import { ToastService } from '../../../core/toast.service';
 
-const ROLES = ['', 'ADMIN', 'ORG_ADMIN', 'DISPATCHER', 'RIDER', 'CUSTOMER'];
+const ROLES = ['', 'SYSTEM_ADMIN', 'ORG_ADMIN', 'DISPATCHER', 'RIDER', 'CUSTOMER'];
 
 @Component({
   selector: 'app-admin-users',
