@@ -1,48 +1,32 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass, NgIf, NgFor, DatePipe } from '@angular/common';
 import { catchError, of } from 'rxjs';
 
 import {
-  KycService,
-  DriverKycListItem, DriverKycDetail,
-  DocViewDTO, DocVersionDTO,
-  KycStatus, RejectionCode,
-  DocRejectPayload,
-} from './kyc.service';
+  KycBikesService,
+  BikeKycListItem, BikeKycDetail, BikeDocViewDTO,
+  DocVersionDTO, KycStatus, RejectionCode, DocRejectPayload,
+} from './kyc-bikes.service';
 import { ToastService } from '../../../core/toast.service';
+import { REJECTION_CODES, KYC_STATUS_LABELS } from '../kyc/kyc';
 
-export const REJECTION_CODES: { code: RejectionCode; label: string }[] = [
-  { code: 'BLURRY',         label: 'Image is blurry'        },
-  { code: 'EXPIRED_DOC',    label: 'Document is expired'    },
-  { code: 'WRONG_DOCUMENT', label: 'Wrong document type'    },
-  { code: 'UNREADABLE',     label: 'Document is unreadable' },
-  { code: 'MISMATCH',       label: 'Information mismatch'   },
-  { code: 'INCOMPLETE',     label: 'Incomplete document'    },
-  { code: 'OTHER',          label: 'Other reason'           },
-];
-
-export const KYC_STATUS_LABELS: Record<KycStatus, string> = {
-  NOT_STARTED: 'Not Started',
-  IN_PROGRESS: 'In Progress',
-  APPROVED:    'Approved',
-  REJECTED:    'Rejected',
-};
+type ImageState = { loading: boolean; url: string | null; error: boolean };
 
 @Component({
-  selector:    'app-admin-kyc',
+  selector:    'app-admin-kyc-bikes',
   standalone:  true,
   imports:     [FormsModule, NgClass, NgIf, NgFor, DatePipe],
-  templateUrl: './kyc.html',
-  styleUrl:    './kyc.css',
+  templateUrl: './kyc-bikes.html',
+  styleUrl:    './kyc-bikes.css',
 })
-export class AdminKyc implements OnInit {
+export class AdminKycBikes implements OnInit {
 
   readonly rejectionCodes = REJECTION_CODES;
   readonly statusLabels   = KYC_STATUS_LABELS;
 
-  // ── Level 1: Driver list ──────────────────────────────────────────────────
-  drivers       = signal<DriverKycListItem[]>([]);
+  // ── Level 1: Bike list ────────────────────────────────────────────────────
+  bikes         = signal<BikeKycListItem[]>([]);
   listLoading   = signal(false);
   listError     = signal<string | null>(null);
   totalElements = signal(0);
@@ -53,14 +37,11 @@ export class AdminKyc implements OnInit {
   readonly pageSize = 20;
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  // ── Level 2: Driver detail ────────────────────────────────────────────────
-  selectedDriver  = signal<DriverKycDetail | null>(null);
-  detailLoading   = signal(false);
+  // ── Level 2: Bike detail ──────────────────────────────────────────────────
+  selectedBike  = signal<BikeKycDetail | null>(null);
+  detailLoading = signal(false);
 
-  // Per-document image state
-  docImages = signal<Record<string, { loading: boolean; url: string | null; error: boolean }>>({});
-
-  // Per-document reject form state
+  docImages       = signal<Record<string, ImageState>>({});
   rejectingDocId  = signal<string | null>(null);
   rejectCode      = signal<RejectionCode | ''>('');
   rejectReason    = signal('');
@@ -70,112 +51,95 @@ export class AdminKyc implements OnInit {
   versionDocId    = signal<string | null>(null);
   versions        = signal<DocVersionDTO[]>([]);
   versionsLoading = signal(false);
+  versionImages   = signal<Record<string, ImageState>>({});
 
-  // Per-version image state (admin only — archived versions)
-  versionImages = signal<Record<string, { loading: boolean; url: string | null; error: boolean }>>({});
-
-  // ── Image lightbox ────────────────────────────────────────────────────────
+  // ── Lightbox ──────────────────────────────────────────────────────────────
   lightboxUrl   = signal<string | null>(null);
-  lightboxLabel = signal<string>('');
+  lightboxLabel = signal('');
 
   openLightbox(url: string, label: string): void {
     this.lightboxUrl.set(url);
     this.lightboxLabel.set(label);
   }
+  closeLightbox(): void { this.lightboxUrl.set(null); }
 
-  closeLightbox(): void {
-    this.lightboxUrl.set(null);
-  }
-
-  // ── Profile override modal ─────────────────────────────────────────────────
-  overrideMode    = signal<'approve' | 'reject' | null>(null);
-  overrideNote    = signal('');
+  // ── Profile override ──────────────────────────────────────────────────────
+  overrideMode       = signal<'approve' | 'reject' | null>(null);
+  overrideNote       = signal('');
   submittingOverride = signal(false);
 
   constructor(
-    private kycService: KycService,
-    private toast:      ToastService,
+    private svc:   KycBikesService,
+    private toast: ToastService,
   ) {}
 
-  ngOnInit(): void {
-    this.loadDrivers();
-  }
+  ngOnInit(): void { this.loadBikes(); }
 
   // ── Level 1 actions ───────────────────────────────────────────────────────
 
+  loadBikes(p = 0): void {
+    this.listLoading.set(true);
+    this.listError.set(null);
+    const status = this.statusFilter() || undefined;
+    const search = this.searchQuery().trim() || undefined;
+    this.svc.listBikes(p, this.pageSize, status as KycStatus | undefined, search).subscribe({
+      next: res => {
+        this.bikes.set(res.content);
+        this.totalElements.set(res.totalElements);
+        this.totalPages.set(res.totalPages);
+        this.page.set(p);
+        this.listLoading.set(false);
+      },
+      error: () => {
+        this.listError.set('Failed to load bikes.');
+        this.listLoading.set(false);
+      },
+    });
+  }
+
+  onFilterChange(): void { this.loadBikes(0); }
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
     if (this.searchTimer) clearTimeout(this.searchTimer);
-    this.searchTimer = setTimeout(() => this.loadDrivers(0), 350);
+    this.searchTimer = setTimeout(() => this.loadBikes(0), 350);
   }
-
-  loadDrivers(p = 0): void {
-    this.listLoading.set(true);
-    this.listError.set(null);
-
-    const status = this.statusFilter() || undefined;
-    const search = this.searchQuery().trim() || undefined;
-    this.kycService.listDrivers(p, this.pageSize, status as KycStatus | undefined, search)
-      .subscribe({
-        next: res => {
-          this.drivers.set(res.content);
-          this.totalElements.set(res.totalElements);
-          this.totalPages.set(res.totalPages);
-          this.page.set(p);
-          this.listLoading.set(false);
-        },
-        error: () => {
-          this.listError.set('Failed to load drivers.');
-          this.listLoading.set(false);
-        },
-      });
-  }
-
-  onFilterChange(): void {
-    this.loadDrivers(0);
-  }
-
-  prevPage(): void { if (this.page() > 0) this.loadDrivers(this.page() - 1); }
-  nextPage(): void { if (this.page() < this.totalPages() - 1) this.loadDrivers(this.page() + 1); }
+  prevPage(): void { if (this.page() > 0) this.loadBikes(this.page() - 1); }
+  nextPage(): void { if (this.page() < this.totalPages() - 1) this.loadBikes(this.page() + 1); }
 
   // ── Level 2 actions ───────────────────────────────────────────────────────
 
-  selectDriver(driverId: string): void {
+  selectBike(bikeId: string): void {
     this.detailLoading.set(true);
-    this.selectedDriver.set(null);
+    this.selectedBike.set(null);
     this.docImages.set({});
     this.versionDocId.set(null);
     this.rejectingDocId.set(null);
 
-    this.kycService.getDriverDetail(driverId).subscribe({
+    this.svc.getBikeDetail(bikeId).subscribe({
       next: detail => {
-        this.selectedDriver.set(detail);
+        this.selectedBike.set(detail);
         this.detailLoading.set(false);
         this.preloadDocImages(detail.documents);
       },
       error: () => {
-        this.toast.error('Failed to load driver KYC details.');
+        this.toast.error('Failed to load bike KYC details.');
         this.detailLoading.set(false);
       },
     });
   }
 
   closeDetail(): void {
-    this.selectedDriver.set(null);
+    this.selectedBike.set(null);
     this.versionDocId.set(null);
   }
 
-  private preloadDocImages(docs: DocViewDTO[]): void {
-    // Mark all docs as loading up front in one signal write
-    const initial: Record<string, { loading: boolean; url: string | null; error: boolean }> = {};
-    for (const doc of docs) {
-      initial[doc.id] = { loading: true, url: null, error: false };
-    }
+  private preloadDocImages(docs: BikeDocViewDTO[]): void {
+    const initial: Record<string, ImageState> = {};
+    for (const doc of docs) initial[doc.id] = { loading: true, url: null, error: false };
     this.docImages.set(initial);
 
-    // Fetch each URL and update the signal immutably so Angular detects the change
     for (const doc of docs) {
-      this.kycService.getDocViewUrl(doc.id)
+      this.svc.getBikeDocViewUrl(doc.id)
         .pipe(catchError(() => of(null)))
         .subscribe(res => {
           this.docImages.update(map => ({
@@ -188,9 +152,9 @@ export class AdminKyc implements OnInit {
 
   // ── Per-document verdicts ─────────────────────────────────────────────────
 
-  approveDoc(doc: DocViewDTO): void {
+  approveDoc(doc: BikeDocViewDTO): void {
     this.submittingDoc.set(true);
-    this.kycService.approveDocument(doc.id).subscribe({
+    this.svc.approveBikeDocument(doc.id).subscribe({
       next: () => {
         this.toast.success(`${this.formatDocType(doc.docType)} approved.`);
         this.submittingDoc.set(false);
@@ -203,17 +167,15 @@ export class AdminKyc implements OnInit {
     });
   }
 
-  startReject(doc: DocViewDTO): void {
+  startReject(doc: BikeDocViewDTO): void {
     this.rejectingDocId.set(doc.id);
     this.rejectCode.set('');
     this.rejectReason.set('');
   }
 
-  cancelReject(): void {
-    this.rejectingDocId.set(null);
-  }
+  cancelReject(): void { this.rejectingDocId.set(null); }
 
-  submitReject(doc: DocViewDTO): void {
+  submitReject(doc: BikeDocViewDTO): void {
     if (!this.rejectCode()) {
       this.toast.error('Please select a rejection reason.');
       return;
@@ -223,7 +185,7 @@ export class AdminKyc implements OnInit {
       rejectionReason: this.rejectReason() || undefined,
     };
     this.submittingDoc.set(true);
-    this.kycService.rejectDocument(doc.id, payload).subscribe({
+    this.svc.rejectBikeDocument(doc.id, payload).subscribe({
       next: () => {
         this.toast.success(`${this.formatDocType(doc.docType)} rejected.`);
         this.rejectingDocId.set(null);
@@ -243,7 +205,7 @@ export class AdminKyc implements OnInit {
     this.versionDocId.set(docId);
     this.versionsLoading.set(true);
     this.versionImages.set({});
-    this.kycService.getDocVersionHistory(docId).subscribe({
+    this.svc.getBikeDocVersionHistory(docId).subscribe({
       next: versions => {
         this.versions.set(versions);
         this.versionsLoading.set(false);
@@ -257,14 +219,12 @@ export class AdminKyc implements OnInit {
   }
 
   private preloadVersionImages(versions: DocVersionDTO[]): void {
-    const initial: Record<string, { loading: boolean; url: string | null; error: boolean }> = {};
-    for (const v of versions) {
-      initial[v.id] = { loading: true, url: null, error: false };
-    }
+    const initial: Record<string, ImageState> = {};
+    for (const v of versions) initial[v.id] = { loading: true, url: null, error: false };
     this.versionImages.set(initial);
 
     for (const v of versions) {
-      this.kycService.getDocVersionViewUrl(v.id)
+      this.svc.getBikeDocVersionViewUrl(v.id)
         .pipe(catchError(() => of(null)))
         .subscribe(res => {
           this.versionImages.update(map => ({
@@ -287,31 +247,28 @@ export class AdminKyc implements OnInit {
     this.overrideNote.set('');
   }
 
-  cancelOverride(): void {
-    this.overrideMode.set(null);
-  }
+  cancelOverride(): void { this.overrideMode.set(null); }
 
   submitOverride(): void {
-    const driver = this.selectedDriver();
-    if (!driver) return;
-
+    const bike = this.selectedBike();
+    if (!bike) return;
     this.submittingOverride.set(true);
     const note    = this.overrideNote() || undefined;
     const request = this.overrideMode() === 'approve'
-      ? this.kycService.forceApproveProfile(driver.driverId, { note })
-      : this.kycService.forceRejectProfile(driver.driverId, { note });
+      ? this.svc.forceApproveBikeProfile(bike.bikeId, { note })
+      : this.svc.forceRejectBikeProfile(bike.bikeId, { note });
 
     request.subscribe({
       next: () => {
         const label = this.overrideMode() === 'approve' ? 'approved' : 'rejected';
-        this.toast.success(`Driver KYC profile ${label}.`);
+        this.toast.success(`Bike KYC profile ${label}.`);
         this.overrideMode.set(null);
         this.submittingOverride.set(false);
         this.refreshDetail();
-        this.loadDrivers(this.page());
+        this.loadBikes(this.page());
       },
       error: () => {
-        this.toast.error('Failed to update profile.');
+        this.toast.error('Failed to update bike profile.');
         this.submittingOverride.set(false);
       },
     });
@@ -320,8 +277,8 @@ export class AdminKyc implements OnInit {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   refreshDetail(): void {
-    const driver = this.selectedDriver();
-    if (driver) this.selectDriver(driver.driverId);
+    const bike = this.selectedBike();
+    if (bike) this.selectBike(bike.bikeId);
   }
 
   formatDocType(raw: string): string {

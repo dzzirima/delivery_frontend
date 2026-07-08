@@ -47,6 +47,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/system-admin/kyc/kyc').then(m => m.AdminKyc),
       },
       {
+        path: 'kyc-bikes',
+        loadComponent: () => import('./features/system-admin/kyc-bikes/kyc-bikes').then(m => m.AdminKycBikes),
+      },
+      {
         path: 'riders',
         loadComponent: () => import('./features/system-admin/riders/riders').then(m => m.AdminRiders),
       },

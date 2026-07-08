@@ -1,18 +1,18 @@
 <div class="kyc-root">
 
   <!-- ═══════════════════════════════════════════════════════════════
-       LEFT PANEL — Driver list (Level 1)
+       LEFT PANEL — Bike list (Level 1)
   ════════════════════════════════════════════════════════════════ -->
   <aside class="kyc-sidebar">
 
     <div class="sidebar-header">
-      <h2 class="sidebar-title">Driver KYC</h2>
+      <h2 class="sidebar-title">Bike KYC</h2>
       <span class="badge">{{ totalElements() }}</span>
     </div>
 
     <!-- Search -->
     <div class="filter-row">
-      <input class="filter-select" type="text" placeholder="Search name or email…"
+      <input class="filter-select" type="text" placeholder="Search plate, make, or owner…"
              [ngModel]="searchQuery()"
              (ngModelChange)="onSearchChange($event)">
     </div>
@@ -29,27 +29,27 @@
       </select>
     </div>
 
-    <!-- Driver list -->
+    <!-- Bike list -->
     <div class="driver-list">
-      <div *ngIf="listLoading()" class="loading-msg">Loading drivers…</div>
+      <div *ngIf="listLoading()" class="loading-msg">Loading bikes…</div>
       <div *ngIf="listError()" class="error-msg">{{ listError() }}</div>
 
-      <button *ngFor="let d of drivers()"
+      <button *ngFor="let b of bikes()"
               class="driver-row"
-              [class.active]="selectedDriver()?.driverId === d.driverId"
-              (click)="selectDriver(d.driverId)">
+              [class.active]="selectedBike()?.bikeId === b.bikeId"
+              (click)="selectBike(b.bikeId)">
         <div class="driver-row-top">
-          <span class="driver-name">{{ d.driverUserName }}</span>
-          <span class="status-pill" [ngClass]="statusClass(d.kycStatus)">
-            {{ statusLabels[d.kycStatus] }}
+          <span class="driver-name">{{ b.licensePlate }} — {{ b.make }} {{ b.bikeModel }}</span>
+          <span class="status-pill" [ngClass]="statusClass(b.kycStatus)">
+            {{ statusLabels[b.kycStatus] }}
           </span>
         </div>
         <div class="driver-row-sub">
-          <span>{{ d.driverEmail }}</span>
+          <span>{{ b.ownerName }} · {{ b.ownerEmail }}</span>
           <span class="doc-count">
-            {{ d.approvedDocCount }}/{{ d.totalDocCount }} docs
-            <span *ngIf="d.pendingReviewCount > 0" class="pending-badge">
-              {{ d.pendingReviewCount }} pending
+            {{ b.approvedDocCount }}/{{ b.totalDocCount }} docs
+            <span *ngIf="b.pendingReviewCount > 0" class="pending-badge">
+              {{ b.pendingReviewCount }} pending
             </span>
           </span>
         </div>
@@ -66,44 +66,42 @@
   </aside>
 
   <!-- ═══════════════════════════════════════════════════════════════
-       RIGHT PANEL — Driver detail (Level 2) or empty state
+       RIGHT PANEL — Bike detail (Level 2) or empty state
   ════════════════════════════════════════════════════════════════ -->
   <main class="kyc-workspace">
 
     <!-- Empty state -->
-    <div *ngIf="!selectedDriver() && !detailLoading()" class="empty-state">
-      <p>Select a driver from the list to review their KYC documents.</p>
+    <div *ngIf="!selectedBike() && !detailLoading()" class="empty-state">
+      <p>Select a bike from the list to review its KYC documents.</p>
     </div>
 
     <!-- Loading detail -->
     <div *ngIf="detailLoading()" class="loading-msg centered">Loading…</div>
 
-    <!-- Driver detail -->
-    <ng-container *ngIf="selectedDriver() as driver">
+    <!-- Bike detail -->
+    <ng-container *ngIf="selectedBike() as bike">
 
       <!-- Detail header -->
       <div class="detail-header">
         <div class="detail-header-left">
           <button class="back-btn" (click)="closeDetail()">← Back</button>
           <div>
-            <h2 class="detail-name">{{ driver.driverUserName }}</h2>
-            <span class="detail-email">{{ driver.driverEmail }}</span>
+            <h2 class="detail-name">{{ bike.licensePlate }} — {{ bike.make }} {{ bike.bikeModel }}</h2>
+            <span class="detail-email">Owner: {{ bike.ownerName }} · {{ bike.ownerEmail }}</span>
           </div>
         </div>
         <div class="detail-header-right">
-          <span class="status-pill large" [ngClass]="statusClass(driver.kycStatus)">
-            {{ statusLabels[driver.kycStatus] }}
+          <span class="status-pill large" [ngClass]="statusClass(bike.kycStatus)">
+            {{ statusLabels[bike.kycStatus] }}
           </span>
           <button class="btn btn-ghost refresh-btn" (click)="refreshDetail()" title="Refresh">
             ↺ Refresh
           </button>
           <div class="override-actions">
-            <button class="btn btn-success-outline"
-                    (click)="openOverride('approve')">
+            <button class="btn btn-success-outline" (click)="openOverride('approve')">
               Force Approve
             </button>
-            <button class="btn btn-danger-outline"
-                    (click)="openOverride('reject')">
+            <button class="btn btn-danger-outline" (click)="openOverride('reject')">
               Force Reject
             </button>
           </div>
@@ -112,7 +110,7 @@
 
       <!-- Document grid -->
       <div class="doc-grid">
-        <div *ngFor="let doc of driver.documents" class="doc-card">
+        <div *ngFor="let doc of bike.documents" class="doc-card">
 
           <!-- Document image -->
           <div class="doc-image-wrap">
@@ -280,16 +278,16 @@
   <div class="modal-panel modal-sm" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
-      <h3>{{ overrideMode() === 'approve' ? 'Force Approve' : 'Force Reject' }} Profile</h3>
+      <h3>{{ overrideMode() === 'approve' ? 'Force Approve' : 'Force Reject' }} Bike Profile</h3>
       <button class="modal-close" (click)="cancelOverride()">✕</button>
     </div>
 
     <p class="override-warning">
       <ng-container *ngIf="overrideMode() === 'approve'">
-        This will approve the driver's KYC profile <strong>bypassing</strong> individual document checks.
+        This will approve the bike's KYC profile <strong>bypassing</strong> individual document checks.
       </ng-container>
       <ng-container *ngIf="overrideMode() === 'reject'">
-        This will reject the driver's KYC profile entirely (e.g. suspected fraud).
+        This will reject the bike's KYC profile entirely (e.g. vehicle issues or suspected fraud).
       </ng-container>
     </p>
 

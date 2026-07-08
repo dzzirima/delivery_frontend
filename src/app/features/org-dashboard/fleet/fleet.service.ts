@@ -58,13 +58,13 @@ export class BikeService {
   }
 
   assignRider(bikeId: string, riderId: string) {
-    return this.http.patch<{ data: Bike }>(
-      `${this.base}/bikes/${bikeId}/assign-rider?riderId=${riderId}`, {});
+    return this.http.post<{ data: Bike }>(
+      `${this.base}/bikes/${bikeId}/assign/${riderId}`, {});
   }
 
   unassignRider(bikeId: string) {
-    return this.http.patch<{ data: Bike }>(
-      `${this.base}/bikes/${bikeId}/unassign-rider`, {});
+    return this.http.delete<{ data: Bike }>(
+      `${this.base}/bikes/${bikeId}/assign`);
   }
 
   /** Search all bikes globally (no org filter) — used for the invite flow */

@@ -13,11 +13,12 @@ export class SystemAdmin {
   collapsed = signal(false);
 
   readonly navItems = [
-    { id: 'overview',       route: 'overview',       label: 'Overview',       icon: 'home'     },
-    { id: 'kyc',            route: 'kyc',            label: 'KYC Review',     icon: 'shield'   },
-    { id: 'riders',         route: 'riders',         label: 'Riders',         icon: 'bike'     },
-    { id: 'organisations',  route: 'organisations',  label: 'Organisations',  icon: 'building' },
-    { id: 'users',          route: 'users',          label: 'Users',          icon: 'users'    },
+    { id: 'overview',       route: 'overview',       label: 'Overview',       icon: 'home'        },
+    { id: 'kyc',            route: 'kyc',            label: 'Rider KYC',      icon: 'shield'      },
+    { id: 'kyc-bikes',      route: 'kyc-bikes',      label: 'Bike KYC',       icon: 'bike-shield' },
+    { id: 'riders',         route: 'riders',         label: 'Riders',         icon: 'bike'        },
+    { id: 'organisations',  route: 'organisations',  label: 'Organisations',  icon: 'building'    },
+    { id: 'users',          route: 'users',          label: 'Users',          icon: 'users'       },
   ];
 
   initials = computed(() => {
