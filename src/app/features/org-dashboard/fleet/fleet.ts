@@ -180,7 +180,7 @@ export class Fleet implements OnInit {
     if (!orgId || this.orgRiders().length > 0) return;
     this.ridersLoading.set(true);
     this.userService.getRiders().subscribe({
-      next:  r => { this.orgRiders.set(Array.isArray(r.data) ? r.data : []); this.ridersLoading.set(false); },
+      next:  r => { const raw = r.data as any; this.orgRiders.set(Array.isArray(raw) ? raw : raw?.content ?? []); this.ridersLoading.set(false); },
       error: () => { this.ridersLoading.set(false); },
     });
   }
