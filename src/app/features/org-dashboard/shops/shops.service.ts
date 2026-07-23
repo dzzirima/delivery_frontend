@@ -23,22 +23,28 @@ export interface ShopReq {
 
 @Injectable({ providedIn: 'root' })
 export class ShopService {
-  private base = environment.apiUrl;
+  private base = `${environment.apiUrl}/shops`;
   constructor(private http: HttpClient) {}
 
-  getAll(orgId: string) {
-    return this.http.get<{ data: Shop[] }>(`${this.base}/org/${orgId}/shops?size=100`);
+  getAll(page = 0, size = 20, q?: string) {
+    let url = `${this.base}?page=${page}&size=${size}`;
+    if (q?.trim()) url += `&q=${encodeURIComponent(q.trim())}`;
+    return this.http.get<{ data: Shop[]; length: number }>(url);
   }
 
-  create(orgId: string, req: ShopReq) {
-    return this.http.post<{ data: Shop }>(`${this.base}/org/${orgId}/shops`, req);
+  getById(shopId: string) {
+    return this.http.get<{ data: Shop }>(`${this.base}/${shopId}`);
   }
 
-  update(orgId: string, shopId: string, req: ShopReq) {
-    return this.http.put<{ data: Shop }>(`${this.base}/org/${orgId}/shops/${shopId}`, req);
+  create(req: ShopReq) {
+    return this.http.post<{ data: Shop }>(this.base, req);
   }
 
-  delete(orgId: string, shopId: string) {
-    return this.http.delete(`${this.base}/org/${orgId}/shops/${shopId}`);
+  update(shopId: string, req: ShopReq) {
+    return this.http.put<{ data: Shop }>(`${this.base}/${shopId}`, req);
+  }
+
+  delete(shopId: string) {
+    return this.http.delete(`${this.base}/${shopId}`);
   }
 }

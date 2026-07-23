@@ -37,7 +37,7 @@
       <button *ngFor="let b of bikes()"
               class="driver-row"
               [class.active]="selectedBike()?.bikeId === b.bikeId"
-              (click)="selectBike(b.bikeId)">
+              (click)="navigateToBike(b.bikeId)">
         <div class="driver-row-top">
           <span class="driver-name">{{ b.licensePlate }} — {{ b.make }} {{ b.bikeModel }}</span>
           <span class="status-pill" [ngClass]="statusClass(b.kycStatus)">
@@ -105,6 +105,24 @@
               Force Reject
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Manual override banner -->
+      <div *ngIf="bike.manualOverride" class="manual-override-banner">
+        <div class="override-icon">✦</div>
+        <div class="override-body">
+          <p class="override-title">
+            Manually {{ bike.kycStatus === 'APPROVED' ? 'Approved' : 'Rejected' }}
+            <ng-container *ngIf="bike.overriddenByName"> by <strong>{{ bike.overriddenByName }}</strong></ng-container>
+          </p>
+          <p *ngIf="bike.overrideNote" class="override-note">"{{ bike.overrideNote }}"</p>
+          <p *ngIf="bike.approvedAt && bike.kycStatus === 'APPROVED'" class="override-date">
+            {{ bike.approvedAt | date:'dd MMM yyyy, HH:mm' }}
+          </p>
+          <p *ngIf="bike.rejectedAt && bike.kycStatus === 'REJECTED'" class="override-date">
+            {{ bike.rejectedAt | date:'dd MMM yyyy, HH:mm' }}
+          </p>
         </div>
       </div>
 

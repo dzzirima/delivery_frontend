@@ -3,13 +3,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 export interface PlatformRider {
-  id:          string;
-  name:        string;
-  email:       string;
-  phoneNumber: string | null;
-  status:      string;
-  kycStatus:   string;
-  createdAt:   string;
+  id:                   string;
+  name:                 string;
+  email:                string;
+  phoneNumber:          string | null;
+  status:               string;
+  kycStatus:            string;
+  createdAt:            string;
+  assignedBikeId:       string | null;
+  assignedBikeRegNumber: string | null;
 }
 
 export interface RiderPage {

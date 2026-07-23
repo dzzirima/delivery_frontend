@@ -1,7 +1,9 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, DestroyRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass, NgIf, NgFor, DatePipe } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
 import { catchError, of } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   KycService,
@@ -92,13 +94,29 @@ export class AdminKyc implements OnInit {
   overrideNote    = signal('');
   submittingOverride = signal(false);
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private kycService: KycService,
     private toast:      ToastService,
+    private router:     Router,
+    private route:      ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
     this.loadDrivers();
+
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const driverId = params.get('driverId');
+        if (driverId) {
+          this.selectDriver(driverId);
+        } else {
+          this.selectedDriver.set(null);
+          this.detailLoading.set(false);
+        }
+      });
   }
 
   // ── Level 1 actions ───────────────────────────────────────────────────────
@@ -152,6 +170,7 @@ export class AdminKyc implements OnInit {
         this.selectedDriver.set(detail);
         this.detailLoading.set(false);
         this.preloadDocImages(detail.documents);
+        this.patchDriverInList(detail);
       },
       error: () => {
         this.toast.error('Failed to load driver KYC details.');
@@ -160,9 +179,24 @@ export class AdminKyc implements OnInit {
     });
   }
 
+  private patchDriverInList(detail: DriverKycDetail): void {
+    this.drivers.update(list =>
+      list.map(d => d.driverId !== detail.driverId ? d : {
+        ...d,
+        kycStatus:          detail.kycStatus,
+        approvedDocCount:   detail.documents.filter(doc => doc.status === 'APPROVED').length,
+        totalDocCount:      detail.documents.length,
+        pendingReviewCount: detail.documents.filter(doc => doc.status === 'UNDER_REVIEW').length,
+      })
+    );
+  }
+
+  navigateToDriver(driverId: string): void {
+    this.router.navigate(['/admin/kyc/driver', driverId]);
+  }
+
   closeDetail(): void {
-    this.selectedDriver.set(null);
-    this.versionDocId.set(null);
+    this.router.navigate(['/admin/kyc']);
   }
 
   private preloadDocImages(docs: DocViewDTO[]): void {

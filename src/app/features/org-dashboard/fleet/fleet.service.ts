@@ -21,7 +21,6 @@ export interface BikeReq {
   model: string;
   licensePlate: string;
   vin?: string;
-  organisationId: string;
 }
 
 export interface BikeUpdateReq {
@@ -33,38 +32,33 @@ export interface BikeUpdateReq {
 
 @Injectable({ providedIn: 'root' })
 export class BikeService {
-  private base = environment.apiUrl;
+  private base = `${environment.apiUrl}/bikes`;
   constructor(private http: HttpClient) {}
 
-  getAll(orgId: string, page = 0, size = 50, search?: string) {
-    let params = new HttpParams()
-      .set('organisationId', orgId)
-      .set('page', page)
-      .set('size', size);
+  getAll(page = 0, size = 50, search?: string) {
+    let params = new HttpParams().set('page', page).set('size', size);
     if (search) params = params.set('search', search);
-    return this.http.get<{ data: Bike[] }>(`${this.base}/bikes`, { params });
+    return this.http.get<{ data: Bike[] }>(this.base, { params });
   }
 
   create(req: BikeReq) {
-    return this.http.post<{ data: Bike }>(`${this.base}/bikes`, req);
+    return this.http.post<{ data: Bike }>(this.base, req);
   }
 
   update(bikeId: string, req: BikeUpdateReq) {
-    return this.http.put<{ data: Bike }>(`${this.base}/bikes/${bikeId}`, req);
+    return this.http.put<{ data: Bike }>(`${this.base}/${bikeId}`, req);
   }
 
   delete(bikeId: string) {
-    return this.http.delete(`${this.base}/bikes/${bikeId}`);
+    return this.http.delete(`${this.base}/${bikeId}`);
   }
 
   assignRider(bikeId: string, riderId: string) {
-    return this.http.post<{ data: Bike }>(
-      `${this.base}/bikes/${bikeId}/assign/${riderId}`, {});
+    return this.http.post<{ data: Bike }>(`${this.base}/${bikeId}/assign/${riderId}`, {});
   }
 
   unassignRider(bikeId: string) {
-    return this.http.delete<{ data: Bike }>(
-      `${this.base}/bikes/${bikeId}/assign`);
+    return this.http.delete<{ data: Bike }>(`${this.base}/${bikeId}/assign`);
   }
 
   /** Search all bikes globally (no org filter) — used for the invite flow */
@@ -73,6 +67,6 @@ export class BikeService {
       .set('search', search)
       .set('page', page)
       .set('size', size);
-    return this.http.get<{ data: Bike[] }>(`${this.base}/bikes`, { params });
+    return this.http.get<{ data: Bike[] }>(this.base, { params });
   }
 }

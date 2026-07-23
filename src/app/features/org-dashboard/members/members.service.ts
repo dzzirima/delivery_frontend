@@ -10,6 +10,8 @@ export interface OrgMember {
   role: 'RIDER' | 'DISPATCHER';
   status: string;
   createdAt: string;
+  assignedBikeId: string | null;
+  assignedBikeRegNumber: string | null;
 }
 
 export interface OrgMemberReq {
@@ -28,31 +30,28 @@ export interface OrgMemberUpdateReq {
 
 @Injectable({ providedIn: 'root' })
 export class OrgMemberService {
-  private base = environment.apiUrl;
+  private base = `${environment.apiUrl}/members`;
   constructor(private http: HttpClient) {}
 
-  list(orgId: string, role?: string) {
+  list(role?: string) {
     let params = new HttpParams();
     if (role) params = params.set('role', role);
-    return this.http.get<{ data: OrgMember[] }>(
-      `${this.base}/org/${orgId}/members`, { params });
+    return this.http.get<{ data: OrgMember[] }>(this.base, { params });
   }
 
-  add(orgId: string, req: OrgMemberReq) {
-    return this.http.post<{ data: OrgMember }>(
-      `${this.base}/org/${orgId}/members`, req);
+  add(req: OrgMemberReq) {
+    return this.http.post<{ data: OrgMember }>(this.base, req);
   }
 
-  update(orgId: string, userId: string, req: OrgMemberUpdateReq) {
-    return this.http.patch<{ data: OrgMember }>(
-      `${this.base}/org/${orgId}/members/${userId}`, req);
+  update(userId: string, req: OrgMemberUpdateReq) {
+    return this.http.patch<{ data: OrgMember }>(`${this.base}/${userId}`, req);
   }
 
-  resetPassword(orgId: string, userId: string, password: string) {
-    return this.http.patch(`${this.base}/org/${orgId}/members/${userId}/password`, { password });
+  resetPassword(userId: string, password: string) {
+    return this.http.patch(`${this.base}/${userId}/password`, { password });
   }
 
-  remove(orgId: string, userId: string) {
-    return this.http.delete(`${this.base}/org/${orgId}/members/${userId}`);
+  remove(userId: string) {
+    return this.http.delete(`${this.base}/${userId}`);
   }
 }

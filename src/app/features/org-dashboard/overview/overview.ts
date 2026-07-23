@@ -81,9 +81,7 @@ export class Overview implements OnInit, AfterViewInit, OnDestroy {
   shops = signal<Shop[]>([]);
 
   loadShops() {
-    const orgId = this.orgId();
-    if (!orgId) return;
-    this.shopService.getAll(orgId).subscribe({
+    this.shopService.getAll(0, 100).subscribe({
       next:  r => { this.shops.set(r.data ?? []); this.refreshMapMarkers(); },
       error: () => {},
     });

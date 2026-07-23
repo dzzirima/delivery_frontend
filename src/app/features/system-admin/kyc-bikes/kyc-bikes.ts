@@ -1,7 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, DestroyRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass, NgIf, NgFor, DatePipe } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
 import { catchError, of } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   KycBikesService,
@@ -68,12 +70,30 @@ export class AdminKycBikes implements OnInit {
   overrideNote       = signal('');
   submittingOverride = signal(false);
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
-    private svc:   KycBikesService,
-    private toast: ToastService,
+    private svc:    KycBikesService,
+    private toast:  ToastService,
+    private router: Router,
+    private route:  ActivatedRoute,
   ) {}
 
-  ngOnInit(): void { this.loadBikes(); }
+  ngOnInit(): void {
+    this.loadBikes();
+
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const bikeId = params.get('bikeId');
+        if (bikeId) {
+          this.selectBike(bikeId);
+        } else {
+          this.selectedBike.set(null);
+          this.detailLoading.set(false);
+        }
+      });
+  }
 
   // ── Level 1 actions ───────────────────────────────────────────────────────
 
@@ -120,6 +140,7 @@ export class AdminKycBikes implements OnInit {
         this.selectedBike.set(detail);
         this.detailLoading.set(false);
         this.preloadDocImages(detail.documents);
+        this.patchBikeInList(detail);
       },
       error: () => {
         this.toast.error('Failed to load bike KYC details.');
@@ -128,9 +149,24 @@ export class AdminKycBikes implements OnInit {
     });
   }
 
+  private patchBikeInList(detail: BikeKycDetail): void {
+    this.bikes.update(list =>
+      list.map(b => b.bikeId !== detail.bikeId ? b : {
+        ...b,
+        kycStatus:          detail.kycStatus,
+        approvedDocCount:   detail.documents.filter(doc => doc.status === 'APPROVED').length,
+        totalDocCount:      detail.documents.length,
+        pendingReviewCount: detail.documents.filter(doc => doc.status === 'UNDER_REVIEW').length,
+      })
+    );
+  }
+
+  navigateToBike(bikeId: string): void {
+    this.router.navigate(['/admin/kyc-bikes/bike', bikeId]);
+  }
+
   closeDetail(): void {
-    this.selectedBike.set(null);
-    this.versionDocId.set(null);
+    this.router.navigate(['/admin/kyc-bikes']);
   }
 
   private preloadDocImages(docs: BikeDocViewDTO[]): void {

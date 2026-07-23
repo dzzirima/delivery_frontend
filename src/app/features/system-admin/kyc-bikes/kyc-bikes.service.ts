@@ -47,17 +47,20 @@ export interface BikeKycListItem {
 
 /** Full bike KYC detail when admin selects a bike (Level 2). */
 export interface BikeKycDetail {
-  profileId?:   string;
-  bikeId:       string;
-  licensePlate: string;
-  make:         string;
-  bikeModel:    string;
-  ownerName:    string;
-  ownerEmail:   string;
-  kycStatus:    KycStatus;
-  approvedAt?:  string;
-  rejectedAt?:  string;
-  documents:    BikeDocViewDTO[];
+  profileId?:       string;
+  bikeId:           string;
+  licensePlate:     string;
+  make:             string;
+  bikeModel:        string;
+  ownerName:        string;
+  ownerEmail:       string;
+  kycStatus:        KycStatus;
+  approvedAt?:      string;
+  rejectedAt?:      string;
+  documents:        BikeDocViewDTO[];
+  manualOverride:   boolean;
+  overriddenByName: string | null;
+  overrideNote:     string | null;
 }
 
 // ── Service ────────────────────────────────────────────────────────────────────

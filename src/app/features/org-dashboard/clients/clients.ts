@@ -1,9 +1,8 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { GooglePlacesDirective, PlaceResult } from '../../../core/directives/google-places.directive';
 import { ClientService, OrgClient, OrgClientReq } from './clients.service';
-import { UserService } from '../../../core/user.service';
 import { ToastService } from '../../../core/toast.service';
 
 @Component({
@@ -13,8 +12,6 @@ import { ToastService } from '../../../core/toast.service';
   templateUrl: './clients.html',
 })
 export class Clients implements OnInit {
-  readonly orgId = computed(() => this.userService.profile()?.organisationId ?? null);
-
   clients          = signal<OrgClient[]>([]);
   clientsLoading   = signal(false);
   clientModal      = signal(false);
@@ -25,10 +22,8 @@ export class Clients implements OnInit {
   clientForm       = { name: '', phone: '', email: '', address: '', latitude: null as number | null, longitude: null as number | null, notes: '' };
 
   loadClients() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.clientsLoading.set(true);
-    this.clientService.getAll(orgId, this.clientSearch).subscribe({
+    this.clientService.getAll(this.clientSearch).subscribe({
       next:  r => { this.clients.set(r.data ?? []); this.clientsLoading.set(false); },
       error: () => { this.clientsLoading.set(false); this.toast.error('Error', 'Failed to load clients.'); },
     });
@@ -46,8 +41,6 @@ export class Clients implements OnInit {
   closeClientModal() { this.clientModalError.set(''); this.clientModal.set(false); }
 
   saveClient() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     const editing = this.clientEditing();
     this.clientsLoading.set(true);
 
@@ -62,22 +55,17 @@ export class Clients implements OnInit {
     };
 
     const obs = editing
-      ? this.clientService.update(orgId, editing.id, req)
-      : this.clientService.create(orgId, req);
+      ? this.clientService.update(editing.id, req)
+      : this.clientService.create(req);
 
     obs.subscribe({
       next: () => { this.closeClientModal(); this.loadClients(); this.toast.success('Success', editing ? 'Client updated.' : 'Client added.'); },
-      error: (e) => {
-        this.clientsLoading.set(false);
-        this.clientModalError.set(e?.error?.message ?? 'Failed to save client.');
-      },
+      error: (e) => { this.clientsLoading.set(false); this.clientModalError.set(e?.error?.message ?? 'Failed to save client.'); },
     });
   }
 
   deleteClient(clientId: string) {
-    const orgId = this.orgId();
-    if (!orgId) return;
-    this.clientService.delete(orgId, clientId).subscribe({
+    this.clientService.delete(clientId).subscribe({
       next:  () => { this.clientDeletingId.set(null); this.loadClients(); this.toast.success('Success', 'Client removed.'); },
       error: (e) => { this.clientDeletingId.set(null); this.toast.error('Error', e?.error?.message ?? 'Failed to delete client.'); },
     });
@@ -91,7 +79,6 @@ export class Clients implements OnInit {
 
   constructor(
     private clientService: ClientService,
-    private userService:   UserService,
     private toast:         ToastService,
   ) {}
 

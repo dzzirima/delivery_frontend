@@ -25,25 +25,29 @@ export class ShopItemService {
   private base = environment.apiUrl;
   constructor(private http: HttpClient) {}
 
-  getAllByOrg(orgId: string) {
-    return this.http.get<{ data: ShopItem[] }>(`${this.base}/org/${orgId}/items?size=200`);
-  }
-
-  getAllByShop(orgId: string, shopId: string, page = 0, size = 20, search?: string) {
-    let url = `${this.base}/org/${orgId}/shops/${shopId}/items?page=${page}&size=${size}`;
-    if (search?.trim()) url += `&search=${encodeURIComponent(search.trim())}`;
+  /** All items — org-scoped for org users, global for SYSTEM_ADMIN. */
+  getAll(page = 0, size = 20, q?: string) {
+    let url = `${this.base}/shop-items?page=${page}&size=${size}`;
+    if (q?.trim()) url += `&q=${encodeURIComponent(q.trim())}`;
     return this.http.get<{ data: ShopItem[]; length: number }>(url);
   }
 
-  create(orgId: string, shopId: string, req: ShopItemReq) {
-    return this.http.post<{ data: ShopItem }>(`${this.base}/org/${orgId}/shops/${shopId}/items`, req);
+  /** Items within a specific shop. */
+  getByShop(shopId: string, page = 0, size = 20, q?: string) {
+    let url = `${this.base}/shops/${shopId}/items?page=${page}&size=${size}`;
+    if (q?.trim()) url += `&q=${encodeURIComponent(q.trim())}`;
+    return this.http.get<{ data: ShopItem[]; length: number }>(url);
   }
 
-  update(orgId: string, shopId: string, itemId: string, req: ShopItemReq) {
-    return this.http.put<{ data: ShopItem }>(`${this.base}/org/${orgId}/shops/${shopId}/items/${itemId}`, req);
+  create(shopId: string, req: ShopItemReq) {
+    return this.http.post<{ data: ShopItem }>(`${this.base}/shops/${shopId}/items`, req);
   }
 
-  delete(orgId: string, shopId: string, itemId: string) {
-    return this.http.delete(`${this.base}/org/${orgId}/shops/${shopId}/items/${itemId}`);
+  update(itemId: string, req: ShopItemReq) {
+    return this.http.put<{ data: ShopItem }>(`${this.base}/shop-items/${itemId}`, req);
+  }
+
+  delete(itemId: string) {
+    return this.http.delete(`${this.base}/shop-items/${itemId}`);
   }
 }

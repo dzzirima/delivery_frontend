@@ -3,13 +3,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 export interface PlatformUser {
-  id:          string;
-  name:        string;
-  email:       string;
-  phoneNumber: string | null;
-  role:        string;
-  status:      string;
-  createdAt:   string;
+  id:                   string;
+  name:                 string;
+  email:                string;
+  phoneNumber:          string | null;
+  role:                 string;
+  status:               string;
+  createdAt:            string;
+  assignedBikeId:       string | null;
+  assignedBikeRegNumber: string | null;
 }
 
 export interface UserPage {

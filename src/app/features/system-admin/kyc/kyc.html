@@ -37,7 +37,7 @@
       <button *ngFor="let d of drivers()"
               class="driver-row"
               [class.active]="selectedDriver()?.driverId === d.driverId"
-              (click)="selectDriver(d.driverId)">
+              (click)="navigateToDriver(d.driverId)">
         <div class="driver-row-top">
           <span class="driver-name">{{ d.driverUserName }}</span>
           <span class="status-pill" [ngClass]="statusClass(d.kycStatus)">
@@ -107,6 +107,24 @@
               Force Reject
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Manual override banner -->
+      <div *ngIf="driver.manualOverride" class="manual-override-banner">
+        <div class="override-icon">✦</div>
+        <div class="override-body">
+          <p class="override-title">
+            Manually {{ driver.kycStatus === 'APPROVED' ? 'Approved' : 'Rejected' }}
+            <ng-container *ngIf="driver.overriddenByName"> by <strong>{{ driver.overriddenByName }}</strong></ng-container>
+          </p>
+          <p *ngIf="driver.overrideNote" class="override-note">"{{ driver.overrideNote }}"</p>
+          <p *ngIf="driver.approvedAt && driver.kycStatus === 'APPROVED'" class="override-date">
+            {{ driver.approvedAt | date:'dd MMM yyyy, HH:mm' }}
+          </p>
+          <p *ngIf="driver.rejectedAt && driver.kycStatus === 'REJECTED'" class="override-date">
+            {{ driver.rejectedAt | date:'dd MMM yyyy, HH:mm' }}
+          </p>
         </div>
       </div>
 

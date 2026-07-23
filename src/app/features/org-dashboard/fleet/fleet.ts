@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -14,8 +14,6 @@ import { ToastService } from '../../../core/toast.service';
   templateUrl: './fleet.html',
 })
 export class Fleet implements OnInit {
-  readonly orgId = computed(() => this.userService.profile()?.organisationId ?? null);
-
   // ── Bikes ────────────────────────────────────────────────────────────────────
   bikes          = signal<Bike[]>([]);
   bikesLoading   = signal(false);
@@ -26,10 +24,8 @@ export class Fleet implements OnInit {
   bikeForm       = { make: '', model: '', licensePlate: '', vin: '' };
 
   loadBikes() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.bikesLoading.set(true);
-    this.bikeService.getAll(orgId).subscribe({
+    this.bikeService.getAll().subscribe({
       next:  r => { this.bikes.set(Array.isArray(r.data) ? r.data : []); this.bikesLoading.set(false); },
       error: () => { this.bikesLoading.set(false); this.toast.error('Error', 'Failed to load fleet.'); },
     });
@@ -47,14 +43,12 @@ export class Fleet implements OnInit {
   closeBikeModal() { this.bikeModalError.set(''); this.bikeModal.set(false); }
 
   saveBike() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     const editing = this.bikeEditing();
     this.bikesLoading.set(true);
 
     const obs = editing
       ? this.bikeService.update(editing.id, this.bikeForm)
-      : this.bikeService.create({ ...this.bikeForm, organisationId: orgId });
+      : this.bikeService.create(this.bikeForm);
 
     obs.subscribe({
       next: () => { this.closeBikeModal(); this.loadBikes(); this.toast.success('Success', editing ? 'Bike updated.' : 'Bike registered.'); },
@@ -126,10 +120,8 @@ export class Fleet implements OnInit {
   fleetTab           = signal<'bikes' | 'invites'>('bikes');
 
   loadInvites() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.invitesLoading.set(true);
-    this.bikeOrgInviteService.list(orgId).subscribe({
+    this.bikeOrgInviteService.list().subscribe({
       next:  r => { this.invites.set(Array.isArray(r.data) ? r.data : []); this.invitesLoading.set(false); },
       error: () => { this.invitesLoading.set(false); this.toast.error('Error', 'Failed to load invites.'); },
     });
@@ -152,20 +144,16 @@ export class Fleet implements OnInit {
   }
 
   sendInvite(bikeId: string) {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.inviteSendingId.set(bikeId);
-    this.bikeOrgInviteService.send(orgId, bikeId).subscribe({
+    this.bikeOrgInviteService.send(bikeId).subscribe({
       next:  () => { this.inviteSendingId.set(null); this.closeInviteModal(); this.loadInvites(); this.fleetTab.set('invites'); this.toast.success('Success', 'Invite sent to bike owner.'); },
       error: (e) => { this.inviteSendingId.set(null); this.toast.error('Error', e?.error?.message ?? 'Failed to send invite.'); },
     });
   }
 
   cancelInvite(inviteId: string) {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.inviteCancellingId.set(inviteId);
-    this.bikeOrgInviteService.cancel(orgId, inviteId).subscribe({
+    this.bikeOrgInviteService.cancel(inviteId).subscribe({
       next:  () => { this.inviteCancellingId.set(null); this.loadInvites(); this.toast.success('Success', 'Invite cancelled.'); },
       error: (e) => { this.inviteCancellingId.set(null); this.toast.error('Error', e?.error?.message ?? 'Failed to cancel.'); },
     });
@@ -176,8 +164,7 @@ export class Fleet implements OnInit {
   ridersLoading = signal(false);
 
   loadOrgRiders() {
-    const orgId = this.orgId();
-    if (!orgId || this.orgRiders().length > 0) return;
+    if (this.orgRiders().length > 0) return;
     this.ridersLoading.set(true);
     this.userService.getRiders().subscribe({
       next:  r => { const raw = r.data as any; this.orgRiders.set(Array.isArray(raw) ? raw : raw?.content ?? []); this.ridersLoading.set(false); },

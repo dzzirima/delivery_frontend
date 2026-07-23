@@ -52,6 +52,7 @@ export interface NearbyRider {
   hasLocation: boolean;
   distanceKm: number | null;
   durationMinutes: number | null;
+  onActiveDelivery: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

@@ -23,7 +23,6 @@ import { DeliveryUiService } from '../deliveries-ui.service';
 export class CreateDeliveryModal implements OnDestroy {
   @Output() created = new EventEmitter<void>();
 
-  readonly orgId = computed(() => this.userService.profile()?.organisationId ?? null);
   wsConnected = computed(() => this.deliveryWsService.connected());
 
   // ── Create delivery modal ────────────────────────────────────────────────────
@@ -315,8 +314,6 @@ export class CreateDeliveryModal implements OnDestroy {
 
   // ── Internal delivery ────────────────────────────────────────────────────────
   saveInternalDelivery() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     const f = this.deliveryForm;
     this.deliverySaving.set(true);
     const body: Record<string, unknown> = {
@@ -363,8 +360,6 @@ export class CreateDeliveryModal implements OnDestroy {
    */
   maybeFetchNearbyRiders() {
     if (this.deliveryTab() !== 'INTERNAL') return;
-    const orgId = this.orgId();
-    if (!orgId) return;
 
     const { pickupLat, pickupLng } = this.deliveryForm;
     this.nearbyRidersLoading.set(true);
@@ -387,6 +382,7 @@ export class CreateDeliveryModal implements OnDestroy {
 
   formatRiderLabel(r: NearbyRider): string {
     let label = r.name;
+    if (r.onActiveDelivery)          label += ' · on delivery';
     if (r.distanceKm != null)        label += ` · ${r.distanceKm.toFixed(1)} km`;
     if (r.durationMinutes != null)   label += ` · ~${Math.round(r.durationMinutes)} min`;
     if (!r.hasLocation)              label += ' · no location';
@@ -451,9 +447,7 @@ export class CreateDeliveryModal implements OnDestroy {
   });
 
   loadClients() {
-    const orgId = this.orgId();
-    if (!orgId) return;
-    this.clientService.getAll(orgId).subscribe({
+    this.clientService.getAll().subscribe({
       next: r => this.clients.set(r.data ?? []),
       error: () => {},
     });
@@ -480,10 +474,9 @@ export class CreateDeliveryModal implements OnDestroy {
   }
 
   saveQuickDeliveryClient() {
-    const orgId = this.orgId();
-    if (!orgId || !this.deliveryQuickForm.name.trim()) return;
+    if (!this.deliveryQuickForm.name.trim()) return;
     this.deliveryQuickSaving.set(true);
-    this.clientService.create(orgId, {
+    this.clientService.create({
       name:      this.deliveryQuickForm.name.trim(),
       phone:     this.deliveryQuickForm.phone     || undefined,
       address:   this.deliveryQuickForm.address   || undefined,
@@ -525,19 +518,15 @@ export class CreateDeliveryModal implements OnDestroy {
   });
 
   loadDeliveryItems() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.deliveryItemsLoading.set(true);
-    this.shopItemService.getAllByOrg(orgId).subscribe({
-      next:  r => { this.shopItems.set(r.data ?? []); this.deliveryItemsLoading.set(false); },
+    this.shopItemService.getAll(0, 200).subscribe({
+      next:  (r: { data: ShopItem[] }) => { this.shopItems.set(r.data ?? []); this.deliveryItemsLoading.set(false); },
       error: () => { this.deliveryItemsLoading.set(false); },
     });
   }
 
   loadShops() {
-    const orgId = this.orgId();
-    if (!orgId) return;
-    this.shopService.getAll(orgId).subscribe({
+    this.shopService.getAll(0, 100).subscribe({
       next: r => this.shops.set(r.data ?? []),
       error: () => {},
     });

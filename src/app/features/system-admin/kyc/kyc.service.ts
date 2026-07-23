@@ -56,14 +56,17 @@ export interface DriverKycListItem {
 
 /** Full detail when admin clicks a driver (Level 2). */
 export interface DriverKycDetail {
-  profileId?:    string;
-  driverId:      string;
-  driverUserName:string;
-  driverEmail:   string;
-  kycStatus:     KycStatus;
-  approvedAt?:   string;
-  rejectedAt?:   string;
-  documents:     DocViewDTO[];
+  profileId?:       string;
+  driverId:         string;
+  driverUserName:   string;
+  driverEmail:      string;
+  kycStatus:        KycStatus;
+  approvedAt?:      string;
+  rejectedAt?:      string;
+  documents:        DocViewDTO[];
+  manualOverride:   boolean;
+  overriddenByName: string | null;
+  overrideNote:     string | null;
 }
 
 export interface PageResponse<T> {

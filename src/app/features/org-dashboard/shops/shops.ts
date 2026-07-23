@@ -1,9 +1,8 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { GooglePlacesDirective, PlaceResult } from '../../../core/directives/google-places.directive';
 import { ShopService, Shop, ShopReq } from './shops.service';
-import { UserService } from '../../../core/user.service';
 import { ToastService } from '../../../core/toast.service';
 
 @Component({
@@ -13,8 +12,6 @@ import { ToastService } from '../../../core/toast.service';
   templateUrl: './shops.html',
 })
 export class Shops implements OnInit {
-  readonly orgId = computed(() => this.userService.profile()?.organisationId ?? null);
-
   shops          = signal<Shop[]>([]);
   shopsLoading   = signal(false);
   shopModal      = signal(false);
@@ -24,10 +21,8 @@ export class Shops implements OnInit {
   shopForm       = { name: '', address: '', phone: '', latitude: null as number | null, longitude: null as number | null };
 
   loadShops() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.shopsLoading.set(true);
-    this.shopService.getAll(orgId).subscribe({
+    this.shopService.getAll(0, 100).subscribe({
       next:  r => { this.shops.set(r.data ?? []); this.shopsLoading.set(false); },
       error: () => { this.shopsLoading.set(false); this.toast.error('Error', 'Failed to load shops.'); },
     });
@@ -45,15 +40,13 @@ export class Shops implements OnInit {
   closeShopModal() { this.shopModalError.set(''); this.shopModal.set(false); }
 
   saveShop() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     const editing = this.shopEditing();
     this.shopsLoading.set(true);
 
     const req: ShopReq = { name: this.shopForm.name, address: this.shopForm.address || undefined, phone: this.shopForm.phone || undefined, latitude: this.shopForm.latitude ?? undefined, longitude: this.shopForm.longitude ?? undefined };
     const obs = editing
-      ? this.shopService.update(orgId, editing.id, req)
-      : this.shopService.create(orgId, req);
+      ? this.shopService.update(editing.id, req)
+      : this.shopService.create(req);
 
     obs.subscribe({
       next: () => { this.closeShopModal(); this.loadShops(); this.toast.success('Success', editing ? 'Shop updated.' : 'Shop created.'); },
@@ -62,9 +55,7 @@ export class Shops implements OnInit {
   }
 
   deleteShop(shopId: string) {
-    const orgId = this.orgId();
-    if (!orgId) return;
-    this.shopService.delete(orgId, shopId).subscribe({
+    this.shopService.delete(shopId).subscribe({
       next:  () => { this.shopDeletingId.set(null); this.loadShops(); this.toast.success('Success', 'Shop deleted.'); },
       error: (e) => { this.shopDeletingId.set(null); this.toast.error('Error', e?.error?.message ?? 'Failed to delete shop.'); },
     });
@@ -77,9 +68,8 @@ export class Shops implements OnInit {
   }
 
   constructor(
-    private shopService:  ShopService,
-    private userService:  UserService,
-    private toast:        ToastService,
+    private shopService: ShopService,
+    private toast:       ToastService,
   ) {}
 
   ngOnInit() {

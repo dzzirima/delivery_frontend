@@ -18,18 +18,18 @@ export interface BikeOrgInvite {
 
 @Injectable({ providedIn: 'root' })
 export class BikeOrgInviteService {
-  private base = environment.apiUrl;
+  private base = `${environment.apiUrl}/bike-invites`;
   constructor(private http: HttpClient) {}
 
-  send(orgId: string, bikeId: string) {
-    return this.http.post<{ data: BikeOrgInvite }>(`${this.base}/org/${orgId}/bike-invites`, { bikeId });
+  send(bikeId: string) {
+    return this.http.post<{ data: BikeOrgInvite }>(this.base, { bikeId });
   }
 
-  list(orgId: string) {
-    return this.http.get<{ data: BikeOrgInvite[] }>(`${this.base}/org/${orgId}/bike-invites`);
+  list() {
+    return this.http.get<{ data: BikeOrgInvite[] }>(this.base);
   }
 
-  cancel(orgId: string, inviteId: string) {
-    return this.http.delete(`${this.base}/org/${orgId}/bike-invites/${inviteId}`);
+  cancel(inviteId: string) {
+    return this.http.delete(`${this.base}/${inviteId}`);
   }
 }

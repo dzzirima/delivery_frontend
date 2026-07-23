@@ -26,24 +26,24 @@ export interface OrgClientReq {
 
 @Injectable({ providedIn: 'root' })
 export class ClientService {
-  private base = environment.apiUrl;
+  private base = `${environment.apiUrl}/clients`;
   constructor(private http: HttpClient) {}
 
-  getAll(orgId: string, search = '', page = 0, size = 50) {
+  getAll(q = '', page = 0, size = 50) {
     let params = new HttpParams().set('page', page).set('size', size);
-    if (search) params = params.set('search', search);
-    return this.http.get<{ data: OrgClient[] }>(`${this.base}/org/${orgId}/clients`, { params });
+    if (q.trim()) params = params.set('q', q.trim());
+    return this.http.get<{ data: OrgClient[]; length: number }>(this.base, { params });
   }
 
-  create(orgId: string, req: OrgClientReq) {
-    return this.http.post<{ data: OrgClient }>(`${this.base}/org/${orgId}/clients`, req);
+  create(req: OrgClientReq) {
+    return this.http.post<{ data: OrgClient }>(this.base, req);
   }
 
-  update(orgId: string, clientId: string, req: OrgClientReq) {
-    return this.http.put<{ data: OrgClient }>(`${this.base}/org/${orgId}/clients/${clientId}`, req);
+  update(clientId: string, req: OrgClientReq) {
+    return this.http.put<{ data: OrgClient }>(`${this.base}/${clientId}`, req);
   }
 
-  delete(orgId: string, clientId: string) {
-    return this.http.delete(`${this.base}/org/${orgId}/clients/${clientId}`);
+  delete(clientId: string) {
+    return this.http.delete(`${this.base}/${clientId}`);
   }
 }

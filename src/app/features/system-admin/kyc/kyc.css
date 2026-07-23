@@ -579,3 +579,59 @@
   border-radius: 6px;
   display: block;
 }
+
+/* ── Manual override banner ─────────────────────────────────────────────── */
+
+.manual-override-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0 0 20px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #86efac;
+  border-left: 4px solid #22c55e;
+  border-radius: 10px;
+}
+
+.manual-override-banner:has(+ .doc-grid .doc-card) {
+  /* has documents below — subtle variant */
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+  border-color: #fde047;
+  border-left-color: #eab308;
+}
+
+.override-icon {
+  font-size: 20px;
+  color: #16a34a;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.override-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.override-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #15803d;
+  margin: 0;
+}
+
+.override-note {
+  font-size: 13px;
+  color: #166534;
+  font-style: italic;
+  margin: 0;
+}
+
+.override-date {
+  font-size: 12px;
+  color: #4ade80;
+  margin: 0;
+  color: #16a34a;
+  opacity: 0.75;
+}

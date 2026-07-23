@@ -3,7 +3,6 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ShopService, Shop, ShopReq } from '../shops.service';
 import { ShopItemService, ShopItem, ShopItemReq } from '../../shop-items/shop-items.service';
-import { UserService } from '../../../../core/user.service';
 import { ToastService } from '../../../../core/toast.service';
 import { GooglePlacesDirective, PlaceResult } from '../../../../core/directives/google-places.directive';
 
@@ -15,7 +14,6 @@ import { GooglePlacesDirective, PlaceResult } from '../../../../core/directives/
 })
 export class ShopDetail implements OnInit {
   private readonly route_ = inject(ActivatedRoute);
-  readonly orgId  = computed(() => this.userService.profile()?.organisationId ?? null);
   readonly shopId = this.route_.snapshot.paramMap.get('shopId')!;
 
   // ── Shop ──────────────────────────────────────────────────────────────────────
@@ -26,14 +24,9 @@ export class ShopDetail implements OnInit {
   shopForm       = { name: '', address: '', phone: '', latitude: null as number | null, longitude: null as number | null };
 
   loadShop() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.shopLoading.set(true);
-    this.shopService.getAll(orgId).subscribe({
-      next: r => {
-        this.shop.set((r.data ?? []).find(s => s.id === this.shopId) ?? null);
-        this.shopLoading.set(false);
-      },
+    this.shopService.getById(this.shopId).subscribe({
+      next: r => { this.shop.set(r.data ?? null); this.shopLoading.set(false); },
       error: () => { this.shopLoading.set(false); },
     });
   }
@@ -48,9 +41,8 @@ export class ShopDetail implements OnInit {
   closeShopModal() { this.shopModalError.set(''); this.shopModal.set(false); }
 
   saveShop() {
-    const orgId = this.orgId();
     const s = this.shop();
-    if (!orgId || !s) return;
+    if (!s) return;
     const req: ShopReq = {
       name:      this.shopForm.name,
       address:   this.shopForm.address   || undefined,
@@ -58,7 +50,7 @@ export class ShopDetail implements OnInit {
       latitude:  this.shopForm.latitude  ?? undefined,
       longitude: this.shopForm.longitude ?? undefined,
     };
-    this.shopService.update(orgId, s.id, req).subscribe({
+    this.shopService.update(s.id, req).subscribe({
       next: r => { this.shop.set(r.data); this.closeShopModal(); this.toast.success('Success', 'Shop updated.'); },
       error: (e) => { this.shopModalError.set(e?.error?.message ?? 'Failed to save shop.'); },
     });
@@ -73,9 +65,9 @@ export class ShopDetail implements OnInit {
   // ── Items — pagination ────────────────────────────────────────────────────────
   readonly pageSize = 20;
 
-  items       = signal<ShopItem[]>([]);
-  totalItems  = signal(0);
-  currentPage = signal(0);
+  items        = signal<ShopItem[]>([]);
+  totalItems   = signal(0);
+  currentPage  = signal(0);
   itemsLoading = signal(false);
 
   totalPages  = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.pageSize)));
@@ -83,17 +75,14 @@ export class ShopDetail implements OnInit {
     const total = this.totalPages();
     const cur   = this.currentPage();
     if (total <= 7) return Array.from({ length: total }, (_, i) => i);
-    // Sliding window of 5 around current page
     const start = Math.max(0, Math.min(cur - 2, total - 5));
     return Array.from({ length: Math.min(5, total) }, (_, i) => start + i);
   });
 
   loadPage(page: number) {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.itemsLoading.set(true);
     this.currentPage.set(page);
-    this.shopItemService.getAllByShop(orgId, this.shopId, page, this.pageSize).subscribe({
+    this.shopItemService.getByShop(this.shopId, page, this.pageSize).subscribe({
       next: r => {
         this.items.set(r.data ?? []);
         this.totalItems.set(r.length ?? 0);
@@ -113,11 +102,10 @@ export class ShopDetail implements OnInit {
   }
 
   // ── Items — search ────────────────────────────────────────────────────────────
-  searchQuery    = signal('');
-  isSearchMode   = signal(false);   // true = showing backend search results
-  searchLoading  = signal(false);
+  searchQuery   = signal('');
+  isSearchMode  = signal(false);
+  searchLoading = signal(false);
 
-  // Local matches within the currently loaded page
   localMatches = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
     if (!q) return [];
@@ -129,12 +117,11 @@ export class ShopDetail implements OnInit {
     );
   });
 
-  // What the table renders — local matches take priority, otherwise full page
   displayItems = computed(() => {
     const q = this.searchQuery().trim();
     if (!q) return this.items();
     if (this.localMatches().length > 0) return this.localMatches();
-    return this.items(); // backend search results stored in items()
+    return this.items();
   });
 
   displayTotal = computed(() => {
@@ -146,25 +133,15 @@ export class ShopDetail implements OnInit {
 
   onSearch(q: string) {
     this.searchQuery.set(q);
-    if (!q.trim()) {
-      this.clearSearch();
-      return;
-    }
-    // Check local matches first (synchronous, instant)
-    if (this.localMatches().length > 0) {
-      this.isSearchMode.set(false);
-      return;
-    }
-    // No local hits — go to backend
+    if (!q.trim()) { this.clearSearch(); return; }
+    if (this.localMatches().length > 0) { this.isSearchMode.set(false); return; }
     this.runBackendSearch(q, 0);
   }
 
   runBackendSearch(q: string, page = 0) {
-    const orgId = this.orgId();
-    if (!orgId) return;
     this.searchLoading.set(true);
     this.currentPage.set(page);
-    this.shopItemService.getAllByShop(orgId, this.shopId, page, this.pageSize, q).subscribe({
+    this.shopItemService.getByShop(this.shopId, page, this.pageSize, q).subscribe({
       next: r => {
         this.items.set(r.data ?? []);
         this.totalItems.set(r.length ?? 0);
@@ -200,8 +177,6 @@ export class ShopDetail implements OnInit {
   closeItemModal() { this.itemModalError.set(''); this.itemModal.set(false); }
 
   saveItem() {
-    const orgId = this.orgId();
-    if (!orgId) return;
     const editing = this.itemEditing();
     this.itemsLoading.set(true);
     const req: ShopItemReq = {
@@ -211,13 +186,12 @@ export class ShopDetail implements OnInit {
       unit:        this.itemForm.unit        || undefined,
     };
     const obs = editing
-      ? this.shopItemService.update(orgId, this.shopId, editing.id, req)
-      : this.shopItemService.create(orgId, this.shopId, req);
+      ? this.shopItemService.update(editing.id, req)
+      : this.shopItemService.create(this.shopId, req);
 
     obs.subscribe({
       next: () => {
         this.closeItemModal();
-        // Stay on current page/search state after save
         if (this.isSearchMode()) {
           this.runBackendSearch(this.searchQuery(), this.currentPage());
         } else {
@@ -230,13 +204,11 @@ export class ShopDetail implements OnInit {
   }
 
   deleteItem() {
-    const orgId  = this.orgId();
     const itemId = this.itemDeletingId();
-    if (!orgId || !itemId) return;
-    this.shopItemService.delete(orgId, this.shopId, itemId).subscribe({
+    if (!itemId) return;
+    this.shopItemService.delete(itemId).subscribe({
       next: () => {
         this.itemDeletingId.set(null);
-        // If last item on this page, go back one page
         const goTo = this.items().length === 1 && this.currentPage() > 0
           ? this.currentPage() - 1 : this.currentPage();
         if (this.isSearchMode()) {
@@ -255,7 +227,6 @@ export class ShopDetail implements OnInit {
     private router:          Router,
     private shopService:     ShopService,
     private shopItemService: ShopItemService,
-    private userService:     UserService,
     private toast:           ToastService,
   ) {}
 
