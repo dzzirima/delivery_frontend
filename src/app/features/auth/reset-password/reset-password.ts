@@ -11,27 +11,42 @@ import { ToastService } from '../../../core/toast.service';
 })
 export class ResetPassword {
   code = '';
-  newPassword = '';
-  showPassword = signal(false);
+  secret = '';
+  isPhoneReset = false;
+  showSecret = signal(false);
   loading = signal(false);
   error = signal('');
 
-  constructor(private userService: UserService, private toast: ToastService, private router: Router) {}
+  constructor(private userService: UserService, private toast: ToastService, private router: Router) {
+    // Router state is set by forgot-password when navigating here.
+    // Falls back to false (email/password reset) if navigated to directly.
+    this.isPhoneReset = !!(history.state as { isPhoneReset?: boolean })?.isPhoneReset;
+  }
 
-  togglePassword() {
-    this.showPassword.update(v => !v);
+  toggleSecret() {
+    this.showSecret.update(v => !v);
   }
 
   submit() {
-    if (!this.code || !this.newPassword) {
-      this.error.set('Please enter the reset code and your new password.');
+    if (!this.code.trim()) {
+      this.error.set('Please enter the reset code.');
       return;
     }
+    if (!this.secret) {
+      this.error.set(this.isPhoneReset ? 'Please enter your new PIN.' : 'Please enter your new password.');
+      return;
+    }
+    if (this.isPhoneReset && this.secret.length !== 4) {
+      this.error.set('PIN must be exactly 4 digits.');
+      return;
+    }
+
     this.loading.set(true);
     this.error.set('');
-    this.userService.resetPassword(this.code, this.newPassword).subscribe({
+    this.userService.resetPassword(this.code.trim(), this.secret).subscribe({
       next: () => {
-        this.toast.success('Password reset!', 'Your password has been updated. Please sign in.');
+        const msg = this.isPhoneReset ? 'Your PIN has been updated. Please sign in.' : 'Your password has been updated. Please sign in.';
+        this.toast.success(this.isPhoneReset ? 'PIN reset!' : 'Password reset!', msg);
         setTimeout(() => this.router.navigate(['/signin']), 1500);
       },
       error: () => {

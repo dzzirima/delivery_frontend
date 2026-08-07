@@ -26,10 +26,8 @@ export interface TokenPayload {
 
 // ── API contract ───────────────────────────────────────────────────────────────
 export interface SigninPayload {
-  userName?: string;
-  password?: string;
-  phoneNumber?: string;
-  pin?: string;
+  identifier: string;   // email or phone number — backend auto-detects
+  password: string;     // password (email) or PIN (phone)
 }
 
 export interface SignupPayload {

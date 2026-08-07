@@ -107,11 +107,19 @@ export class UserService {
     );
   }
 
-  forgotPassword(email: string) {
-    return this.http.post(`${environment.apiUrl}/reset-password/forgot`, { email });
+  forgotPassword(identifier: string) {
+    const isEmail = identifier.includes('@');
+    const body = isEmail
+      ? { email: identifier.trim() }
+      : { phoneNumber: identifier.trim() };
+    return this.http.post(`${environment.apiUrl}/reset-password/forgot`, body);
   }
 
-  resetPassword(code: string, newPassword: string) {
-    return this.http.post(`${environment.apiUrl}/reset-password/reset`, { code, newPassword });
+  resetPassword(code: string, secret: string) {
+    return this.http.post(`${environment.apiUrl}/reset-password/reset`, {
+      code,
+      newPassword: secret,
+      newPin: secret,
+    });
   }
 }

@@ -31,11 +31,6 @@ export class Signin {
     this.showPassword.update(v => !v);
   }
 
-  /** Returns true if the identifier looks like a phone number */
-  private isPhone(value: string): boolean {
-    return /^\+?[\d\s\-()]{7,}$/.test(value.trim());
-  }
-
   login() {
     if (!this.identifier || !this.password) {
       this.toast.warning('Missing fields', 'Please enter your email or phone number and password.');
@@ -44,11 +39,7 @@ export class Signin {
 
     this.loading.set(true);
 
-    const payload = this.isPhone(this.identifier)
-      ? { phoneNumber: this.identifier.trim(), pin: this.password }
-      : { userName:    this.identifier.trim(), password: this.password };
-
-    this.authService.signin(payload).subscribe({
+    this.authService.signin({ identifier: this.identifier.trim(), password: this.password }).subscribe({
       next:  () => this.handleSuccess(),
       error: () => {
         this.toast.error('Sign in failed', 'Invalid credentials. Please try again.');
