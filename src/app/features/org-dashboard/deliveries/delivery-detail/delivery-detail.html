@@ -1,6 +1,8 @@
 <div class="flex overflow-hidden -m-6" style="height:100vh">
 
-  <!-- ── LEFT: detail panel ── -->
+  <!-- ══════════════════════════════════════════════════════════════════════
+       LEFT — scrollable detail panel
+       ════════════════════════════════════════════════════════════════════ -->
   <div class="w-[420px] shrink-0 flex flex-col overflow-hidden bg-white border-r border-gray-100">
 
     <!-- Sticky header -->
@@ -17,6 +19,17 @@
           <p class="text-xs text-gray-400 font-mono">#{{ delivery()!.id.slice(-8).toUpperCase() }}</p>
         }
       </div>
+      @if (delivery() && !isTerminal) {
+        <button (click)="openEdit()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200
+                 text-gray-600 text-xs font-semibold hover:bg-gray-50 transition-colors shrink-0">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Edit
+        </button>
+      }
       @if (delivery()) {
         <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold shrink-0"
           [style.background]="statusColor(delivery()!.status) + '20'"
@@ -32,17 +45,190 @@
       @if (loading()) {
         <div class="py-20 text-center text-sm text-gray-400">Loading…</div>
       }
-
       @else if (error()) {
         <div class="m-5 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 text-sm">
           {{ error() }}
         </div>
       }
-
       @else if (delivery()) {
 
-        <!-- Route -->
-        <div class="px-5 py-5 border-b border-gray-100">
+        <!-- ── Status message banner ───────────────────────────────────────── -->
+        <div class="mx-5 mt-5 mb-1 flex items-center gap-3 px-4 py-3 rounded-2xl"
+          [style.background]="statusColor(delivery()!.status) + '12'"
+          [style.border]="'1px solid ' + statusColor(delivery()!.status) + '30'">
+          @switch (delivery()!.status) {
+            @case ('CREATED')    { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> }
+            @case ('PUBLISHED')  { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg> }
+            @case ('ASSIGNED')   { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg> }
+            @case ('ACCEPTED')   { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> }
+            @case ('IN_TRANSIT') { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/></svg> }
+            @case ('ARRIVED')    { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> }
+            @case ('DELIVERED')  { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> }
+            @case ('DECLINED')   { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> }
+            @case ('CANCELLED')  { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> }
+            @default             { <svg class="w-5 h-5 shrink-0" [style.color]="statusColor(delivery()!.status)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> }
+          }
+          <p class="text-sm font-semibold" [style.color]="statusColor(delivery()!.status)">
+            {{ statusMessage(delivery()!.status).text }}
+          </p>
+        </div>
+
+        <!-- ── Rider offline banner ─────────────────────────────────────────── -->
+        @if (riderOfflineWithLocation) {
+          <div class="mx-5 mt-3 flex items-center gap-2.5 px-4 py-3 rounded-2xl
+                      bg-amber-50 border border-amber-200">
+            <!-- Offline pulse dot -->
+            <span class="relative flex h-2.5 w-2.5 shrink-0">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 block"></span>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold text-amber-800 leading-snug">
+                Rider offline — map shows last known position
+              </p>
+              <p class="text-[11px] text-amber-600 mt-0.5">Last seen {{ lastSeenLabel() }}</p>
+            </div>
+            <!-- Bike icon -->
+            <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+            </svg>
+          </div>
+        }
+
+        <!-- ── 5-step visual timeline ─────────────────────────────────────── -->
+        <div class="mx-5 mt-4 mb-1">
+          <div class="flex items-center">
+            @for (step of timelineSteps(); track step.label; let last = $last) {
+              <div class="flex flex-col items-center">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all"
+                  [class.bg-green-500]="step.done"
+                  [class.text-white]="step.done || step.current"
+                  [class.bg-gray-100]="!step.done && !step.current && !step.isError"
+                  [class.text-gray-400]="!step.done && !step.current && !step.isError"
+                  [class.bg-red-100]="step.isError"
+                  [class.text-red-500]="step.isError"
+                  [style.background]="step.current ? statusColor(delivery()!.status) : ''">
+                  @if (step.done) {
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  } @else if (step.isError) {
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  } @else {
+                    <span class="w-2 h-2 rounded-full"
+                      [class.bg-white]="step.current"
+                      [class.bg-gray-300]="!step.current"></span>
+                  }
+                </div>
+                <p class="text-[9px] mt-1 font-semibold text-center leading-tight w-10"
+                  [class.text-green-600]="step.done"
+                  [class.text-gray-800]="step.current && !step.isError"
+                  [class.text-gray-400]="!step.done && !step.current && !step.isError"
+                  [class.text-red-500]="step.isError">
+                  {{ step.label }}
+                </p>
+              </div>
+              @if (!last) {
+                <div class="flex-1 h-0.5 mb-5 mx-1 rounded-full transition-all"
+                  [class.bg-green-400]="step.done"
+                  [class.bg-gray-200]="!step.done"></div>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- ── Info chips ────────────────────────────────────────────────── -->
+        <div class="px-5 mt-3 flex flex-wrap gap-1.5">
+          @if (delivery()!.price) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              ${{ delivery()!.price | number:'1.2-2' }}
+            </span>
+          }
+          @if (delivery()!.distanceKm) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+              {{ delivery()!.distanceKm | number:'1.1-1' }} km
+            </span>
+          }
+          @if (delivery()!.estimatedDurationMinutes) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              ~{{ delivery()!.estimatedDurationMinutes }} min
+            </span>
+          }
+          @if (delivery()!.priority) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+              [class.bg-red-50]="['HIGH','URGENT'].includes(delivery()!.priority!)"
+              [class.text-red-600]="['HIGH','URGENT'].includes(delivery()!.priority!)"
+              [class.bg-amber-50]="!['HIGH','URGENT'].includes(delivery()!.priority!)"
+              [class.text-amber-600]="!['HIGH','URGENT'].includes(delivery()!.priority!)">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M4 21V7l8-4 8 4v14"/></svg>
+              {{ delivery()!.priority | titlecase }}
+            </span>
+          }
+          @if (delivery()!.paymentStatus) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+              [class.bg-green-50]="delivery()!.paymentStatus === 'PAID'"
+              [class.text-green-700]="delivery()!.paymentStatus === 'PAID'"
+              [class.bg-amber-50]="delivery()!.paymentStatus !== 'PAID'"
+              [class.text-amber-600]="delivery()!.paymentStatus !== 'PAID'">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+              {{ delivery()!.paymentStatus | titlecase }}
+            </span>
+          }
+          @if (delivery()!.dispatchStrategy) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+              {{ strategyLabel(delivery()!.dispatchStrategy) }}
+            </span>
+          }
+        </div>
+
+        <!-- ── Action buttons ────────────────────────────────────────────── -->
+        @if (canReassign || canPublish || canCancel) {
+          <div class="px-5 mt-4 flex items-center gap-2 flex-wrap">
+            @if (canReassign) {
+              <button (click)="openReassign()"
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-blue-200
+                       text-blue-600 text-xs font-semibold hover:bg-blue-50 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+                Reassign Rider
+              </button>
+            }
+            @if (canPublish) {
+              <button (click)="showPublishConfirm.set(true)"
+                [disabled]="publishing()"
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-200
+                       text-amber-600 text-xs font-semibold hover:bg-amber-50 transition-colors
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                </svg>
+                {{ publishing() ? 'Publishing…' : 'Publish' }}
+              </button>
+            }
+            @if (canCancel) {
+              <button (click)="showCancelConfirm.set(true)"
+                [disabled]="cancelling()"
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200
+                       text-red-500 text-xs font-semibold hover:bg-red-50 transition-colors
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ cancelling() ? 'Cancelling…' : 'Cancel' }}
+              </button>
+            }
+          </div>
+        }
+
+        <!-- ── Route ─────────────────────────────────────────────────────── -->
+        <div class="px-5 py-5 mt-3 border-t border-gray-100">
           <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Route</p>
           <div class="flex items-start gap-3">
             <div class="flex flex-col items-center mt-1 shrink-0">
@@ -52,62 +238,54 @@
             </div>
             <div class="flex-1 min-w-0 space-y-3">
               <div>
-                <p class="text-sm font-semibold text-gray-900 leading-snug">{{ delivery()!.route.pickupAddress }}</p>
+                <p class="text-sm font-semibold text-gray-900 leading-snug">{{ delivery()!.pickupAddress }}</p>
                 <p class="text-xs text-gray-400 mt-0.5">Pickup</p>
               </div>
               <div>
-                <p class="text-sm font-semibold text-gray-900 leading-snug">{{ delivery()!.route.dropoffAddress }}</p>
+                <p class="text-sm font-semibold text-gray-900 leading-snug">{{ delivery()!.dropoffAddress }}</p>
                 <p class="text-xs text-gray-400 mt-0.5">Dropoff</p>
-                @if (delivery()!.route.dropoffInstructions) {
-                  <p class="text-xs text-gray-500 mt-1 italic">{{ delivery()!.route.dropoffInstructions }}</p>
+                @if (delivery()!.dropoffInstructions) {
+                  <p class="text-xs text-gray-500 mt-1 italic bg-gray-50 px-2 py-1 rounded-lg">
+                    {{ delivery()!.dropoffInstructions }}
+                  </p>
                 }
               </div>
             </div>
           </div>
-          @if (delivery()!.route.distanceKm || delivery()!.route.estimatedDurationMinutes) {
-            <div class="flex items-center gap-3 mt-3 pt-3 border-t border-gray-50">
-              @if (delivery()!.route.distanceKm) {
-                <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-                  </svg>
-                  {{ delivery()!.route.distanceKm | number:'1.1-1' }} km
-                </span>
-              }
-              @if (delivery()!.route.estimatedDurationMinutes) {
-                <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  {{ delivery()!.route.estimatedDurationMinutes }} min
-                </span>
-              }
-            </div>
-          }
         </div>
 
-        <!-- Driver -->
-        <div class="px-5 py-5 border-b border-gray-100">
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Driver</p>
-          @if (delivery()!.driver) {
+        <!-- ── Driver ────────────────────────────────────────────────────── -->
+        <div class="px-5 py-5 border-t border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Assigned Rider</p>
+          @if (delivery()!.driverName) {
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-full bg-green-100 text-green-700 font-bold text-sm flex items-center justify-center shrink-0">
-                {{ delivery()!.driver!.name.charAt(0).toUpperCase() }}
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-teal-500
+                          text-white font-bold text-sm flex items-center justify-center shrink-0">
+                {{ delivery()!.driverName!.charAt(0).toUpperCase() }}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-900">{{ delivery()!.driver!.name }}</p>
-                <p class="text-xs text-gray-400">{{ delivery()!.driver!.phone ?? '—' }}</p>
+                <p class="text-sm font-semibold text-gray-900">{{ delivery()!.driverName }}</p>
+                @if (delivery()!.driverPhone) {
+                  <a [href]="'tel:' + delivery()!.driverPhone"
+                     class="text-xs text-green-600 hover:text-green-700 flex items-center gap-1 mt-0.5 w-fit">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                    </svg>
+                    {{ delivery()!.driverPhone }}
+                  </a>
+                }
               </div>
             </div>
-            @if (delivery()!.driver!.bikeMake) {
+            @if (delivery()!.bikeMake) {
               <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50">
                 <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
                 </svg>
-                <span class="text-xs text-gray-500">{{ delivery()!.driver!.bikeMake }} {{ delivery()!.driver!.bikeModel }}</span>
-                @if (delivery()!.driver!.licensePlate) {
+                <span class="text-xs text-gray-500">{{ delivery()!.bikeMake }} {{ delivery()!.bikeModel }}</span>
+                @if (delivery()!.licensePlate) {
                   <span class="ml-auto text-xs font-mono font-semibold text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
-                    {{ delivery()!.driver!.licensePlate }}
+                    {{ delivery()!.licensePlate }}
                   </span>
                 }
               </div>
@@ -117,98 +295,109 @@
           }
         </div>
 
-        <!-- Client -->
-        <div class="px-5 py-5 border-b border-gray-100">
+        <!-- ── Client ────────────────────────────────────────────────────── -->
+        <div class="px-5 py-5 border-t border-gray-100">
           <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Client</p>
-          @if (delivery()!.client) {
-            <p class="text-sm font-semibold text-gray-900">{{ delivery()!.client!.name }}</p>
-            @if (delivery()!.client!.phone) {
-              <p class="text-xs text-gray-500 mt-1">{{ delivery()!.client!.phone }}</p>
-            }
-            @if (delivery()!.client!.address) {
-              <p class="text-xs text-gray-400 mt-0.5">{{ delivery()!.client!.address }}</p>
-            }
+          @if (delivery()!.clientName) {
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 font-bold text-sm
+                          flex items-center justify-center shrink-0">
+                {{ delivery()!.clientName!.charAt(0).toUpperCase() }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900">{{ delivery()!.clientName }}</p>
+                @if (delivery()!.clientPhone) {
+                  <a [href]="'tel:' + delivery()!.clientPhone"
+                     class="text-xs text-green-600 hover:text-green-700 flex items-center gap-1 mt-0.5 w-fit">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                    </svg>
+                    {{ delivery()!.clientPhone }}
+                  </a>
+                }
+                @if (delivery()!.clientAddress) {
+                  <p class="text-xs text-gray-400 mt-0.5 truncate">{{ delivery()!.clientAddress }}</p>
+                }
+              </div>
+            </div>
           } @else {
             <p class="text-sm text-gray-400">No client recorded.</p>
           }
         </div>
 
-        <!-- Package -->
-        <div class="px-5 py-5 border-b border-gray-100">
+        <!-- ── Package ───────────────────────────────────────────────────── -->
+        <div class="px-5 py-5 border-t border-gray-100">
           <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Package</p>
-          @if (delivery()!.packageDetails.description) {
-            <p class="text-sm text-gray-800 mb-2">{{ delivery()!.packageDetails.description }}</p>
+          @if (delivery()!.description) {
+            <p class="text-sm text-gray-800 mb-2">{{ delivery()!.description }}</p>
           }
           <div class="flex flex-wrap gap-1.5">
-            @if (delivery()!.packageDetails.sizeCategory) {
+            @if (delivery()!.packageSizeCategory) {
               <span class="text-xs bg-gray-100 text-gray-600 font-medium px-2.5 py-1 rounded-lg">
-                {{ delivery()!.packageDetails.sizeCategory | titlecase }}
+                {{ delivery()!.packageSizeCategory | titlecase }}
               </span>
             }
-            @if (delivery()!.packageDetails.priority) {
+            @if (delivery()!.packageWeight) {
               <span class="text-xs bg-gray-100 text-gray-600 font-medium px-2.5 py-1 rounded-lg">
-                {{ delivery()!.packageDetails.priority | titlecase }}
-              </span>
-            }
-            @if (delivery()!.packageDetails.weight) {
-              <span class="text-xs bg-gray-100 text-gray-600 font-medium px-2.5 py-1 rounded-lg">
-                {{ delivery()!.packageDetails.weight }} kg
+                {{ delivery()!.packageWeight }} kg
               </span>
             }
           </div>
-          @if (!delivery()!.packageDetails.description && !delivery()!.packageDetails.sizeCategory) {
+          @if (!delivery()!.description && !delivery()!.packageSizeCategory) {
             <p class="text-sm text-gray-400">No package details.</p>
           }
         </div>
 
-        <!-- Financials -->
-        <div class="px-5 py-5 border-b border-gray-100">
+        <!-- ── Financials ─────────────────────────────────────────────────── -->
+        <div class="px-5 py-5 border-t border-gray-100">
           <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Financials</p>
           <div class="space-y-2.5">
             <div class="flex items-center justify-between">
               <span class="text-xs text-gray-500">Price</span>
               <span class="text-base font-bold text-gray-900">
-                {{ delivery()!.financials.price | currency:'USD':'symbol':'1.2-2' }}
+                {{ delivery()!.price | currency:'USD':'symbol':'1.2-2' }}
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-xs text-gray-500">Payment</span>
+              <span class="text-xs text-gray-500">Payment method</span>
               <span class="text-xs font-medium text-gray-700">
-                {{ delivery()!.financials.paymentMethod ?? '—' | titlecase }}
+                {{ (delivery()!.paymentMethod ?? '—') | titlecase }}
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-xs text-gray-500">Status</span>
+              <span class="text-xs text-gray-500">Payment status</span>
               <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
-                [class.bg-green-50]="delivery()!.financials.paymentStatus === 'PAID'"
-                [class.text-green-700]="delivery()!.financials.paymentStatus === 'PAID'"
-                [class.bg-amber-50]="delivery()!.financials.paymentStatus !== 'PAID'"
-                [class.text-amber-700]="delivery()!.financials.paymentStatus !== 'PAID'">
-                {{ delivery()!.financials.paymentStatus ?? 'Pending' | titlecase }}
+                [class.bg-green-50]="delivery()!.paymentStatus === 'PAID'"
+                [class.text-green-700]="delivery()!.paymentStatus === 'PAID'"
+                [class.bg-amber-50]="delivery()!.paymentStatus !== 'PAID'"
+                [class.text-amber-700]="delivery()!.paymentStatus !== 'PAID'">
+                {{ (delivery()!.paymentStatus ?? 'Pending') | titlecase }}
               </span>
             </div>
           </div>
         </div>
 
-        <!-- Timeline -->
-        <div class="px-5 py-5" [class.border-b]="delivery()!.cancellationReason" [class.border-gray-100]="delivery()!.cancellationReason">
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Timeline</p>
+        <!-- ── Event log ──────────────────────────────────────────────────── -->
+        <div class="px-5 py-5 border-t border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Event Log</p>
           <div class="space-y-3">
             @for (event of [
-              { label: 'Created',   time: delivery()!.timeline.createdAt,   done: true },
-              { label: 'Picked up', time: delivery()!.timeline.pickedUpAt,  done: !!delivery()!.timeline.pickedUpAt },
-              { label: 'Delivered', time: delivery()!.timeline.deliveredAt, done: !!delivery()!.timeline.deliveredAt },
-              { label: 'Cancelled', time: delivery()!.timeline.cancelledAt, done: !!delivery()!.timeline.cancelledAt }
+              { label: 'Created',   time: delivery()!.createdAt,          done: true },
+              { label: 'Picked up', time: delivery()!.actualPickupTime,   done: !!delivery()!.actualPickupTime },
+              { label: 'Delivered', time: delivery()!.actualDeliveryTime, done: !!delivery()!.actualDeliveryTime },
+              { label: 'Cancelled', time: delivery()!.cancelledAt,        done: !!delivery()!.cancelledAt }
             ]; track event.label) {
               @if (event.label !== 'Cancelled' || event.done) {
                 <div class="flex items-center gap-3">
                   <span class="w-2 h-2 rounded-full shrink-0"
-                    [class.bg-green-500]="event.done"
+                    [class.bg-green-500]="event.done && event.label !== 'Cancelled'"
+                    [class.bg-red-400]="event.done && event.label === 'Cancelled'"
                     [class.bg-gray-200]="!event.done">
                   </span>
-                  <span class="text-xs w-20 shrink-0"
-                    [class.font-semibold]="event.done"
-                    [class.text-gray-800]="event.done"
+                  <span class="text-xs w-20 shrink-0 font-semibold"
+                    [class.text-gray-800]="event.done && event.label !== 'Cancelled'"
+                    [class.text-red-500]="event.done && event.label === 'Cancelled'"
                     [class.text-gray-400]="!event.done">
                     {{ event.label }}
                   </span>
@@ -219,45 +408,373 @@
               }
             }
           </div>
-          @if (delivery()!.assignedBy) {
+          @if (delivery()!.assignedByName) {
             <p class="text-xs text-gray-400 mt-4 pt-3 border-t border-gray-50">
-              Assigned by <span class="font-medium text-gray-600">{{ delivery()!.assignedBy }}</span>
+              Assigned by <span class="font-medium text-gray-600">{{ delivery()!.assignedByName }}</span>
             </p>
           }
         </div>
 
-        <!-- Cancellation reason -->
+        <!-- ── Cancellation reason ────────────────────────────────────────── -->
         @if (delivery()!.cancellationReason) {
-          <div class="px-5 py-5">
+          <div class="px-5 py-5 border-t border-red-100">
             <p class="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-2">Cancellation Reason</p>
-            <p class="text-sm text-red-700">{{ delivery()!.cancellationReason }}</p>
+            <p class="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-xl">
+              {{ delivery()!.cancellationReason }}
+            </p>
           </div>
         }
 
+        <div class="h-10"></div>
+
+      } @else {
+        <div class="py-20 text-center text-sm text-gray-400">Delivery not found.</div>
       }
     </div>
   </div>
 
-  <!-- ── RIGHT: map (always rendered) ── -->
+  <!-- ══════════════════════════════════════════════════════════════════════
+       RIGHT — map
+       ════════════════════════════════════════════════════════════════════ -->
   <div class="flex-1 relative bg-gray-200">
-
     <div #detailMap class="absolute inset-0"></div>
 
-    <!-- Pin legend -->
+    <!-- Legend -->
     <div class="absolute top-4 left-4 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl shadow-md px-3 py-2 flex items-center gap-3 text-xs text-gray-600">
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0"></span>Pickup</span>
       <span class="w-px h-3 bg-gray-200"></span>
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></span>Dropoff</span>
+      <span class="w-px h-3 bg-gray-200"></span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>Rider</span>
     </div>
 
-    <!-- No coordinates notice -->
-    @if (delivery() && !delivery()!.route.pickupLat && !delivery()!.route.pickupLng) {
+    <!-- ETA badges -->
+    @if (delivery() && detailEta(); as eta) {
+      <div class="absolute top-4 right-4 z-[1000] flex flex-col items-end gap-2 pointer-events-none">
+        <!-- Primary ETA: to pickup / to dropoff / delivery route -->
+        <div class="flex items-center gap-2 bg-gray-900/90 backdrop-blur-sm rounded-xl px-3 py-2 shadow-lg">
+          <svg class="w-3.5 h-3.5 shrink-0"
+               [style.color]="eta.label === 'to pickup' ? '#f59e0b' : eta.label === 'to dropoff' ? '#8b5cf6' : '#3b82f6'"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="text-xs font-bold text-white">{{ eta.mins }} min</span>
+          <span class="text-[10px] text-gray-300">{{ eta.label }}</span>
+          <span class="text-[10px] text-gray-400">· {{ eta.distKm | number:'1.1-1' }} km</span>
+        </div>
+        <!-- Secondary ETA: delivery route (pickup→dropoff leg when rider is en-route) -->
+        @if (eta.routeMins) {
+          <div class="flex items-center gap-2 bg-blue-600/90 backdrop-blur-sm rounded-xl px-3 py-2 shadow-lg">
+            <svg class="w-3.5 h-3.5 text-blue-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/>
+            </svg>
+            <span class="text-xs font-bold text-white">{{ eta.routeMins }} min</span>
+            <span class="text-[10px] text-blue-200">delivery route</span>
+            <span class="text-[10px] text-blue-300">· {{ eta.routeDistKm | number:'1.1-1' }} km</span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (delivery() && !delivery()!.pickupLat && !delivery()!.pickupLng) {
       <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg px-5 py-3 text-center pointer-events-none">
         <p class="text-sm font-semibold text-gray-600">No location data</p>
         <p class="text-xs text-gray-400 mt-0.5">Coordinates not recorded for this delivery</p>
       </div>
     }
-
   </div>
-
 </div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Cancel confirm dialog
+     ════════════════════════════════════════════════════════════════════ -->
+@if (showCancelConfirm()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
+       (click)="showCancelConfirm.set(false)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-gray-900">Cancel Delivery?</h3>
+          <p class="text-xs text-gray-500 mt-0.5">This action cannot be undone.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button (click)="showCancelConfirm.set(false)"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+          No, Keep It
+        </button>
+        <button (click)="confirmCancel()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors">
+          Yes, Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Publish confirm dialog
+     ════════════════════════════════════════════════════════════════════ -->
+@if (showPublishConfirm()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
+       (click)="showPublishConfirm.set(false)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-gray-900">Publish to Open Bidding?</h3>
+          <p class="text-xs text-gray-500 mt-0.5">All available riders will see this delivery.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button (click)="showPublishConfirm.set(false)"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+          Cancel
+        </button>
+        <button (click)="confirmPublish()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-colors">
+          Yes, Publish
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Reassign Rider modal
+     ════════════════════════════════════════════════════════════════════ -->
+@if (showReassignModal()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
+       (click)="showReassignModal.set(false)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] flex flex-col"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 shrink-0">
+        <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-bold text-gray-900">Reassign Rider</h3>
+          <p class="text-xs text-gray-400 mt-0.5">Select a new rider for this delivery</p>
+        </div>
+        <button (click)="showReassignModal.set(false)"
+          class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-y-auto">
+        @if (reassignLoading()) {
+          <div class="flex flex-col items-center justify-center py-16 gap-3">
+            <svg class="w-6 h-6 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <p class="text-sm text-gray-400">Finding available riders…</p>
+          </div>
+        } @else if (reassignRiders().length === 0) {
+          <div class="flex flex-col items-center justify-center py-16">
+            <svg class="w-10 h-10 text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <p class="text-sm text-gray-500 font-medium">No riders available</p>
+          </div>
+        } @else {
+          @if (!reassignOsrmOk()) {
+            <div class="mx-4 mt-4 flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 text-xs text-amber-700">
+              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+              </svg>
+              Routing service offline — riders sorted online-first
+            </div>
+          }
+          <div class="divide-y divide-gray-100">
+            @for (rider of reassignRiders(); track rider.id) {
+              <button
+                (click)="selectedRiderId.set(rider.id)"
+                class="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-gray-50 transition-colors"
+                [class.bg-blue-50]="selectedRiderId() === rider.id">
+                <!-- Avatar + online dot -->
+                <div class="relative shrink-0">
+                  <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                    [class.bg-blue-500]="selectedRiderId() === rider.id"
+                    [class.bg-gradient-to-br]="selectedRiderId() !== rider.id"
+                    [class.from-green-400]="selectedRiderId() !== rider.id"
+                    [class.to-teal-500]="selectedRiderId() !== rider.id">
+                    {{ riderInitial(rider.name) }}
+                  </div>
+                  <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white"
+                    [class.bg-green-500]="rider.online"
+                    [class.bg-gray-300]="!rider.online">
+                  </span>
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-sm font-semibold truncate"
+                      [class.text-blue-700]="selectedRiderId() === rider.id"
+                      [class.text-gray-900]="selectedRiderId() !== rider.id">
+                      {{ rider.name }}
+                    </span>
+                    @if (isCurrentRider(rider)) {
+                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-semibold">current</span>
+                    }
+                    @if (rider.onActiveDelivery) {
+                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-600 font-semibold">on delivery</span>
+                    }
+                  </div>
+                  <p class="text-xs text-gray-400 mt-0.5">
+                    @if (rider.distanceKm != null) { {{ rider.distanceKm | number:'1.1-1' }} km away · }
+                    @if (rider.durationMinutes != null) { ~{{ rider.durationMinutes }} min · }
+                    {{ rider.online ? 'Online' : 'Offline' }}
+                  </p>
+                </div>
+
+                <!-- Check -->
+                @if (selectedRiderId() === rider.id) {
+                  <svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                }
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      @if (!reassignLoading() && reassignRiders().length > 0) {
+        <div class="px-6 py-4 border-t border-gray-100 shrink-0">
+          <button
+            (click)="confirmReassign()"
+            [disabled]="!selectedRiderId() || selectedRiderId() === delivery()?.driverId || reassignSaving()"
+            class="w-full py-3 rounded-xl text-sm font-bold text-white transition-colors
+                   bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ reassignSaving() ? 'Reassigning…' : 'Confirm Reassignment' }}
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Edit Delivery modal
+     ════════════════════════════════════════════════════════════════════ -->
+@if (editModal()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
+       (click)="closeEdit()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+         (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+        <div>
+          <h3 class="text-sm font-bold text-gray-900">Edit Delivery</h3>
+          <p class="text-xs text-gray-400 mt-0.5">
+            {{ delivery()?.clientName ?? 'No client' }} · #{{ delivery()?.id?.slice(-6)?.toUpperCase() }}
+          </p>
+        </div>
+        <button (click)="closeEdit()"
+          class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (editError()) {
+        <div class="mx-6 mt-4 flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700
+                    rounded-xl px-4 py-3 text-sm">
+          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>{{ editError() }}</span>
+        </div>
+      }
+
+      <div class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Status</label>
+          <select [(ngModel)]="editForm.status"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500/20 bg-white">
+            <option value="ASSIGNED">Assigned</option>
+            <option value="ACCEPTED">Accepted</option>
+            <option value="IN_TRANSIT">In Transit</option>
+            <option value="ARRIVED">Arrived</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="PUBLISHED">Published</option>
+            <option value="DECLINED">Declined</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Pickup Address</label>
+          <input [(ngModel)]="editForm.pickupAddress"
+            placeholder="e.g. 123 Main St"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500/20"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Dropoff Address</label>
+          <input [(ngModel)]="editForm.dropoffAddress"
+            placeholder="e.g. 456 Park Ave"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500/20"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Description</label>
+          <textarea [(ngModel)]="editForm.description"
+            placeholder="Package contents, notes…"
+            rows="2"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500/20 resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5">Price ($)</label>
+          <input [(ngModel)]="editForm.price"
+            type="number" min="0" step="0.01"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500/20"/>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 px-6 pb-6">
+        <button (click)="closeEdit()"
+          class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm
+                 hover:bg-gray-200 transition-colors">
+          Cancel
+        </button>
+        <button (click)="saveEdit()"
+          [disabled]="editSaving() || !editForm.pickupAddress.trim() || !editForm.dropoffAddress.trim()"
+          class="px-5 py-2.5 rounded-xl bg-green-600 text-white font-semibold text-sm
+                 hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+          {{ editSaving() ? 'Saving…' : 'Save Changes' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

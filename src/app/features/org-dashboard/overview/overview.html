@@ -159,19 +159,6 @@
               </div>
             </button>
 
-            <!-- Hover quick-edit -->
-            <button
-              (click)="$event.stopPropagation(); openEditDelivery(item)"
-              title="Edit delivery"
-              class="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-gray-300
-                     hover:text-green-600 hover:bg-green-100 opacity-0 group-hover:opacity-100 transition-all"
-            >
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
-                     m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-              </svg>
-            </button>
 
           </div>
         }
@@ -189,20 +176,92 @@
     <!-- ── Map canvas (always full height) ── -->
     <div #dashboardMap class="absolute inset-0 z-0"></div>
 
-    <!-- ── Detail overlay — slides up from below on selection ── -->
+    <!-- ── Floating ETA badge — top-right of map when a delivery is selected ── -->
+    @if (selectedDelivery() && selectedDeliveryEta(); as eta) {
+      <div class="absolute top-3 right-3 z-[400] flex flex-col gap-1.5 pointer-events-none">
+
+        <!-- Active leg ETA (rider → pickup or rider → dropoff) -->
+        <div class="flex items-center gap-1.5 bg-gray-900/85 backdrop-blur-sm
+                    text-white rounded-xl px-3 py-2 shadow-lg">
+          <svg class="w-3.5 h-3.5 shrink-0"
+               [style.color]="eta.label === 'to pickup' ? '#f59e0b' : eta.label === 'to dropoff' ? '#8b5cf6' : '#3b82f6'"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <p class="text-[9px] font-bold uppercase tracking-widest opacity-60 leading-none mb-0.5">
+              {{ eta.label === 'delivery route' ? 'Route duration' : 'ETA ' + eta.label }}
+            </p>
+            <p class="text-sm font-bold leading-none">
+              {{ eta.mins }} min
+              <span class="text-xs font-normal opacity-60">· {{ eta.distKm | number:'1.1-1' }} km</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Full route ETA — shown when rider is still heading to pickup -->
+        @if (eta.routeMins) {
+          <div class="flex items-center gap-1.5 bg-blue-600/90 backdrop-blur-sm
+                      text-white rounded-xl px-3 py-2 shadow-lg">
+            <svg class="w-3.5 h-3.5 shrink-0 opacity-80" fill="none"
+                 stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243
+                       a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <div>
+              <p class="text-[9px] font-bold uppercase tracking-widest opacity-75 leading-none mb-0.5">
+                Delivery route
+              </p>
+              <p class="text-sm font-bold leading-none">
+                {{ eta.routeMins }} min
+                @if (eta.routeDistKm) {
+                  <span class="text-xs font-normal opacity-70">· {{ eta.routeDistKm | number:'1.1-1' }} km</span>
+                }
+              </p>
+            </div>
+          </div>
+        }
+
+        <!-- Offline rider warning — ETA is based on last known position -->
+        @if (selectedRiderOffline()) {
+          <div class="flex items-center gap-2 bg-amber-500/90 backdrop-blur-sm
+                      text-white rounded-xl px-3 py-2 shadow-lg">
+            <span class="w-1.5 h-1.5 rounded-full bg-white/70 shrink-0"></span>
+            <p class="text-[10px] font-semibold leading-none">
+              Rider offline · last seen {{ selectedRiderLastSeen() }}
+            </p>
+          </div>
+        }
+
+      </div>
+    }
+
+    <!-- ── Map legend ── -->
+    <div class="absolute top-3 left-3 z-[400] bg-white/95 backdrop-blur-sm rounded-xl shadow-md px-3 py-2 flex items-center gap-3 text-xs text-gray-600 pointer-events-none">
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0"></span>Online</span>
+      <span class="w-px h-3 bg-gray-200"></span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>On delivery</span>
+      <span class="w-px h-3 bg-gray-200"></span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></span>Offline</span>
+    </div>
+
+    <!-- ── Rider pin detail panel — slides up when a rider marker is clicked ── -->
     <div
-      class="absolute bottom-0 left-0 right-0 z-[500] transition-transform duration-300 ease-out"
-      [class.translate-y-full]="!selectedDelivery()"
-      [class.translate-y-0]="!!selectedDelivery()"
+      class="absolute bottom-0 left-0 right-0 z-[600] transition-transform duration-300 ease-out"
+      [class.translate-y-full]="!selectedRiderState()"
+      [class.translate-y-0]="!!selectedRiderState()"
     >
-      <!-- frosted card -->
-      <div class="relative bg-white/95 backdrop-blur-md border-t border-gray-200
+      <div class="relative bg-white/95 backdrop-blur-md border-t border-blue-100
                   shadow-[0_-8px_32px_rgba(0,0,0,.10)]">
 
-        <!-- Dismiss button -->
+        <!-- Dismiss -->
         <div class="absolute top-2 right-2 z-10 group/dismiss">
           <button
-            (click)="selectedDeliveryId.set(null); refreshMapMarkers()"
+            (click)="dismissRiderPanel()"
             class="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600
                    flex items-center justify-center transition-colors"
           >
@@ -217,136 +276,389 @@
           </span>
         </div>
 
-        @if (selectedDelivery(); as d) {
+        @if (selectedRiderState(); as rs) {
           <div class="grid grid-cols-3 divide-x divide-gray-100 h-36">
 
-            <!-- ─ Col 1: People (Driver + Client) ─ -->
+            <!-- ─ Col 1: Rider identity ─ -->
             <div class="px-5 py-4 flex flex-col justify-between overflow-hidden">
-              <!-- Status + ID -->
-              <div class="flex items-center gap-2 mb-2">
-                <span
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
-                  [style.background]="statusColour(d.status)"
-                >
-                  <span class="w-1 h-1 rounded-full bg-white/60"></span>
-                  {{ statusLabel(d.status) }}
-                </span>
-                <span class="text-[10px] text-gray-400 font-mono">#{{ d.id.slice(-6).toUpperCase() }}</span>
-              </div>
+              <!-- Status pill -->
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-white w-fit"
+                [style.background]="statusColour(rs.status ?? '')"
+              >
+                <span class="w-1 h-1 rounded-full bg-white/60"></span>
+                {{ statusLabel(rs.status ?? 'ASSIGNED') }}
+              </span>
 
-              <!-- Driver -->
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-green-100 text-green-700 font-bold text-[11px]
-                            flex items-center justify-center shrink-0">
-                  {{ d.driverName ? d.driverName.charAt(0).toUpperCase() : '?' }}
+              <!-- Avatar + name -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-bold text-sm text-white"
+                     [style.background]="statusColour(rs.status ?? 'ASSIGNED')">
+                  {{ (selectedRiderDelivery()?.driverName ?? 'R').charAt(0).toUpperCase() }}
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rider</p>
-                  <p class="text-xs font-semibold text-gray-900 truncate">{{ d.driverName ?? 'No rider assigned' }}</p>
+                  <p class="text-sm font-bold text-gray-900 truncate">
+                    {{ selectedRiderDelivery()?.driverName ?? 'On duty' }}
+                  </p>
                 </div>
               </div>
 
-              <!-- Divider -->
-              <div class="border-t border-dashed border-gray-200"></div>
-
-              <!-- Client -->
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-[11px]
-                            flex items-center justify-center shrink-0">
-                  {{ d.clientName ? d.clientName.charAt(0).toUpperCase() : '?' }}
-                </div>
-                <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</p>
-                  <p class="text-xs font-semibold text-gray-900 truncate">{{ d.clientName ?? 'No client' }}</p>
-                </div>
-              </div>
+              <!-- GPS coords -->
+              <p class="text-[10px] text-gray-400 font-mono">
+                {{ rs.lat | number:'1.4-4' }}, {{ rs.lng | number:'1.4-4' }}
+              </p>
             </div>
 
             <!-- ─ Col 2: Route ─ -->
             <div class="px-5 py-4 flex flex-col justify-between overflow-hidden">
-              <!-- Addresses -->
-              <div class="flex gap-3 flex-1 min-h-0">
-                <!-- A→B connector -->
-                <div class="flex flex-col items-center shrink-0 mt-0.5">
-                  <span class="w-4 h-4 rounded-full bg-green-100 text-green-700 text-[9px] font-bold
-                               flex items-center justify-center shrink-0">A</span>
-                  <span class="w-px flex-1 bg-gray-200 my-1"></span>
-                  <span class="w-4 h-4 rounded-full bg-red-100 text-red-500 text-[9px] font-bold
-                               flex items-center justify-center shrink-0">B</span>
-                </div>
-                <!-- Address text -->
-                <div class="flex flex-col justify-between flex-1 min-w-0">
-                  <div class="min-w-0">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pickup</p>
-                    <p class="text-xs font-semibold text-gray-900 truncate leading-snug">{{ d.pickupAddress }}</p>
+              @if (selectedRiderDelivery(); as d) {
+                <div class="flex gap-3 flex-1 min-h-0">
+                  <!-- A→B connector -->
+                  <div class="flex flex-col items-center shrink-0 mt-0.5">
+                    <span class="w-4 h-4 rounded-full bg-green-100 text-green-700 text-[9px] font-bold
+                                 flex items-center justify-center shrink-0">A</span>
+                    <span class="w-px flex-1 bg-gray-200 my-1"></span>
+                    <span class="w-4 h-4 rounded-full bg-red-100 text-red-500 text-[9px] font-bold
+                                 flex items-center justify-center shrink-0">B</span>
                   </div>
-                  <div class="min-w-0">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dropoff</p>
-                    <p class="text-xs font-semibold text-gray-900 truncate leading-snug">{{ d.dropoffAddress }}</p>
+                  <!-- Addresses -->
+                  <div class="flex flex-col justify-between flex-1 min-w-0">
+                    <div class="min-w-0">
+                      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pickup</p>
+                      <p class="text-xs font-semibold text-gray-900 truncate leading-snug">{{ d.pickupAddress }}</p>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dropoff</p>
+                      <p class="text-xs font-semibold text-gray-900 truncate leading-snug">{{ d.dropoffAddress }}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <!-- ETA + distance -->
-              <div class="flex items-center gap-3 text-[11px] text-gray-400 pt-1 flex-wrap">
-                @if (d.estimatedDurationMinutes) {
-                  <span class="flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    {{ d.estimatedDurationMinutes }} min
-                  </span>
-                }
-                @if (d.distanceKm) {
-                  <span>{{ d.distanceKm | number:'1.1-1' }} km</span>
-                }
-              </div>
+
+                <!-- Client row -->
+                <div class="flex items-center gap-2 pt-1">
+                  <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-bold text-[9px]
+                              flex items-center justify-center shrink-0">
+                    {{ (d.clientName ?? 'C').charAt(0).toUpperCase() }}
+                  </div>
+                  <p class="text-[11px] text-gray-500 truncate">{{ d.clientName ?? 'No client' }}</p>
+                </div>
+              } @else {
+                <div class="flex flex-col items-center justify-center h-full gap-1 text-center">
+                  <svg class="w-8 h-8 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243
+                         a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  <p class="text-xs text-gray-400">No delivery linked</p>
+                </div>
+              }
             </div>
 
-            <!-- ─ Col 4: Order & Actions ─ -->
+            <!-- ─ Col 3: Price + actions ─ -->
             <div class="px-5 py-4 flex flex-col justify-between overflow-hidden">
-              <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Order</p>
-                @if (d.description) {
-                  <p class="text-xs text-gray-600 mb-2 line-clamp-2">{{ d.description }}</p>
-                }
-                <div class="flex flex-wrap gap-1 mb-2">
-                  @if (d.priority) {
-                    <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
-                      {{ d.priority | titlecase }}
-                    </span>
-                  }
-                  @if (d.paymentStatus) {
-                    <span
-                      class="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                      [class.bg-green-50]="d.paymentStatus === 'PAID'"
-                      [class.text-green-700]="d.paymentStatus === 'PAID'"
-                      [class.bg-amber-50]="d.paymentStatus !== 'PAID'"
-                      [class.text-amber-700]="d.paymentStatus !== 'PAID'"
-                    >{{ d.paymentStatus | titlecase }}</span>
+              @if (selectedRiderDelivery(); as d) {
+                <div>
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Order</p>
+                  <p class="text-2xl font-bold text-gray-900">${{ d.price | number:'1.2-2' }}</p>
+                  <div class="flex flex-wrap gap-1 mt-1.5">
+                    @if (d.priority) {
+                      <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
+                        {{ d.priority | titlecase }}
+                      </span>
+                    }
+                    @if (d.distanceKm) {
+                      <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
+                        {{ d.distanceKm | number:'1.1-1' }} km
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-3">
+                  <a
+                    [routerLink]="['/org/deliveries', d.id]"
+                    class="flex items-center gap-1.5 text-xs font-semibold text-blue-600
+                           hover:text-blue-700 transition-colors"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                           -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    View Details
+                  </a>
+                </div>
+              } @else {
+                <!-- No delivery — show rider coordinates as fallback -->
+                <div>
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Position</p>
+                  @if (rs.bearing != null) {
+                    <p class="text-xs text-gray-500">Bearing {{ rs.bearing | number:'1.0-0' }}°</p>
                   }
                 </div>
-                <p class="text-xl font-bold text-gray-900">${{ d.price | number:'1.2-2' }}</p>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex items-center gap-3">
-                <button
-                  (click)="openEditDelivery(d)"
-                  class="flex items-center gap-1.5 text-xs font-semibold text-green-600
-                         hover:text-green-700 transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
-                         m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                  Edit
-                </button>
-              </div>
+                <div></div>
+              }
             </div>
 
           </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Delivery bottom strip — compact by default, expands on demand ── -->
+    <div
+      class="absolute bottom-0 left-0 right-0 z-[500] transition-transform duration-300 ease-out"
+      [class.translate-y-full]="!deliveryPanelVisible()"
+      [class.translate-y-0]="deliveryPanelVisible()"
+    >
+      <div class="bg-white/97 backdrop-blur-md border-t border-gray-200 shadow-[0_-6px_24px_rgba(0,0,0,.08)]">
+        @if (selectedDelivery(); as d) {
+
+          <!-- ── Expanded panel (hidden by default) ── -->
+          @if (panelExpanded()) {
+            <div class="border-b border-gray-100">
+
+              <!-- 3-col info grid -->
+              <div class="grid grid-cols-3 divide-x divide-gray-100">
+
+                <!-- Col 1: People -->
+                <div class="px-5 py-4 flex flex-col gap-3 overflow-hidden">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-green-100 text-green-700 font-bold text-[11px]
+                                flex items-center justify-center shrink-0">
+                      {{ d.driverName ? d.driverName.charAt(0).toUpperCase() : '?' }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rider</p>
+                      <p class="text-xs font-semibold text-gray-900 truncate">{{ d.driverName ?? 'No rider assigned' }}</p>
+                    </div>
+                  </div>
+                  <div class="border-t border-dashed border-gray-100"></div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-[11px]
+                                flex items-center justify-center shrink-0">
+                      {{ d.clientName ? d.clientName.charAt(0).toUpperCase() : '?' }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</p>
+                      <p class="text-xs font-semibold text-gray-900 truncate">{{ d.clientName ?? 'No client' }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Col 2: Route -->
+                <div class="px-5 py-4 flex flex-col gap-2 overflow-hidden">
+                  <div class="flex gap-3">
+                    <div class="flex flex-col items-center shrink-0 mt-0.5">
+                      <span class="w-4 h-4 rounded-full bg-green-100 text-green-700 text-[9px] font-bold
+                                   flex items-center justify-center">A</span>
+                      <span class="w-px flex-1 bg-gray-200 my-1 min-h-[16px]"></span>
+                      <span class="w-4 h-4 rounded-full bg-red-100 text-red-500 text-[9px] font-bold
+                                   flex items-center justify-center">B</span>
+                    </div>
+                    <div class="flex flex-col justify-between flex-1 min-w-0 gap-2">
+                      <div class="min-w-0">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pickup</p>
+                        <p class="text-xs font-semibold text-gray-900 truncate">{{ d.pickupAddress }}</p>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dropoff</p>
+                        <p class="text-xs font-semibold text-gray-900 truncate">{{ d.dropoffAddress }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 text-[11px] text-gray-400 flex-wrap pt-1">
+                    @if (d.distanceKm) { <span>{{ d.distanceKm | number:'1.1-1' }} km</span> }
+                    @if (!selectedDeliveryEta() && d.estimatedDurationMinutes) {
+                      <span>~{{ d.estimatedDurationMinutes }} min</span>
+                    }
+                    @if (selectedDeliveryEta()) {
+                      @if (selectedRiderOffline()) {
+                        <span class="text-amber-600 font-semibold">
+                          Last known · {{ selectedRiderLastSeen() }}
+                        </span>
+                      } @else {
+                        <span class="text-violet-600 font-semibold">Live ETA active</span>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Col 3: Order -->
+                <div class="px-5 py-4 flex flex-col gap-2 overflow-hidden">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Order</p>
+                  @if (d.description) {
+                    <p class="text-xs text-gray-600 line-clamp-2">{{ d.description }}</p>
+                  }
+                  <div class="flex flex-wrap gap-1">
+                    @if (d.priority) {
+                      <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
+                        {{ d.priority | titlecase }}
+                      </span>
+                    }
+                    @if (d.paymentStatus) {
+                      <span class="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                        [class.bg-green-50]="d.paymentStatus === 'PAID'"
+                        [class.text-green-700]="d.paymentStatus === 'PAID'"
+                        [class.bg-amber-50]="d.paymentStatus !== 'PAID'"
+                        [class.text-amber-700]="d.paymentStatus !== 'PAID'">
+                        {{ d.paymentStatus | titlecase }}
+                      </span>
+                    }
+                  </div>
+                  <p class="text-lg font-bold text-gray-900">${{ d.price | number:'1.2-2' }}</p>
+                </div>
+              </div>
+
+              <!-- Action row -->
+              <div class="flex items-center gap-2 px-5 py-2.5 bg-gray-50/70">
+                @if (canReassignSelected()) {
+                  <button (click)="openReassign()"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-200
+                           text-blue-600 text-xs font-semibold hover:bg-blue-50 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                    </svg>
+                    Reassign
+                  </button>
+                }
+                @if (canPublishSelected()) {
+                  <button (click)="showPublishConfirm.set(true)" [disabled]="publishing()"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-200
+                           text-amber-600 text-xs font-semibold hover:bg-amber-50 transition-colors
+                           disabled:opacity-40 disabled:cursor-not-allowed">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                    </svg>
+                    {{ publishing() ? 'Publishing…' : 'Publish' }}
+                  </button>
+                }
+                @if (canCancelSelected()) {
+                  <button (click)="showCancelConfirm.set(true)" [disabled]="cancelling()"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200
+                           text-red-500 text-xs font-semibold hover:bg-red-50 transition-colors
+                           disabled:opacity-40 disabled:cursor-not-allowed">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ cancelling() ? 'Cancelling…' : 'Cancel' }}
+                  </button>
+                }
+                <div class="flex-1"></div>
+                <a [routerLink]="['/org/deliveries', d.id]"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-900 text-white
+                         text-xs font-semibold hover:bg-gray-700 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                  Full Details
+                </a>
+              </div>
+            </div>
+          }
+
+          <!-- ── Compact strip — always visible ── -->
+          <div class="flex items-center gap-3 px-4 h-14">
+
+            <!-- Status + ID -->
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-white shrink-0"
+              [style.background]="statusColour(d.status)">
+              <span class="w-1.5 h-1.5 rounded-full bg-white/60"></span>
+              {{ statusLabel(d.status) }}
+            </span>
+            <span class="text-[10px] text-gray-400 font-mono shrink-0 hidden sm:block">
+              #{{ d.id.slice(-6).toUpperCase() }}
+            </span>
+
+            <!-- Divider -->
+            <span class="w-px h-5 bg-gray-200 shrink-0"></span>
+
+            <!-- Rider -->
+            <div class="flex items-center gap-1.5 min-w-0 shrink">
+              <div class="w-6 h-6 rounded-full bg-green-100 text-green-700 font-bold text-[10px]
+                          flex items-center justify-center shrink-0">
+                {{ d.driverName ? d.driverName.charAt(0).toUpperCase() : '?' }}
+              </div>
+              <span class="text-xs font-semibold text-gray-800 truncate max-w-[100px]">
+                {{ d.driverName ?? 'No rider' }}
+              </span>
+            </div>
+
+            <!-- Divider -->
+            <span class="w-px h-5 bg-gray-200 shrink-0"></span>
+
+            <!-- Price -->
+            <span class="text-sm font-bold text-gray-900 shrink-0">${{ d.price | number:'1.2-2' }}</span>
+
+            <!-- ETA status dot -->
+            @if (selectedDeliveryEta()) {
+              @if (selectedRiderOffline()) {
+                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"
+                      title="ETA based on last known position — rider offline"></span>
+              } @else {
+                <span class="w-2 h-2 rounded-full bg-violet-500 animate-pulse shrink-0"
+                      title="Live ETA active"></span>
+              }
+            }
+
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+
+            <!-- Quick actions (compact) -->
+            @if (canReassignSelected()) {
+              <button (click)="openReassign()" title="Reassign rider"
+                class="p-1.5 rounded-lg border border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+              </button>
+            }
+            @if (canPublishSelected()) {
+              <button (click)="showPublishConfirm.set(true)" [disabled]="publishing()" title="Publish"
+                class="p-1.5 rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50 transition-colors shrink-0
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                </svg>
+              </button>
+            }
+            @if (canCancelSelected()) {
+              <button (click)="showCancelConfirm.set(true)" [disabled]="cancelling()" title="Cancel delivery"
+                class="p-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors shrink-0
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </button>
+            }
+
+            <!-- Expand / collapse toggle -->
+            <button (click)="panelExpanded.set(!panelExpanded())"
+              class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200
+                     text-gray-600 text-xs font-semibold transition-colors shrink-0">
+              <svg class="w-3.5 h-3.5 transition-transform duration-200"
+                [class.rotate-180]="panelExpanded()"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+              </svg>
+              {{ panelExpanded() ? 'Less' : 'More' }}
+            </button>
+
+            <!-- Close -->
+            <button (click)="deliveryPanelVisible.set(false); panelExpanded.set(false)"
+              class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors shrink-0">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
         }
       </div>
     </div>
@@ -357,123 +669,180 @@
 
 
 <!-- ══════════════════════════════════════════════════════════════════════
-     Edit Delivery Modal
+     Cancel confirm
      ════════════════════════════════════════════════════════════════════ -->
-@if (editDeliveryModal()) {
-  <div
-    class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    (click)="closeEditDelivery()"
-  >
-    <div
-      class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7"
-      (click)="$event.stopPropagation()"
-    >
-
-      <div class="flex items-start justify-between mb-3">
-        <div>
-          <h3 class="text-lg font-bold text-gray-900">Edit Delivery</h3>
-          <p class="text-xs text-gray-400 mt-0.5">
-            {{ editDeliveryItem()?.clientName ?? 'No client' }} · #{{ editDeliveryItem()?.id?.slice(-6) }}
-          </p>
+@if (showCancelConfirm()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
+       (click)="showCancelConfirm.set(false)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
         </div>
-        <button
-          (click)="closeEditDelivery()"
-          class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-        >
+        <div>
+          <h3 class="text-sm font-bold text-gray-900">Cancel Delivery?</h3>
+          <p class="text-xs text-gray-500 mt-0.5">This action cannot be undone.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button (click)="showCancelConfirm.set(false)"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+          No, Keep It
+        </button>
+        <button (click)="confirmCancel()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors">
+          Yes, Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Publish confirm
+     ════════════════════════════════════════════════════════════════════ -->
+@if (showPublishConfirm()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
+       (click)="showPublishConfirm.set(false)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-gray-900">Publish to Open Bidding?</h3>
+          <p class="text-xs text-gray-500 mt-0.5">All available riders will see this delivery.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button (click)="showPublishConfirm.set(false)"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+          Cancel
+        </button>
+        <button (click)="confirmPublish()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-colors">
+          Yes, Publish
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Reassign Rider modal
+     ════════════════════════════════════════════════════════════════════ -->
+@if (showReassignModal()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
+       (click)="showReassignModal.set(false)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] flex flex-col"
+         (click)="$event.stopPropagation()">
+
+      <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 shrink-0">
+        <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-bold text-gray-900">Reassign Rider</h3>
+          <p class="text-xs text-gray-400 mt-0.5">Select a new rider for this delivery</p>
+        </div>
+        <button (click)="showReassignModal.set(false)"
+          class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
 
-      @if (editDeliveryModalError()) {
-        <div class="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700
-                    rounded-xl px-4 py-3 mb-4 text-sm">
-          <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span>{{ editDeliveryModalError() }}</span>
+      <div class="flex-1 overflow-y-auto">
+        @if (reassignLoading()) {
+          <div class="flex flex-col items-center justify-center py-16 gap-3">
+            <svg class="w-6 h-6 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <p class="text-sm text-gray-400">Finding available riders…</p>
+          </div>
+        } @else if (reassignRiders().length === 0) {
+          <div class="flex flex-col items-center justify-center py-16">
+            <svg class="w-10 h-10 text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <p class="text-sm text-gray-500 font-medium">No riders available</p>
+          </div>
+        } @else {
+          @if (!reassignOsrmOk()) {
+            <div class="mx-4 mt-4 flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 text-xs text-amber-700">
+              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+              </svg>
+              Routing service offline — riders sorted online-first
+            </div>
+          }
+          <div class="divide-y divide-gray-100">
+            @for (rider of reassignRiders(); track rider.id) {
+              <button (click)="reassignRiderId.set(rider.id)"
+                class="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-gray-50 transition-colors"
+                [class.bg-blue-50]="reassignRiderId() === rider.id">
+                <div class="relative shrink-0">
+                  <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                    [class.bg-blue-500]="reassignRiderId() === rider.id"
+                    [class.bg-gradient-to-br]="reassignRiderId() !== rider.id"
+                    [class.from-green-400]="reassignRiderId() !== rider.id"
+                    [class.to-teal-500]="reassignRiderId() !== rider.id">
+                    {{ riderInitial(rider.name) }}
+                  </div>
+                  <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white"
+                    [class.bg-green-500]="rider.online"
+                    [class.bg-gray-300]="!rider.online"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-sm font-semibold truncate"
+                      [class.text-blue-700]="reassignRiderId() === rider.id"
+                      [class.text-gray-900]="reassignRiderId() !== rider.id">
+                      {{ rider.name }}
+                    </span>
+                    @if (isCurrentRiderSelected(rider)) {
+                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-semibold">current</span>
+                    }
+                    @if (rider.onActiveDelivery) {
+                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-600 font-semibold">on delivery</span>
+                    }
+                  </div>
+                  <p class="text-xs text-gray-400 mt-0.5">
+                    @if (rider.distanceKm != null) { {{ rider.distanceKm | number:'1.1-1' }} km away · }
+                    @if (rider.durationMinutes != null) { ~{{ rider.durationMinutes }} min · }
+                    {{ rider.online ? 'Online' : 'Offline' }}
+                  </p>
+                </div>
+                @if (reassignRiderId() === rider.id) {
+                  <svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                }
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      @if (!reassignLoading() && reassignRiders().length > 0) {
+        <div class="px-6 py-4 border-t border-gray-100 shrink-0">
+          <button (click)="confirmReassign()"
+            [disabled]="!reassignRiderId() || reassignRiderId() === selectedDelivery()?.driverId || reassignSaving()"
+            class="w-full py-3 rounded-xl text-sm font-bold text-white transition-colors
+                   bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ reassignSaving() ? 'Reassigning…' : 'Confirm Reassignment' }}
+          </button>
         </div>
       }
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
-          <select
-            [(ngModel)]="editForm.status"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-green-500/20 bg-white"
-          >
-            <option value="ASSIGNED">Assigned</option>
-            <option value="ACCEPTED">Accepted</option>
-            <option value="IN_TRANSIT">In Transit</option>
-            <option value="ARRIVED">Arrived</option>
-            <option value="DELIVERED">Delivered</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="DECLINED">Declined</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Pickup Address</label>
-          <input
-            appGooglePlaces (placeSelected)="onEditPickupSelected($event)"
-            [(ngModel)]="editForm.pickupAddress"
-            placeholder="e.g. 123 Main St"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-green-500/20"
-          />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Dropoff Address</label>
-          <input
-            appGooglePlaces (placeSelected)="onEditDropoffSelected($event)"
-            [(ngModel)]="editForm.dropoffAddress"
-            placeholder="e.g. 456 Park Ave"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-green-500/20"
-          />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Description</label>
-          <textarea
-            [(ngModel)]="editForm.description"
-            placeholder="Package contents, notes…"
-            rows="2"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-green-500/20 resize-none"
-          ></textarea>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Price ($)</label>
-          <input
-            [(ngModel)]="editForm.price"
-            type="number" min="0" step="0.01"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-green-500/20"
-          />
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-3 mt-6">
-        <button
-          (click)="closeEditDelivery()"
-          class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm
-                 hover:bg-gray-200 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          (click)="saveEditDelivery()"
-          [disabled]="editDeliverySaving() || !editForm.pickupAddress.trim() || !editForm.dropoffAddress.trim()"
-          class="px-5 py-2.5 rounded-xl bg-green-600 text-white font-semibold text-sm
-                 hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {{ editDeliverySaving() ? 'Saving…' : 'Save Changes' }}
-        </button>
-      </div>
-
     </div>
   </div>
 }
+

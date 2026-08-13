@@ -2,30 +2,63 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
+/** Flat DTO — mirrors DeliveryResponseDTO from the backend exactly. */
 export interface DeliveryDetail {
   id: string;
   status: string;
   dispatchStrategy: string | null;
-  requestScope: string | null;
-  route: {
-    pickupAddress: string;
-    pickupLat: number | null;
-    pickupLng: number | null;
-    dropoffAddress: string;
-    dropoffLat: number | null;
-    dropoffLng: number | null;
-    dropoffInstructions: string | null;
-    distanceKm: number | null;
-    estimatedDurationMinutes: number | null;
-  };
-  client: { name: string; phone: string | null; address: string | null; } | null;
-  driver: { id: string; name: string; phone: string | null; bikeMake: string | null; bikeModel: string | null; licensePlate: string | null; } | null;
-  packageDetails: { description: string | null; sizeCategory: string | null; priority: string | null; weight: number | null; };
-  financials: { price: number; paymentMethod: string | null; paymentStatus: string | null; };
-  timeline: { createdAt: string; pickedUpAt: string | null; deliveredAt: string | null; cancelledAt: string | null; };
-  assignedBy: string | null;
-  notes: string | null;
+  requestScope:     string | null;
+
+  // Route
+  pickupAddress:            string;
+  pickupLat:                number | null;
+  pickupLng:                number | null;
+  dropoffAddress:           string;
+  dropoffLat:               number | null;
+  dropoffLng:               number | null;
+  dropoffInstructions:      string | null;
+  distanceKm:               number | null;
+  estimatedDurationMinutes: number | null;
+
+  // Client
+  clientName:    string | null;
+  clientPhone:   string | null;
+  clientAddress: string | null;
+
+  // Driver / bike
+  driverId:     string | null;
+  driverName:   string | null;
+  driverPhone:  string | null;
+  bikeMake:     string | null;
+  bikeModel:    string | null;
+  licensePlate: string | null;
+
+  // Dispatch meta
+  assignedByName: string | null;
+  shopId:         string | null;
+  shopName:       string | null;
+
+  // Package
+  description:         string | null;
+  priority:            string | null;
+  packageSizeCategory: string | null;
+  packageWeight:       number | null;
+
+  // Financials
+  price:         number;
+  paymentMethod: string | null;
+  paymentStatus: string | null;
+
+  // Notes
+  notes:              string | null;
   cancellationReason: string | null;
+
+  // Timestamps
+  createdAt:          string;
+  updatedAt:          string | null;
+  actualPickupTime:   string | null;
+  actualDeliveryTime: string | null;
+  cancelledAt:        string | null;
 }
 
 export interface DeliveryItem {

@@ -1,0 +1,19 @@
+<svg width="58" height="52" viewBox="0 0 58 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main Outer Shadow & Badge Circle -->
+  <circle cx="26" cy="26" r="22" fill="#0F172A" fill-opacity="0.15"/>
+  <circle cx="26" cy="26" r="20" fill="#2563EB" stroke="#FFFFFF" stroke-width="3"/>
+
+  <!-- Direction / Heading Pointer Arrow (Pointing Right / Forward) -->
+  <path d="M56 26L46 19V33L56 26Z" fill="#2563EB" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- Delivery Cargo Box (Rear) -->
+  <rect x="12" y="15" width="9" height="8" rx="1.5" fill="white"/>
+
+  <!-- Scooter Frame, Seat & Handlebars -->
+  <path d="M20 22H23L27 28H32L35 21H31" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M34 21L32 16H36" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Rear & Front Wheels -->
+  <circle cx="16" cy="29" r="3.5" stroke="white" stroke-width="2" fill="none"/>
+  <circle cx="34" cy="29" r="3.5" stroke="white" stroke-width="2" fill="none"/>
+</svg>

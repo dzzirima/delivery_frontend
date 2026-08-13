@@ -108,25 +108,13 @@ export class CreateDeliveryModal implements OnDestroy {
   switchDeliveryTab(tab: 'PUBLIC' | 'INTERNAL') {
     this.deliveryTab.set(tab);
     this.deliveryModalError.set('');
-    this.deliveryForm = {
-      dispatchStrategy: tab === 'PUBLIC' ? 'PUBLIC_BID' : 'DIRECT_ASSIGN',
-      pickupAddress: '', pickupLat: null, pickupLng: null,
-      dropoffAddress: '', dropoffLat: null, dropoffLng: null,
-      description: '', budget: this.randomPrice(),
-      driverId: '', orgClientId: '', paymentMethod: 'CASH',
-      shopId: '', packageSizeCategory: 'MEDIUM',
-    };
-    this.deliveryClientSearch.set('');
-    this.deliveryClientFocused.set(false);
-    this.deliveryQuickAdd.set(false);
-    this.deliveryQuickForm = { name: '', phone: '', address: '', latitude: null, longitude: null };
-    this.deliverySelectedClient.set(null);
+    // Only change the dispatch strategy — preserve all addresses, client, items, budget
+    this.deliveryForm.dispatchStrategy = tab === 'PUBLIC' ? 'PUBLIC_BID' : 'DIRECT_ASSIGN';
+    this.deliveryForm.driverId = '';
+    // Close any open pickers
     this.deliveryShopPickerOpen.set(false);
     this.deliveryShopPickerDropoffOpen.set(false);
     this.deliveryItemPickerOpen.set(false);
-    this.deliveryItemSearch.set('');
-    this.deliverySelectedItems.set([]);
-    this.deliveryShopId.set('');
     this.nearbyRiders.set([]);
     this.nearbyRidersLoading.set(false);
     this.nearbyRidersLoaded.set(false);

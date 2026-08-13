@@ -1,76 +1,311 @@
-<div>
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Deliveries</h1>
-    <button (click)="openCreate()"
-      class="flex items-center gap-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2.5 rounded-xl transition-colors">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-      </svg>
-      New Delivery
-    </button>
+<!-- Header -->
+<div class="flex items-center justify-between mb-5">
+  <h1 class="text-xl font-bold text-gray-900">Deliveries</h1>
+  <button (click)="openCreate()"
+    class="flex items-center gap-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2.5 rounded-xl transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    New Delivery
+  </button>
+</div>
+
+<!-- ── Stats strip ─────────────────────────────────────────────────────────── -->
+@if (stats()) {
+  <div class="grid grid-cols-4 gap-3 mb-5">
+    <div class="bg-white rounded-2xl border border-gray-100 px-4 py-3.5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
+        <svg class="w-4.5 h-4.5 w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Active</p>
+        <p class="text-xl font-bold text-gray-900">{{ activeCount() }}</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 px-4 py-3.5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Published</p>
+        <p class="text-xl font-bold text-gray-900">{{ stats()!.published }}</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 px-4 py-3.5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Delivered</p>
+        <p class="text-xl font-bold text-gray-900">{{ stats()!.delivered }}</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 px-4 py-3.5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total</p>
+        <p class="text-xl font-bold text-gray-900">{{ stats()!.total }}</p>
+      </div>
+    </div>
   </div>
+}
 
-  <!-- Loading -->
-  @if (loading()) {
-    <div class="py-16 text-center">
-      <svg class="w-6 h-6 text-green-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-      </svg>
-    </div>
-  }
-
-  <!-- Empty -->
-  @else if (deliveries().length === 0) {
-    <div class="bg-white rounded-2xl border border-gray-200 py-16 text-center">
-      <svg class="w-10 h-10 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/>
-      </svg>
-      <p class="text-sm text-gray-400">No deliveries yet.</p>
-    </div>
-  }
-
-  <!-- List -->
-  @else {
-    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Route</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Driver</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100 bg-white">
-          @for (item of deliveries(); track item.id) {
-            <tr class="hover:bg-gray-50 cursor-pointer transition-colors"
-              [routerLink]="[item.id]">
-              <td class="px-6 py-3.5">
-                <p class="font-medium text-gray-900">{{ item.pickupAddress }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">→ {{ item.dropoffAddress }}</p>
-              </td>
-              <td class="px-6 py-3.5 text-gray-700">{{ item.driverName ?? '—' }}</td>
-              <td class="px-6 py-3.5">
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                  [style.background]="statusColor(item.status) + '20'"
-                  [style.color]="statusColor(item.status)">
-                  {{ item.status | titlecase }}
-                </span>
-              </td>
-              <td class="px-6 py-3.5 font-medium text-gray-900">
-                {{ item.price | currency:'USD':'symbol':'1.2-2' }}
-              </td>
-              <td class="px-6 py-3.5 text-xs text-gray-400">
-                {{ item.createdAt | date:'MMM d, HH:mm' }}
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+<!-- ── Status filter chips ─────────────────────────────────────────────────── -->
+<div class="flex items-center gap-2 mb-4 flex-wrap">
+  @for (f of STATUS_FILTERS; track f.value) {
+    <button
+      (click)="setFilter(f.value)"
+      class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all border"
+      [style.border-color]="statusFilter() === f.value ? f.color : '#e5e7eb'"
+      [style.background]="statusFilter() === f.value ? f.color + '15' : 'white'"
+      [style.color]="statusFilter() === f.value ? f.color : '#6b7280'">
+      {{ f.label }}
+    </button>
   }
 </div>
+
+<!-- Loading -->
+@if (loading()) {
+  <div class="py-16 text-center">
+    <svg class="w-6 h-6 text-green-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+    </svg>
+  </div>
+}
+
+<!-- Empty -->
+@else if (filteredDeliveries().length === 0) {
+  <div class="bg-white rounded-2xl border border-gray-200 py-16 text-center">
+    <svg class="w-10 h-10 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/>
+    </svg>
+    <p class="text-sm text-gray-400">No deliveries{{ statusFilter() !== 'ALL' ? ' with status ' + statusFilter() : '' }}.</p>
+  </div>
+}
+
+<!-- List -->
+@else {
+  <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
+        <tr>
+          <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Route</th>
+          <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Rider</th>
+          <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Details</th>
+          <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+          <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Age</th>
+          <th class="px-5 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 bg-white">
+        @for (item of filteredDeliveries(); track item.id) {
+          <tr class="hover:bg-gray-50 transition-colors group"
+              [class.opacity-60]="actionInFlight() === item.id">
+
+            <!-- Route -->
+            <td class="px-5 py-3.5" [routerLink]="[item.id]" class="px-5 py-3.5 cursor-pointer">
+              <p class="font-semibold text-gray-900 text-sm max-w-[200px] truncate">{{ item.pickupAddress }}</p>
+              <div class="flex items-center gap-1 mt-0.5">
+                <svg class="w-3 h-3 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+                <p class="text-xs text-gray-400 max-w-[180px] truncate">{{ item.dropoffAddress }}</p>
+              </div>
+              @if (item.clientName) {
+                <p class="text-[10px] text-gray-400 mt-1">
+                  <svg class="w-2.5 h-2.5 inline mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  {{ item.clientName }}
+                </p>
+              }
+            </td>
+
+            <!-- Rider -->
+            <td class="px-5 py-3.5" [routerLink]="[item.id]" class="px-5 py-3.5 cursor-pointer">
+              @if (item.driverName) {
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-teal-500
+                              text-white font-bold text-[11px] flex items-center justify-center shrink-0">
+                    {{ item.driverName.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="text-sm font-medium text-gray-800 truncate max-w-[100px]">{{ item.driverName }}</span>
+                </div>
+              } @else {
+                <span class="text-xs text-amber-500 italic">No rider</span>
+              }
+            </td>
+
+            <!-- Status -->
+            <td class="px-5 py-3.5" [routerLink]="[item.id]" class="px-5 py-3.5 cursor-pointer">
+              <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold"
+                [style.background]="statusColor(item.status) + '18'"
+                [style.color]="statusColor(item.status)">
+                <span class="w-1.5 h-1.5 rounded-full" [style.background]="statusColor(item.status)"></span>
+                {{ item.status | titlecase }}
+              </span>
+            </td>
+
+            <!-- Details (strategy + priority + distance + shop) -->
+            <td class="px-5 py-3.5" [routerLink]="[item.id]" class="px-5 py-3.5 cursor-pointer">
+              <div class="flex flex-wrap gap-1">
+                @if (item.dispatchStrategy) {
+                  <span class="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                    [style.background]="strategyColor(item.dispatchStrategy) + '15'"
+                    [style.color]="strategyColor(item.dispatchStrategy)">
+                    {{ strategyLabel(item.dispatchStrategy) }}
+                  </span>
+                }
+                @if (item.priority) {
+                  <span class="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                    [class.bg-red-50]="isHighPriority(item.priority)"
+                    [class.text-red-600]="isHighPriority(item.priority)"
+                    [class.bg-amber-50]="!isHighPriority(item.priority)"
+                    [class.text-amber-600]="!isHighPriority(item.priority)">
+                    ⚡ {{ item.priority | titlecase }}
+                  </span>
+                }
+                @if (item.distanceKm) {
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-medium">
+                    {{ item.distanceKm | number:'1.1-1' }} km
+                  </span>
+                }
+                @if (item.shopName) {
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-medium">
+                    🏪 {{ item.shopName }}
+                  </span>
+                }
+              </div>
+            </td>
+
+            <!-- Price -->
+            <td class="px-5 py-3.5 font-bold text-gray-900 text-sm" [routerLink]="[item.id]" class="px-5 py-3.5 cursor-pointer">
+              {{ item.price | currency:'USD':'symbol':'1.2-2' }}
+            </td>
+
+            <!-- Age -->
+            <td class="px-5 py-3.5 text-xs text-gray-400 whitespace-nowrap" [routerLink]="[item.id]" class="px-5 py-3.5 cursor-pointer">
+              {{ timeElapsed(item.createdAt) }}
+            </td>
+
+            <!-- Actions -->
+            <td class="px-5 py-3.5">
+              <div class="flex items-center justify-end gap-1.5">
+                <!-- View -->
+                <a [routerLink]="[item.id]"
+                   class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors"
+                   title="View detail">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </a>
+                <!-- Publish -->
+                @if (canPublish(item)) {
+                  <button
+                    (click)="$event.stopPropagation(); showPublishId.set(item.id)"
+                    [disabled]="actionInFlight() === item.id"
+                    class="p-1.5 rounded-lg text-amber-500 hover:bg-amber-50 transition-colors disabled:opacity-40"
+                    title="Publish to open bidding">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                    </svg>
+                  </button>
+                }
+                <!-- Cancel -->
+                @if (canCancel(item)) {
+                  <button
+                    (click)="$event.stopPropagation(); showCancelId.set(item.id)"
+                    [disabled]="actionInFlight() === item.id"
+                    class="p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition-colors disabled:opacity-40"
+                    title="Cancel delivery">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Cancel confirm dialog
+     ════════════════════════════════════════════════════════════════════ -->
+@if (showCancelId()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+       (click)="showCancelId.set(null)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-gray-900">Cancel Delivery?</h3>
+          <p class="text-xs text-gray-500 mt-0.5">This action cannot be undone.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button (click)="showCancelId.set(null)"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+          No, Keep It
+        </button>
+        <button (click)="cancelDelivery(showCancelId()!)"
+          class="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors">
+          Yes, Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Publish confirm dialog
+     ════════════════════════════════════════════════════════════════════ -->
+@if (showPublishId()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+       (click)="showPublishId.set(null)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-gray-900">Publish to Open Bidding?</h3>
+          <p class="text-xs text-gray-500 mt-0.5">All available riders will see this delivery.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button (click)="showPublishId.set(null)"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+          Cancel
+        </button>
+        <button (click)="publishDelivery(showPublishId()!)"
+          class="px-4 py-2 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-colors">
+          Yes, Publish
+        </button>
+      </div>
+    </div>
+  </div>
+}

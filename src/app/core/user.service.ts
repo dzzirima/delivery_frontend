@@ -44,6 +44,16 @@ export interface OrgRider {
   email: string | null;
 }
 
+export interface OrgDriverLocation {
+  driverId:   string;
+  driverName: string | null;
+  latitude:   number | null;
+  longitude:  number | null;
+  lastSeenTs: number;   // epoch millis; 0 = never seen
+  online:     boolean;
+  deliveryId: string | null;
+}
+
 export interface NearbyRider {
   id: string;
   name: string;
@@ -96,6 +106,12 @@ export class UserService {
   getRiders() {
     let params = new HttpParams().set('role', 'RIDER');
     return this.http.get<{ data: OrgRider[] }>(this.base, { params });
+  }
+
+  getOrgDriverLocations(orgId: string) {
+    return this.http.get<{ data: OrgDriverLocation[] }>(
+      `${environment.apiUrl}/location/org/${orgId}/drivers`
+    );
   }
 
   getNearbyRiders(pickupLat?: number | null, pickupLng?: number | null) {
