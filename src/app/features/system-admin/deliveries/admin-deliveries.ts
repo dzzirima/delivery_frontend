@@ -3,33 +3,28 @@ import { TitleCasePipe, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { OrgDeliveryService, DeliveryItem, DeliveryStats } from './deliveries.service';
+import { OrgDeliveryService, DeliveryItem, DeliveryStats } from '../../org-dashboard/deliveries/deliveries.service';
 import { ToastService } from '../../../core/toast.service';
-import { UserService } from '../../../core/user.service';
-import { DeliveryUiService } from './deliveries-ui.service';
 import { DeliveryWebSocketService } from '../../../core/delivery-websocket.service';
 
 @Component({
-  selector: 'app-deliveries',
+  selector: 'app-admin-deliveries',
   standalone: true,
   imports: [TitleCasePipe, CurrencyPipe, DecimalPipe, RouterModule, FormsModule],
-  templateUrl: './deliveries.html',
+  templateUrl: './admin-deliveries.html',
 })
-export class Deliveries implements OnInit, OnDestroy {
+export class AdminDeliveries implements OnInit, OnDestroy {
   readonly Math = Math;
-  readonly orgId = computed(() => this.userService.profile()?.organisationId ?? null);
 
   deliveries   = signal<DeliveryItem[]>([]);
   loading      = signal(false);
   stats        = signal<DeliveryStats | null>(null);
   statusFilter = signal<string>('ALL');
 
-  // Search & filter
   searchQuery = signal('');
   fromDate    = signal('');
   toDate      = signal('');
 
-  // Pagination
   currentPage = signal(0);
   totalCount  = signal(0);
   readonly pageSize = 30;
@@ -37,10 +32,7 @@ export class Deliveries implements OnInit, OnDestroy {
   pageStart   = computed(() => this.totalCount() === 0 ? 0 : this.currentPage() * this.pageSize + 1);
   pageEnd     = computed(() => Math.min((this.currentPage() + 1) * this.pageSize, this.totalCount()));
 
-  // Action state
   actionInFlight = signal<string | null>(null);
-  showCancelId   = signal<string | null>(null);
-  showPublishId  = signal<string | null>(null);
 
   readonly STATUS_FILTERS = [
     { value: 'ALL',        label: 'All',        color: '#6b7280' },
@@ -63,53 +55,40 @@ export class Deliveries implements OnInit, OnDestroy {
   private boardSub: Subscription | null = null;
 
   constructor(
-    private orgDeliveryService: OrgDeliveryService,
-    private toast:              ToastService,
-    private userService:        UserService,
-    private deliveryUiService:  DeliveryUiService,
-    private ws:                 DeliveryWebSocketService,
+    private deliveryService: OrgDeliveryService,
+    private toast:           ToastService,
+    private ws:              DeliveryWebSocketService,
   ) {}
 
   ngOnInit() {
     this.load();
     this.loadStats();
 
-    // Real-time board updates
     this.boardSub = this.ws.boardEvents$.subscribe(evt => {
       const data = evt.data as Record<string, unknown>;
       const id   = String(data['id'] ?? data['deliveryId'] ?? '');
       if (!id) return;
-
-      // Patch the item in the list if it exists, otherwise prepend it
       const newStatus = String(data['status'] ?? '');
       this.deliveries.update(list => {
         const idx = list.findIndex(d => d.id === id);
         if (idx >= 0) {
           const updated = { ...list[idx], status: newStatus || list[idx].status };
-          // Pull updated fields from socket payload
-          if (data['driverName'])  (updated as DeliveryItem).driverName  = String(data['driverName']);
-          if (data['driverId'])    (updated as DeliveryItem).driverId    = String(data['driverId']);
-          const next = [...list];
-          next[idx]  = updated;
-          return next;
+          if (data['driverName']) (updated as DeliveryItem).driverName = String(data['driverName']);
+          if (data['driverId'])   (updated as DeliveryItem).driverId   = String(data['driverId']);
+          const next = [...list]; next[idx] = updated; return next;
         }
         return list;
       });
-      // Refresh stats on any board event
       this.loadStats();
     });
-
-    // Org dispatch topic is subscribed once by the OrgDashboard shell.
   }
 
-  ngOnDestroy() {
-    this.boardSub?.unsubscribe();
-  }
+  ngOnDestroy() { this.boardSub?.unsubscribe(); }
 
   load() {
     this.loading.set(true);
     const status = this.statusFilter() === 'ALL' ? undefined : this.statusFilter();
-    this.orgDeliveryService
+    this.deliveryService
       .getBoard(status, this.currentPage(), this.pageSize, this.searchQuery(), this.fromDate(), this.toDate())
       .subscribe({
         next: r => {
@@ -122,7 +101,7 @@ export class Deliveries implements OnInit, OnDestroy {
   }
 
   loadStats() {
-    this.orgDeliveryService.getStats().subscribe({
+    this.deliveryService.getStats().subscribe({
       next:  r => this.stats.set(r.data),
       error: () => {},
     });
@@ -153,52 +132,20 @@ export class Deliveries implements OnInit, OnDestroy {
     this.load();
   }
 
-  openCreate() {
-    this.deliveryUiService.open();
+  visiblePages(): number[] {
+    const total = this.totalPages();
+    const cur   = this.currentPage();
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i);
+    const pages: number[] = [];
+    pages.push(0);
+    const lo = Math.max(1, cur - 2);
+    const hi = Math.min(total - 2, cur + 2);
+    if (lo > 1) pages.push(-1);
+    for (let i = lo; i <= hi; i++) pages.push(i);
+    if (hi < total - 2) pages.push(-1);
+    pages.push(total - 1);
+    return pages;
   }
-
-  // ── Actions ──────────────────────────────────────────────────────────────────
-
-  canCancel(item: DeliveryItem): boolean {
-    return !['DELIVERED', 'CANCELLED', 'FAILED', 'IN_TRANSIT'].includes(item.status);
-  }
-
-  canPublish(item: DeliveryItem): boolean {
-    return ['ASSIGNED', 'DECLINED'].includes(item.status);
-  }
-
-  cancelDelivery(id: string) {
-    this.showCancelId.set(null);
-    this.actionInFlight.set(id);
-    this.orgDeliveryService.cancel(id).subscribe({
-      next: () => {
-        this.actionInFlight.set(null);
-        this.load(); this.loadStats();
-      },
-      error: e => {
-        this.actionInFlight.set(null);
-        this.toast.error('Error', e?.error?.message ?? 'Failed to cancel delivery.');
-      },
-    });
-  }
-
-  publishDelivery(id: string) {
-    this.showPublishId.set(null);
-    this.actionInFlight.set(id);
-    this.orgDeliveryService.publish(id).subscribe({
-      next: () => {
-        this.actionInFlight.set(null);
-        this.toast.success('Published', 'Delivery published to open bidding.');
-        this.load(); this.loadStats();
-      },
-      error: e => {
-        this.actionInFlight.set(null);
-        this.toast.error('Error', e?.error?.message ?? 'Failed to publish delivery.');
-      },
-    });
-  }
-
-  // ── Display helpers ──────────────────────────────────────────────────────────
 
   statusColor(status: string): string {
     const map: Record<string, string> = {
@@ -217,12 +164,7 @@ export class Deliveries implements OnInit, OnDestroy {
 
   strategyLabel(s: string | null): string {
     if (!s) return '';
-    const m: Record<string, string> = {
-      DIRECT_ASSIGN: 'Direct',
-      INTERNAL_BID:  'Int. Bid',
-      PUBLIC_BID:    'Public',
-    };
-    return m[s] ?? s;
+    return { DIRECT_ASSIGN: 'Direct', INTERNAL_BID: 'Int. Bid', PUBLIC_BID: 'Public' }[s] ?? s;
   }
 
   strategyColor(s: string | null): string {
@@ -243,24 +185,14 @@ export class Deliveries implements OnInit, OnDestroy {
     return `${Math.floor(hrs / 24)}d ago`;
   }
 
-  isHighPriority(p: string | null): boolean {
-    return p === 'HIGH' || p === 'URGENT';
-  }
-
-  private readonly _cargoOptions: Record<string, { emoji: string; label: string }> = {
-    DOCUMENTS:   { emoji: '📄', label: 'Documents'   },
-    ELECTRONICS: { emoji: '📱', label: 'Electronics' },
-    HARDWARE:    { emoji: '🔧', label: 'Hardware'    },
-    FOOD:        { emoji: '🍱', label: 'Food'        },
-    FRAGILE:     { emoji: '🪟', label: 'Fragile'     },
-    OTHER:       { emoji: '📦', label: 'Other'       },
-  };
-
-  cargoLabel(value: string | null): string {
-    return this._cargoOptions[value ?? '']?.label ?? 'Other';
-  }
-
-  cargoEmoji(value: string | null): string {
-    return this._cargoOptions[value ?? '']?.emoji ?? '📦';
+  cancelDelivery(id: string) {
+    this.actionInFlight.set(id);
+    this.deliveryService.cancel(id).subscribe({
+      next: () => { this.actionInFlight.set(null); this.load(); this.loadStats(); },
+      error: e => {
+        this.actionInFlight.set(null);
+        this.toast.error('Error', e?.error?.message ?? 'Failed to cancel delivery.');
+      },
+    });
   }
 }

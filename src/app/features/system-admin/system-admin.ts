@@ -19,6 +19,9 @@ export class SystemAdmin {
     { id: 'riders',         route: 'riders',         label: 'Riders',         icon: 'bike'        },
     { id: 'organisations',  route: 'organisations',  label: 'Organisations',  icon: 'building'    },
     { id: 'users',          route: 'users',          label: 'Users',          icon: 'users'       },
+    { id: 'pricing',        route: 'pricing',        label: 'Pricing',        icon: 'currency'    },
+    { id: 'deliveries',     route: 'deliveries',     label: 'Deliveries',     icon: 'truck'       },
+    { id: 'live-ops',       route: 'live-ops',       label: 'Live Ops',       icon: 'map'         },
   ];
 
   initials = computed(() => {

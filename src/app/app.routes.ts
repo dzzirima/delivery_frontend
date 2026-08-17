@@ -70,6 +70,22 @@ export const routes: Routes = [
         path: 'users',
         loadComponent: () => import('./features/system-admin/users/users').then(m => m.AdminUsers),
       },
+      {
+        path: 'pricing',
+        loadComponent: () => import('./features/system-admin/pricing/pricing').then(m => m.PricingConfigComponent),
+      },
+      {
+        path: 'deliveries',
+        loadComponent: () => import('./features/system-admin/deliveries/admin-deliveries').then(m => m.AdminDeliveries),
+      },
+      {
+        path: 'deliveries/:id',
+        loadComponent: () => import('./features/org-dashboard/deliveries/delivery-detail/delivery-detail').then(m => m.DeliveryDetail),
+      },
+      {
+        path: 'live-ops',
+        loadComponent: () => import('./features/system-admin/live-ops/admin-live-ops').then(m => m.AdminLiveOps),
+      },
     ],
   },
 

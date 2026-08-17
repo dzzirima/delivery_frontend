@@ -36,7 +36,7 @@ export class CreateDeliveryModal implements OnDestroy {
     dropoffAddress: '', dropoffLat: null as number | null, dropoffLng: null as number | null,
     description: '', budget: null as number | null,
     driverId: '', orgClientId: '', paymentMethod: 'CASH',
-    shopId: '', packageSizeCategory: 'MEDIUM',
+    shopId: '', packageSizeCategory: 'MEDIUM', cargoType: 'OTHER',
   };
 
   openCreateDelivery() {
@@ -47,7 +47,7 @@ export class CreateDeliveryModal implements OnDestroy {
       dropoffAddress: '', dropoffLat: null, dropoffLng: null,
       description: '', budget: this.randomPrice(),
       driverId: '', orgClientId: '', paymentMethod: 'CASH',
-      shopId: '', packageSizeCategory: 'MEDIUM',
+      shopId: '', packageSizeCategory: 'MEDIUM', cargoType: 'OTHER',
     };
     this.deliveryClientSearch.set('');
     this.deliveryClientFocused.set(false);
@@ -152,6 +152,7 @@ export class CreateDeliveryModal implements OnDestroy {
       price:               f.budget ?? 0,
       priority:            'NORMAL',
       packageSizeCategory: f.packageSizeCategory || 'MEDIUM',
+      cargoType:           f.cargoType || 'OTHER',
     };
     if (f.pickupLat  != null) body['pickupLat']  = f.pickupLat;
     if (f.pickupLng  != null) body['pickupLng']  = f.pickupLng;
@@ -305,15 +306,17 @@ export class CreateDeliveryModal implements OnDestroy {
     const f = this.deliveryForm;
     this.deliverySaving.set(true);
     const body: Record<string, unknown> = {
-      dispatchStrategy: f.dispatchStrategy,
-      pickupAddress:  f.pickupAddress,
-      pickupLat:      f.pickupLat  ?? 0,
-      pickupLng:      f.pickupLng  ?? 0,
-      dropoffAddress: f.dropoffAddress,
-      dropoffLat:     f.dropoffLat ?? 0,
-      dropoffLng:     f.dropoffLng ?? 0,
-      price:          f.budget     ?? 0,
-      paymentMethod:  f.paymentMethod || 'CASH',
+      dispatchStrategy:    f.dispatchStrategy,
+      pickupAddress:       f.pickupAddress,
+      pickupLat:           f.pickupLat  ?? 0,
+      pickupLng:           f.pickupLng  ?? 0,
+      dropoffAddress:      f.dropoffAddress,
+      dropoffLat:          f.dropoffLat ?? 0,
+      dropoffLng:          f.dropoffLng ?? 0,
+      price:               f.budget     ?? 0,
+      paymentMethod:       f.paymentMethod || 'CASH',
+      packageSizeCategory: f.packageSizeCategory || 'MEDIUM',
+      cargoType:           f.cargoType || 'OTHER',
     };
     if (f.description)                                           body['description'] = f.description;
     if (f.dispatchStrategy === 'DIRECT_ASSIGN' && f.driverId)   body['driverId']     = f.driverId;
@@ -583,6 +586,24 @@ export class CreateDeliveryModal implements OnDestroy {
     this.deliveryQuickForm.address   = p.address;
     this.deliveryQuickForm.latitude  = p.lat;
     this.deliveryQuickForm.longitude = p.lng;
+  }
+
+  // ── Cargo type ───────────────────────────────────────────────────────────────
+  readonly cargoOptions = [
+    { value: 'DOCUMENTS',   emoji: '📄', label: 'Documents'   },
+    { value: 'ELECTRONICS', emoji: '📱', label: 'Electronics' },
+    { value: 'HARDWARE',    emoji: '🔧', label: 'Hardware'    },
+    { value: 'FOOD',        emoji: '🍱', label: 'Food'        },
+    { value: 'FRAGILE',     emoji: '🪟', label: 'Fragile'     },
+    { value: 'OTHER',       emoji: '📦', label: 'Other'       },
+  ];
+
+  cargoLabel(value: string | null): string {
+    return this.cargoOptions.find(o => o.value === value)?.label ?? 'Other';
+  }
+
+  cargoEmoji(value: string | null): string {
+    return this.cargoOptions.find(o => o.value === value)?.emoji ?? '📦';
   }
 
   // TODO: replace with pricing algorithm

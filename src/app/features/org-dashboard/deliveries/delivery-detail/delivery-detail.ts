@@ -297,6 +297,23 @@ export class DeliveryDetail implements OnInit, AfterViewInit, OnDestroy {
     return m[s] ?? s;
   }
 
+  private readonly _cargoOptions: Record<string, { emoji: string; label: string }> = {
+    DOCUMENTS:   { emoji: '📄', label: 'Documents'   },
+    ELECTRONICS: { emoji: '📱', label: 'Electronics' },
+    HARDWARE:    { emoji: '🔧', label: 'Hardware'    },
+    FOOD:        { emoji: '🍱', label: 'Food'        },
+    FRAGILE:     { emoji: '🪟', label: 'Fragile'     },
+    OTHER:       { emoji: '📦', label: 'Other'       },
+  };
+
+  cargoLabel(value: string | null): string {
+    return this._cargoOptions[value ?? '']?.label ?? 'Other';
+  }
+
+  cargoEmoji(value: string | null): string {
+    return this._cargoOptions[value ?? '']?.emoji ?? '📦';
+  }
+
   /** Whether the assigned rider is currently offline but has a known position. */
   get riderOfflineWithLocation(): boolean {
     return this.riderState.onlineStatus === 'OFFLINE'
@@ -342,7 +359,6 @@ export class DeliveryDetail implements OnInit, AfterViewInit, OnDestroy {
     this.service.cancel(d.id).subscribe({
       next: () => {
         this.cancelling.set(false);
-        this.toast.success('Cancelled', 'Delivery has been cancelled.');
         this.loadDetail(d.id);
       },
       error: e => {

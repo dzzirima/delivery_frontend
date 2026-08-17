@@ -74,6 +74,51 @@
   }
 </div>
 
+<!-- ── Search & date filter bar ────────────────────────────────────────────── -->
+<div class="flex items-center gap-2 mb-4 flex-wrap">
+  <!-- Search -->
+  <div class="relative flex-1 min-w-[200px]">
+    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/>
+    </svg>
+    <input type="text"
+           placeholder="Search address or description…"
+           [ngModel]="searchQuery()"
+           (ngModelChange)="searchQuery.set($event)"
+           (keydown.enter)="search()"
+           class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-white
+                  focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400"/>
+  </div>
+  <!-- From date -->
+  <input type="date"
+         [ngModel]="fromDate()"
+         (ngModelChange)="fromDate.set($event)"
+         class="px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white
+                focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400"/>
+  <!-- To date -->
+  <input type="date"
+         [ngModel]="toDate()"
+         (ngModelChange)="toDate.set($event)"
+         class="px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white
+                focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400"/>
+  <!-- Apply -->
+  <button (click)="search()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700
+                 rounded-xl transition-colors">
+    Apply
+  </button>
+  <!-- Clear -->
+  @if (searchQuery() || fromDate() || toDate()) {
+    <button (click)="clearFilters()"
+            class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200
+                   rounded-xl transition-colors">
+      Clear
+    </button>
+  }
+</div>
+
 <!-- Loading -->
 @if (loading()) {
   <div class="py-16 text-center">
@@ -85,13 +130,13 @@
 }
 
 <!-- Empty -->
-@else if (filteredDeliveries().length === 0) {
+@else if (deliveries().length === 0) {
   <div class="bg-white rounded-2xl border border-gray-200 py-16 text-center">
     <svg class="w-10 h-10 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h8l1-1zM13 16h4l2-4V9h-6v7z"/>
     </svg>
-    <p class="text-sm text-gray-400">No deliveries{{ statusFilter() !== 'ALL' ? ' with status ' + statusFilter() : '' }}.</p>
+    <p class="text-sm text-gray-400">No deliveries found.</p>
   </div>
 }
 
@@ -111,7 +156,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100 bg-white">
-        @for (item of filteredDeliveries(); track item.id) {
+        @for (item of deliveries(); track item.id) {
           <tr class="hover:bg-gray-50 transition-colors group"
               [class.opacity-60]="actionInFlight() === item.id">
 
@@ -186,6 +231,11 @@
                     🏪 {{ item.shopName }}
                   </span>
                 }
+                @if (item.cargoType && item.cargoType !== 'OTHER') {
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 font-medium">
+                    {{ cargoEmoji(item.cargoType) }} {{ cargoLabel(item.cargoType) }}
+                  </span>
+                }
               </div>
             </td>
 
@@ -242,6 +292,51 @@
       </tbody>
     </table>
   </div>
+
+  <!-- ── Pagination ──────────────────────────────────────────────────────── -->
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-between mt-4 px-1">
+      <p class="text-xs text-gray-400">
+        Showing {{ pageStart() }}–{{ pageEnd() }} of {{ totalCount() }}
+      </p>
+      <div class="flex items-center gap-1">
+        <button (click)="goToPage(currentPage() - 1)"
+                [disabled]="currentPage() === 0"
+                class="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50
+                       disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+
+        @for (p of [].constructor(totalPages()); track $index) {
+          @if ($index === 0 || $index === totalPages() - 1 || Math.abs($index - currentPage()) <= 1) {
+            <button (click)="goToPage($index)"
+                    class="min-w-[32px] h-8 px-2 rounded-lg text-xs font-semibold border transition-colors"
+                    [class.bg-green-600]="currentPage() === $index"
+                    [class.text-white]="currentPage() === $index"
+                    [class.border-green-600]="currentPage() === $index"
+                    [class.border-gray-200]="currentPage() !== $index"
+                    [class.text-gray-600]="currentPage() !== $index"
+                    [class.hover:bg-gray-50]="currentPage() !== $index">
+              {{ $index + 1 }}
+            </button>
+          } @else if ($index === 1 || $index === totalPages() - 2) {
+            <span class="text-gray-400 text-xs px-1">…</span>
+          }
+        }
+
+        <button (click)="goToPage(currentPage() + 1)"
+                [disabled]="currentPage() >= totalPages() - 1"
+                class="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50
+                       disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
 }
 
 

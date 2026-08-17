@@ -40,6 +40,7 @@ export interface DeliveryDetail {
 
   // Package
   description:         string | null;
+  cargoType:           string | null;
   priority:            string | null;
   packageSizeCategory: string | null;
   packageWeight:       number | null;
@@ -83,8 +84,9 @@ export interface DeliveryItem {
   price: number;
   paymentStatus: string | null;
   description: string | null;
-  priority: string | null;
-  createdAt: string;
+  cargoType:   string | null;
+  priority:    string | null;
+  createdAt:   string;
   updatedAt: string | null;
   actualPickupTime: string | null;
   actualDeliveryTime: string | null;
@@ -107,9 +109,12 @@ export class OrgDeliveryService {
   private base = `${environment.apiUrl}/deliveries`;
   constructor(private http: HttpClient) {}
 
-  getBoard(status?: string, page = 0, size = 30) {
+  getBoard(status?: string, page = 0, size = 30, q?: string, from?: string, to?: string) {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) params = params.set('status', status);
+    if (q?.trim()) params = params.set('q', q.trim());
+    if (from)     params = params.set('from', from);
+    if (to)       params = params.set('to', to);
     return this.http.get<{ data: DeliveryItem[]; length: number }>(this.base, { params });
   }
 

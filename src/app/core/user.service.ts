@@ -114,6 +114,12 @@ export class UserService {
     );
   }
 
+  getAllDriverLocations() {
+    return this.http.get<{ data: OrgDriverLocation[] }>(
+      `${environment.apiUrl}/location`
+    );
+  }
+
   getNearbyRiders(pickupLat?: number | null, pickupLng?: number | null) {
     let params = new HttpParams().set('role', 'RIDER');
     if (pickupLat != null) params = params.set('lat', String(pickupLat));
