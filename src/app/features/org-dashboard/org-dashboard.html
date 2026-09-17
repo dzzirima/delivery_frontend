@@ -11,7 +11,10 @@
       [class.justify-between]="!collapsed()"
       [class.justify-center]="collapsed()">
       @if (!collapsed()) {
-        <span class="text-xl font-bold text-green-600 tracking-tight">GM</span>
+        <div class="flex items-center gap-2">
+          <img src="icons/zagaah-z-mark.png" alt="Zagaah" class="w-7 h-7 object-contain shrink-0" />
+          <span class="text-lg font-bold text-gray-900 tracking-tight">Zagaah</span>
+        </div>
       }
       <button
         (click)="toggleCollapsed()"

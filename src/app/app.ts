@@ -9,5 +9,5 @@ import { ToastComponent } from './shared/toast/toast';
   styleUrl: './app.css'
 })
 export class App {
-  protected title = 'thi';
+  protected title = 'zagaah';
 }

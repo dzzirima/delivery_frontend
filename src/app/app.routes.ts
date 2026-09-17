@@ -30,7 +30,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/access-denied/access-denied').then(m => m.AccessDenied),
   },
 
-  // ── System admin (TIH team only) ────────────────────────────────────────────
+  // ── System admin (Zagaah team only) ────────────────────────────────────────────
   {
     path: 'admin',
     canActivate: [authGuard, roleGuard(['SYSTEM_ADMIN'])],

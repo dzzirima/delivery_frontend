@@ -53,7 +53,7 @@ export class Signin {
 
     if (!home) {
       this.authService.signOut();
-      this.toast.error('Access denied', 'This portal is for operators only. Please use the TIH mobile app.');
+      this.toast.error('Access denied', 'This portal is for operators only. Please use the Zagaah mobile app.');
       this.loading.set(false);
       return;
     }

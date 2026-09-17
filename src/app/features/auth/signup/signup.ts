@@ -78,7 +78,7 @@ export class Signup {
 
     this.authService.orgRegister(payload).subscribe({
       next: () => {
-        this.toast.success('Account created!', 'Welcome to Thi. Your organisation is ready.');
+        this.toast.success('Account created!', 'Welcome to Zagaah. Your organisation is ready.');
         this.router.navigateByUrl('/org');
       },
       error: (err) => {
