@@ -3,8 +3,8 @@ services:
     build:
       context: .
       args:
-        API_URL: ${API_URL}
-        WS_URL: ${WS_URL}
+        API_URL: ${API_URL:-https://api.fantracker.net/delivery}
+        WS_URL: ${WS_URL:-https://api.fantracker.net/delivery}
         GOOGLE_API_KEY: ${GOOGLE_API_KEY}
     image: zagaah-frontend
     container_name: zagaah-frontend
