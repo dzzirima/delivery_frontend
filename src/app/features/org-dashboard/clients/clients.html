@@ -7,7 +7,7 @@
       <p class="text-sm text-gray-500 mt-0.5">Your private client directory.</p>
     </div>
     <button (click)="openClientModal()"
-      class="flex items-center gap-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2.5 rounded-xl transition-colors">
+      class="flex items-center gap-2 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 px-4 py-2.5 rounded-xl transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
       </svg>
@@ -23,7 +23,7 @@
       (ngModelChange)="loadClients()"
       placeholder="Search by name, phone or email…"
       class="w-full max-w-sm px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-             focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"
+             focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"
     />
   </div>
 
@@ -31,7 +31,7 @@
   <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
     @if (clientsLoading() && clients().length === 0) {
       <div class="py-16 flex flex-col items-center gap-3">
-        <svg class="w-6 h-6 text-green-500 animate-spin" fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 text-orange-500 animate-spin" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
@@ -47,7 +47,7 @@
           <p class="text-xs text-gray-400 mt-0.5">Build your client directory for faster dispatching.</p>
         </div>
         <button (click)="openClientModal()"
-          class="mt-1 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors">
+          class="mt-1 text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
           Add your first client →
         </button>
       </div>
@@ -68,7 +68,7 @@
               <!-- Client identity -->
               <td class="py-3.5 px-6">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-green-100 text-green-700 text-xs font-semibold flex items-center justify-center shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold flex items-center justify-center shrink-0">
                     {{ client.name.charAt(0).toUpperCase() }}
                   </div>
                   <div>
@@ -175,20 +175,20 @@
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Name <span class="text-red-400">*</span></label>
           <input type="text" [(ngModel)]="clientForm.name" name="name" required placeholder="John Doe"
             class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
+                   focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"/>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
             <input type="tel" [(ngModel)]="clientForm.phone" name="phone" placeholder="+263 77 …"
               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-                     focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
+                     focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"/>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
             <input type="email" [(ngModel)]="clientForm.email" name="email" placeholder="client@email.com"
               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-                     focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
+                     focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"/>
           </div>
         </div>
         <div>
@@ -196,13 +196,13 @@
           <input type="text" appGooglePlaces (placeSelected)="onClientAddressSelected($event)"
             [(ngModel)]="clientForm.address" name="address" placeholder="Delivery address"
             class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"/>
+                   focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"/>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Notes <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
           <textarea [(ngModel)]="clientForm.notes" name="notes" rows="2" placeholder="Any notes about this client…"
             class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-                   focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors resize-none"></textarea>
+                   focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors resize-none"></textarea>
         </div>
         <div class="flex gap-3 pt-1">
           <button type="button" (click)="closeClientModal()"
@@ -211,7 +211,7 @@
           </button>
           <button type="submit"
             [disabled]="clientsLoading() || !clientForm.name.trim()"
-            class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl transition-colors">
+            class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl transition-colors">
             {{ clientEditing() ? 'Save Changes' : 'Add Client' }}
           </button>
         </div>

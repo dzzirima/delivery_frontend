@@ -26,6 +26,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/reset-password/reset-password').then(m => m.ResetPassword),
   },
   {
+    path: 'terms',
+    loadComponent: () => import('./features/legal/terms/terms').then(m => m.Terms),
+  },
+  {
+    path: 'privacy',
+    loadComponent: () => import('./features/legal/privacy/privacy').then(m => m.Privacy),
+  },
+  {
     path: 'access-denied',
     loadComponent: () => import('./features/access-denied/access-denied').then(m => m.AccessDenied),
   },

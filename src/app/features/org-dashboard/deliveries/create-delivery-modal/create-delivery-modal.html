@@ -20,7 +20,7 @@
             <button (click)="switchDeliveryTab('PUBLIC')"
               class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
               [class.bg-white]="deliveryTab() === 'PUBLIC'"
-              [class.text-green-600]="deliveryTab() === 'PUBLIC'"
+              [class.text-orange-600]="deliveryTab() === 'PUBLIC'"
               [class.shadow-sm]="deliveryTab() === 'PUBLIC'"
               [class.text-gray-500]="deliveryTab() !== 'PUBLIC'">
               Open to Drivers
@@ -28,7 +28,7 @@
             <button (click)="switchDeliveryTab('INTERNAL')"
               class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
               [class.bg-white]="deliveryTab() === 'INTERNAL'"
-              [class.text-green-600]="deliveryTab() === 'INTERNAL'"
+              [class.text-orange-600]="deliveryTab() === 'INTERNAL'"
               [class.shadow-sm]="deliveryTab() === 'INTERNAL'"
               [class.text-gray-500]="deliveryTab() !== 'INTERNAL'">
               Direct Assign
@@ -49,19 +49,19 @@
                     (focus)="deliveryClientFocused.set(true)"
                     (blur)="deliveryClientFocused.set(false)"
                     placeholder="Search by name or phone…"
-                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
-                    [class.border-green-400]="deliveryForm.orgClientId"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    [class.border-orange-400]="deliveryForm.orgClientId"
                     [class.border-gray-200]="!deliveryForm.orgClientId"
                   />
                   @if (deliveryForm.orgClientId) {
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 text-xs font-semibold">Selected</span>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-orange-500 text-xs font-semibold">Selected</span>
                   }
                   @if (deliveryClientFocused() && !deliveryQuickAdd()) {
                     <div class="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
                       @for (c of filteredDeliveryClients(); track c.id) {
                         <button type="button"
                           (mousedown)="$event.preventDefault(); selectDeliveryClient(c)"
-                          class="w-full text-left px-4 py-2.5 text-sm hover:bg-green-50 flex items-center justify-between gap-2">
+                          class="w-full text-left px-4 py-2.5 text-sm hover:bg-orange-50 flex items-center justify-between gap-2">
                           <span class="font-medium text-gray-800">{{ c.name }}</span>
                           @if (c.phone) { <span class="text-xs text-gray-400 shrink-0">{{ c.phone }}</span> }
                         </button>
@@ -71,7 +71,7 @@
                       }
                       <button type="button"
                         (mousedown)="$event.preventDefault(); openDeliveryQuickAdd()"
-                        class="w-full text-left px-4 py-2.5 text-sm text-green-600 font-semibold hover:bg-green-50 border-t border-gray-100 flex items-center gap-2">
+                        class="w-full text-left px-4 py-2.5 text-sm text-orange-600 font-semibold hover:bg-orange-50 border-t border-gray-100 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -113,7 +113,7 @@
                             @for (shop of shops(); track shop.id) {
                               <button type="button"
                                 (click)="deliveryForm.pickupAddress = shop.address; deliveryForm.pickupLat = shop.latitude; deliveryForm.pickupLng = shop.longitude; deliveryForm.shopId = shop.id; deliveryShopId.set(shop.id); deliveryShopPickerOpen.set(false)"
-                                class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors border-t border-gray-100 first:border-0">
+                                class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors border-t border-gray-100 first:border-0">
                                 <p class="font-semibold text-gray-800">{{ shop.name }}</p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
                               </button>
@@ -129,7 +129,7 @@
                   (placeSelected)="onPickupPlaceSelected($event)"
                   [(ngModel)]="deliveryForm.pickupAddress"
                   placeholder="e.g. 123 Main St"
-                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
                 @if (deliveryForm.pickupAddress && !deliveryForm.pickupLat) {
                   <p class="flex items-center gap-1 text-xs text-amber-600 mt-1">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@
                             @for (shop of shops(); track shop.id) {
                               <button type="button"
                                 (click)="deliveryForm.dropoffAddress = shop.address; deliveryForm.dropoffLat = shop.latitude; deliveryForm.dropoffLng = shop.longitude; deliveryShopPickerDropoffOpen.set(false)"
-                                class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors border-t border-gray-100 first:border-0">
+                                class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors border-t border-gray-100 first:border-0">
                                 <p class="font-semibold text-gray-800">{{ shop.name }}</p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
                               </button>
@@ -187,7 +187,7 @@
                   (placeSelected)="onDropoffPlaceSelected($event)"
                   [(ngModel)]="deliveryForm.dropoffAddress"
                   placeholder="e.g. 456 Park Ave"
-                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
                 @if (deliveryForm.dropoffAddress && !deliveryForm.dropoffLat) {
                   <p class="flex items-center gap-1 text-xs text-amber-600 mt-1">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,30 +204,30 @@
                   <label class="block text-xs font-semibold text-gray-600">Description</label>
                   <button type="button"
                     (click)="deliveryItemPickerOpen.set(true); deliveryItemSearch.set('')"
-                    class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border bg-white text-green-600 border-green-300 hover:bg-green-50 transition-colors">
+                    class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border bg-white text-orange-600 border-orange-300 hover:bg-orange-50 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
                     Add from shop
                     @if (deliverySelectedItems().length > 0) {
-                      <span class="ml-1 bg-green-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">{{ deliverySelectedItems().length }}</span>
+                      <span class="ml-1 bg-orange-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">{{ deliverySelectedItems().length }}</span>
                     }
                   </button>
                 </div>
                 @if (deliverySelectedItems().length > 0) {
                   <div class="flex flex-wrap gap-1.5 mb-2">
                     @for (sel of deliverySelectedItems(); track sel.item.id) {
-                      <div class="flex items-center gap-1 bg-green-100 rounded-lg px-2 py-1 text-xs text-green-700">
+                      <div class="flex items-center gap-1 bg-orange-100 rounded-lg px-2 py-1 text-xs text-orange-700">
                         <span class="font-semibold">{{ sel.item.name }}</span>
                         <div class="flex items-center gap-0.5 ml-1">
                           <button type="button" (click)="updateDeliveryItemQty(sel.item.id, sel.qty - 1)"
-                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-green-200 transition-colors font-bold leading-none">−</button>
+                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-orange-200 transition-colors font-bold leading-none">−</button>
                           <span class="w-5 text-center font-bold">{{ sel.qty }}</span>
                           <button type="button" (click)="updateDeliveryItemQty(sel.item.id, sel.qty + 1)"
-                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-green-200 transition-colors font-bold leading-none">+</button>
+                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-orange-200 transition-colors font-bold leading-none">+</button>
                         </div>
                         <button type="button" (click)="removeDeliveryItem(sel.item.id)"
-                          class="ml-1 text-green-400 hover:text-green-700 transition-colors">
+                          class="ml-1 text-orange-400 hover:text-orange-700 transition-colors">
                           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                           </svg>
@@ -237,7 +237,7 @@
                   </div>
                 }
                 <textarea [(ngModel)]="deliveryForm.description" placeholder="Package contents, notes…" rows="2"
-                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"></textarea>
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"></textarea>
               </div>
 
               <!-- Package size -->
@@ -248,9 +248,9 @@
                     <button type="button"
                       (click)="deliveryForm.packageSizeCategory = size"
                       class="flex-1 py-2 text-xs font-semibold rounded-xl border transition-all"
-                      [class.bg-green-600]="deliveryForm.packageSizeCategory === size"
+                      [class.bg-orange-600]="deliveryForm.packageSizeCategory === size"
                       [class.text-white]="deliveryForm.packageSizeCategory === size"
-                      [class.border-green-600]="deliveryForm.packageSizeCategory === size"
+                      [class.border-orange-600]="deliveryForm.packageSizeCategory === size"
                       [class.border-gray-200]="deliveryForm.packageSizeCategory !== size"
                       [class.text-gray-500]="deliveryForm.packageSizeCategory !== size">
                       {{ size | titlecase }}
@@ -267,9 +267,9 @@
                     <button type="button"
                       (click)="deliveryForm.cargoType = opt.value"
                       class="px-3 py-1.5 text-xs font-semibold rounded-full border transition-all"
-                      [class.bg-green-600]="deliveryForm.cargoType === opt.value"
+                      [class.bg-orange-600]="deliveryForm.cargoType === opt.value"
                       [class.text-white]="deliveryForm.cargoType === opt.value"
-                      [class.border-green-600]="deliveryForm.cargoType === opt.value"
+                      [class.border-orange-600]="deliveryForm.cargoType === opt.value"
                       [class.border-gray-200]="deliveryForm.cargoType !== opt.value"
                       [class.text-gray-500]="deliveryForm.cargoType !== opt.value">
                       {{ opt.emoji }} {{ opt.label }}
@@ -282,7 +282,7 @@
               <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Your Price ($)</label>
                 <input [(ngModel)]="deliveryForm.budget" type="number" min="0" step="0.01"
-                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 placeholder:text-gray-300"/>
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 placeholder:text-gray-300"/>
               </div>
             </div>
           }
@@ -301,19 +301,19 @@
                     (focus)="deliveryClientFocused.set(true)"
                     (blur)="deliveryClientFocused.set(false)"
                     placeholder="Search by name or phone…"
-                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
-                    [class.border-green-400]="deliveryForm.orgClientId"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    [class.border-orange-400]="deliveryForm.orgClientId"
                     [class.border-gray-200]="!deliveryForm.orgClientId"
                   />
                   @if (deliveryForm.orgClientId) {
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 text-xs font-semibold">Selected</span>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-orange-500 text-xs font-semibold">Selected</span>
                   }
                   @if (deliveryClientFocused() && !deliveryQuickAdd()) {
                     <div class="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
                       @for (c of filteredDeliveryClients(); track c.id) {
                         <button type="button"
                           (mousedown)="$event.preventDefault(); selectDeliveryClient(c)"
-                          class="w-full text-left px-4 py-2.5 text-sm hover:bg-green-50 flex items-center justify-between gap-2">
+                          class="w-full text-left px-4 py-2.5 text-sm hover:bg-orange-50 flex items-center justify-between gap-2">
                           <span class="font-medium text-gray-800">{{ c.name }}</span>
                           @if (c.phone) { <span class="text-xs text-gray-400 shrink-0">{{ c.phone }}</span> }
                         </button>
@@ -323,7 +323,7 @@
                       }
                       <button type="button"
                         (mousedown)="$event.preventDefault(); openDeliveryQuickAdd()"
-                        class="w-full text-left px-4 py-2.5 text-sm text-green-600 font-semibold hover:bg-green-50 border-t border-gray-100 flex items-center gap-2">
+                        class="w-full text-left px-4 py-2.5 text-sm text-orange-600 font-semibold hover:bg-orange-50 border-t border-gray-100 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -333,18 +333,18 @@
                   }
                 </div>
                 @if (deliveryQuickAdd()) {
-                  <div class="mt-3 p-4 bg-green-50 rounded-xl space-y-3 border border-green-100">
-                    <p class="text-xs font-semibold text-green-700">New Client</p>
+                  <div class="mt-3 p-4 bg-orange-50 rounded-xl space-y-3 border border-orange-100">
+                    <p class="text-xs font-semibold text-orange-700">New Client</p>
                     <input [(ngModel)]="deliveryQuickForm.name" placeholder="Full name *"
-                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white"/>
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"/>
                     <input [(ngModel)]="deliveryQuickForm.phone" placeholder="Phone number"
-                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white"/>
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"/>
                     <input appGooglePlaces (placeSelected)="onQuickClientAddressSelected($event)"
                       [(ngModel)]="deliveryQuickForm.address" placeholder="Address"
-                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white"/>
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"/>
                     <div class="flex gap-2 pt-1">
                       <button type="button" (click)="saveQuickDeliveryClient()" [disabled]="deliveryQuickSaving() || !deliveryQuickForm.name.trim()"
-                        class="flex-1 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                        class="flex-1 py-2 rounded-lg bg-orange-600 text-white text-sm font-semibold hover:bg-orange-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                         {{ deliveryQuickSaving() ? 'Saving…' : 'Add Client' }}
                       </button>
                       <button type="button" (click)="deliveryQuickAdd.set(false)"
@@ -379,7 +379,7 @@
                             <p class="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Select a shop</p>
                             @for (shop of shops(); track shop.id) {
                               <button type="button" (click)="useShopAsPickup(shop)"
-                                class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors border-t border-gray-100 first:border-0">
+                                class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors border-t border-gray-100 first:border-0">
                                 <p class="font-semibold text-gray-800">{{ shop.name }}</p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
                               </button>
@@ -392,7 +392,7 @@
                 </div>
                 <input appGooglePlaces (placeSelected)="onPickupPlaceSelected($event)"
                   [(ngModel)]="deliveryForm.pickupAddress" placeholder="e.g. 123 Main St"
-                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
                 @if (deliveryForm.pickupAddress && !deliveryForm.pickupLat) {
                   <p class="flex items-center gap-1 text-xs text-amber-600 mt-1">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,7 +431,7 @@
                             <p class="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Select a shop</p>
                             @for (shop of shops(); track shop.id) {
                               <button type="button" (click)="useShopAsDropoff(shop)"
-                                class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors border-t border-gray-100 first:border-0">
+                                class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors border-t border-gray-100 first:border-0">
                                 <p class="font-semibold text-gray-800">{{ shop.name }}</p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ shop.address }}</p>
                               </button>
@@ -444,7 +444,7 @@
                 </div>
                 <input appGooglePlaces (placeSelected)="onDropoffPlaceSelected($event)"
                   [(ngModel)]="deliveryForm.dropoffAddress" placeholder="e.g. 456 Park Ave"
-                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
                 @if (deliveryForm.dropoffAddress && !deliveryForm.dropoffLat) {
                   <p class="flex items-center gap-1 text-xs text-amber-600 mt-1">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,7 +460,7 @@
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Rider</label>
 
                 @if (nearbyRidersLoading()) {
-                  <div class="w-full border border-green-100 bg-green-50 rounded-lg px-3 py-2.5 text-xs text-green-500 flex items-center gap-2">
+                  <div class="w-full border border-orange-100 bg-orange-50 rounded-lg px-3 py-2.5 text-xs text-orange-500 flex items-center gap-2">
                     <svg class="w-3.5 h-3.5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
@@ -481,7 +481,7 @@
                     </div>
                   }
                   <select [(ngModel)]="deliveryForm.driverId"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white">
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white">
                     <option value="">Select a rider…</option>
                     @for (rider of nearbyRiders(); track rider.id) {
                       <option [value]="rider.id">{{ formatRiderLabel(rider) }}</option>
@@ -490,7 +490,7 @@
                   <!-- Online indicator summary -->
                   <div class="flex items-center gap-3 mt-1.5">
                     <span class="flex items-center gap-1 text-[11px] text-gray-400">
-                      <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-orange-500 inline-block"></span>
                       {{ onlineRiderCount() }} online
                     </span>
                     <span class="text-[11px] text-gray-300">·</span>
@@ -505,30 +505,30 @@
                   <label class="block text-xs font-semibold text-gray-600">Description</label>
                   <button type="button"
                     (click)="deliveryItemPickerOpen.set(true); deliveryItemSearch.set('')"
-                    class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border bg-white text-green-600 border-green-300 hover:bg-green-50 transition-colors">
+                    class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border bg-white text-orange-600 border-orange-300 hover:bg-orange-50 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
                     Add from shop
                     @if (deliverySelectedItems().length > 0) {
-                      <span class="ml-1 bg-green-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">{{ deliverySelectedItems().length }}</span>
+                      <span class="ml-1 bg-orange-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">{{ deliverySelectedItems().length }}</span>
                     }
                   </button>
                 </div>
                 @if (deliverySelectedItems().length > 0) {
                   <div class="flex flex-wrap gap-1.5 mb-2">
                     @for (sel of deliverySelectedItems(); track sel.item.id) {
-                      <div class="flex items-center gap-1 bg-green-100 rounded-lg px-2 py-1 text-xs text-green-700">
+                      <div class="flex items-center gap-1 bg-orange-100 rounded-lg px-2 py-1 text-xs text-orange-700">
                         <span class="font-semibold">{{ sel.item.name }}</span>
                         <div class="flex items-center gap-0.5 ml-1">
                           <button type="button" (click)="updateDeliveryItemQty(sel.item.id, sel.qty - 1)"
-                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-green-200 transition-colors font-bold leading-none">−</button>
+                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-orange-200 transition-colors font-bold leading-none">−</button>
                           <span class="w-5 text-center font-bold">{{ sel.qty }}</span>
                           <button type="button" (click)="updateDeliveryItemQty(sel.item.id, sel.qty + 1)"
-                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-green-200 transition-colors font-bold leading-none">+</button>
+                            class="w-4 h-4 rounded flex items-center justify-center hover:bg-orange-200 transition-colors font-bold leading-none">+</button>
                         </div>
                         <button type="button" (click)="removeDeliveryItem(sel.item.id)"
-                          class="ml-1 text-green-400 hover:text-green-700 transition-colors">
+                          class="ml-1 text-orange-400 hover:text-orange-700 transition-colors">
                           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                           </svg>
@@ -538,7 +538,7 @@
                   </div>
                 }
                 <textarea [(ngModel)]="deliveryForm.description" placeholder="Package contents, notes…" rows="2"
-                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"></textarea>
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"></textarea>
               </div>
 
               <!-- Cargo type -->
@@ -549,9 +549,9 @@
                     <button type="button"
                       (click)="deliveryForm.cargoType = opt.value"
                       class="px-3 py-1.5 text-xs font-semibold rounded-full border transition-all"
-                      [class.bg-green-600]="deliveryForm.cargoType === opt.value"
+                      [class.bg-orange-600]="deliveryForm.cargoType === opt.value"
                       [class.text-white]="deliveryForm.cargoType === opt.value"
-                      [class.border-green-600]="deliveryForm.cargoType === opt.value"
+                      [class.border-orange-600]="deliveryForm.cargoType === opt.value"
                       [class.border-gray-200]="deliveryForm.cargoType !== opt.value"
                       [class.text-gray-500]="deliveryForm.cargoType !== opt.value">
                       {{ opt.emoji }} {{ opt.label }}
@@ -576,12 +576,12 @@
                     <div>
                       <label class="block text-xs font-semibold text-gray-600 mb-1">Price ($)</label>
                       <input [(ngModel)]="deliveryForm.budget" type="number" min="0" step="0.01"
-                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
                     </div>
                     <div>
                       <label class="block text-xs font-semibold text-gray-600 mb-1">Payment Method</label>
                       <select [(ngModel)]="deliveryForm.paymentMethod"
-                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300">
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
                         <option value="CASH">Cash</option>
                         <option value="CARD">Card</option>
                       </select>
@@ -601,7 +601,7 @@
               </button>
               <button (click)="saveDelivery()"
                 [disabled]="deliverySaving() || !deliveryForm.pickupAddress.trim() || !deliveryForm.dropoffAddress.trim() || (deliveryTab() === 'INTERNAL' && deliveryForm.dispatchStrategy === 'DIRECT_ASSIGN' && !deliveryForm.driverId)"
-                class="px-5 py-2.5 rounded-xl bg-green-600 text-white font-semibold text-sm hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                class="px-5 py-2.5 rounded-xl bg-orange-600 text-white font-semibold text-sm hover:bg-orange-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                 {{ deliverySaving() ? 'Creating…' : (deliveryTab() === 'PUBLIC' ? 'Find Drivers' : 'Create Delivery') }}
               </button>
             </div>
@@ -621,9 +621,9 @@
                       <button type="button"
                         (click)="toggleCancelReason(reason)"
                         class="px-3 py-2 rounded-xl text-xs font-semibold border transition-all"
-                        [class.bg-green-50]="cancelReasonSelected() === reason"
-                        [class.border-green-400]="cancelReasonSelected() === reason"
-                        [class.text-green-700]="cancelReasonSelected() === reason"
+                        [class.bg-orange-50]="cancelReasonSelected() === reason"
+                        [class.border-orange-400]="cancelReasonSelected() === reason"
+                        [class.text-orange-700]="cancelReasonSelected() === reason"
                         [class.border-gray-200]="cancelReasonSelected() !== reason"
                         [class.text-gray-500]="cancelReasonSelected() !== reason">
                         {{ reason }}
@@ -635,7 +635,7 @@
                     (ngModelChange)="cancelReasonSelected.set(null)"
                     placeholder="Or type your own reason…"
                     rows="2"
-                    class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"></textarea>
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"></textarea>
                   <div class="flex gap-2 pt-1">
                     <button type="button" (click)="confirmCancel(true)"
                       [disabled]="cancelLoading()"
@@ -672,15 +672,15 @@
                   <div class="flex items-center justify-center gap-4 mb-4">
                     <button type="button" (click)="adjustReprice(-1)"
                       [disabled]="repriceLoading() || repriceCooldown() > 0"
-                      class="w-10 h-10 rounded-full border-2 border-green-300 text-green-600 font-bold text-lg flex items-center justify-center hover:bg-green-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                      class="w-10 h-10 rounded-full border-2 border-orange-300 text-orange-600 font-bold text-lg flex items-center justify-center hover:bg-orange-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                       −
                     </button>
                     <div class="text-center">
-                      <span class="text-3xl font-bold text-green-600">${{ repriceValue().toFixed(2) }}</span>
+                      <span class="text-3xl font-bold text-orange-600">${{ repriceValue().toFixed(2) }}</span>
                     </div>
                     <button type="button" (click)="adjustReprice(1)"
                       [disabled]="repriceLoading() || repriceCooldown() > 0"
-                      class="w-10 h-10 rounded-full border-2 border-green-300 text-green-600 font-bold text-lg flex items-center justify-center hover:bg-green-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                      class="w-10 h-10 rounded-full border-2 border-orange-300 text-orange-600 font-bold text-lg flex items-center justify-center hover:bg-orange-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                       +
                     </button>
                   </div>
@@ -688,8 +688,8 @@
                   <button type="button" (click)="submitReprice()"
                     [disabled]="repriceLoading() || repriceCooldown() > 0"
                     class="w-full py-2.5 rounded-xl text-sm font-bold transition-colors disabled:cursor-not-allowed"
-                    [class.bg-green-600]="!repriceLoading() && repriceCooldown() === 0"
-                    [class.hover:bg-green-700]="!repriceLoading() && repriceCooldown() === 0"
+                    [class.bg-orange-600]="!repriceLoading() && repriceCooldown() === 0"
+                    [class.hover:bg-orange-700]="!repriceLoading() && repriceCooldown() === 0"
                     [class.text-white]="!repriceLoading() && repriceCooldown() === 0"
                     [class.bg-gray-100]="repriceLoading() || repriceCooldown() > 0"
                     [class.text-gray-400]="repriceLoading() || repriceCooldown() > 0">
@@ -703,7 +703,7 @@
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-3.5 mb-4">
                   <div class="flex items-start gap-2.5">
                     <div class="flex flex-col items-center mt-1 shrink-0">
-                      <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                      <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
                       <span class="w-px h-6 bg-gray-300 my-0.5"></span>
                       <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     </div>
@@ -719,7 +719,7 @@
                   <div class="space-y-2 mb-4 max-h-48 overflow-y-auto">
                     @for (bid of publicBids(); track bid.driverId) {
                       <div class="flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-3 py-2.5 shadow-sm">
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-green-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
                           {{ bid.driverName.charAt(0).toUpperCase() || 'D' }}
                         </div>
                         <div class="flex-1 min-w-0">
@@ -730,12 +730,12 @@
                           </p>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
-                          <span class="text-base font-bold text-green-600">
+                          <span class="text-base font-bold text-orange-600">
                             ${{ bid.offeredPrice != null ? bid.offeredPrice.toFixed(2) : '—' }}
                           </span>
                           <button type="button" (click)="acceptBid(bid)"
                             [disabled]="publicAcceptingId() !== null"
-                            class="px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                             {{ publicAcceptingId() === bid.driverId ? '…' : 'Accept' }}
                           </button>
                         </div>
@@ -794,18 +794,18 @@
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Full Name <span class="text-red-400">*</span></label>
           <input [(ngModel)]="deliveryQuickForm.name" placeholder="e.g. John Doe"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Phone Number</label>
           <input [(ngModel)]="deliveryQuickForm.phone" placeholder="e.g. +263 77 123 4567" type="tel"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Address</label>
           <input appGooglePlaces (placeSelected)="onQuickClientAddressSelected($event)"
             [(ngModel)]="deliveryQuickForm.address" placeholder="e.g. 12 Main St, Harare"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"/>
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
         </div>
       </div>
 
@@ -816,7 +816,7 @@
         </button>
         <button type="button" (click)="saveQuickDeliveryClient()"
           [disabled]="deliveryQuickSaving() || !deliveryQuickForm.name.trim()"
-          class="flex-1 py-2.5 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50">
+          class="flex-1 py-2.5 rounded-xl bg-orange-600 text-white text-sm font-semibold hover:bg-orange-700 transition-colors disabled:opacity-50">
           {{ deliveryQuickSaving() ? 'Saving…' : 'Add Client' }}
         </button>
       </div>
@@ -868,10 +868,10 @@
                 <button type="button"
                   (click)="addDeliveryItem(item)"
                   class="w-full flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 last:border-0 text-left transition-colors hover:bg-gray-50"
-                  [class.bg-green-50]="selectedQty(item.id) > 0">
+                  [class.bg-orange-50]="selectedQty(item.id) > 0">
                   <span class="w-4 h-4 rounded-full shrink-0 flex items-center justify-center border transition-colors"
-                    [class.bg-green-500]="selectedQty(item.id) > 0"
-                    [class.border-green-500]="selectedQty(item.id) > 0"
+                    [class.bg-orange-500]="selectedQty(item.id) > 0"
+                    [class.border-orange-500]="selectedQty(item.id) > 0"
                     [class.border-gray-200]="selectedQty(item.id) === 0">
                     @if (selectedQty(item.id) > 0) {
                       <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -881,7 +881,7 @@
                   </span>
                   <div class="flex-1 min-w-0">
                     <p class="text-xs font-semibold truncate"
-                       [class.text-green-700]="selectedQty(item.id) > 0"
+                       [class.text-orange-700]="selectedQty(item.id) > 0"
                        [class.text-gray-800]="selectedQty(item.id) === 0">{{ item.name }}</p>
                     <div class="flex items-center gap-1.5 mt-0.5">
                       @if (item.unit) { <span class="text-[11px] text-gray-400">{{ item.unit }}</span> }
@@ -890,7 +890,7 @@
                     </div>
                   </div>
                   @if (selectedQty(item.id) > 0) {
-                    <span class="text-xs font-bold text-green-500 shrink-0">×{{ selectedQty(item.id) }}</span>
+                    <span class="text-xs font-bold text-orange-500 shrink-0">×{{ selectedQty(item.id) }}</span>
                   }
                 </button>
               }
@@ -903,7 +903,7 @@
           <div class="px-4 py-2.5 border-b border-gray-100 shrink-0 flex items-center justify-between">
             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Selected</p>
             @if (deliverySelectedItems().length > 0) {
-              <span class="text-xs font-bold text-green-600">{{ deliverySelectedItems().length }} item{{ deliverySelectedItems().length > 1 ? 's' : '' }}</span>
+              <span class="text-xs font-bold text-orange-600">{{ deliverySelectedItems().length }} item{{ deliverySelectedItems().length > 1 ? 's' : '' }}</span>
             }
           </div>
           <div class="flex-1 overflow-y-auto">
@@ -934,7 +934,7 @@
                     <span class="w-6 text-center text-xs font-bold text-gray-800">{{ sel.qty }}</span>
                     <button type="button"
                       (click)="updateDeliveryItemQty(sel.item.id, sel.qty + 1)"
-                      class="w-6 h-6 rounded-md bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center text-sm font-bold transition-colors">+</button>
+                      class="w-6 h-6 rounded-md bg-orange-100 hover:bg-orange-200 text-orange-600 flex items-center justify-center text-sm font-bold transition-colors">+</button>
                   </div>
                   <button type="button"
                     (click)="removeDeliveryItem(sel.item.id)"
@@ -953,14 +953,14 @@
       <div class="px-5 py-3 border-t border-gray-100 shrink-0 flex items-center justify-between">
         <p class="text-xs text-gray-500">
           @if (deliverySelectedItems().length > 0) {
-            <span class="font-semibold text-green-600">{{ deliverySelectedItems().reduce(totalQty, 0) }} units</span>
+            <span class="font-semibold text-orange-600">{{ deliverySelectedItems().reduce(totalQty, 0) }} units</span>
             <span class="text-gray-400"> across {{ deliverySelectedItems().length }} item{{ deliverySelectedItems().length > 1 ? 's' : '' }}</span>
           } @else {
             <span class="text-gray-400">No items selected</span>
           }
         </p>
         <button (click)="deliveryItemPickerOpen.set(false)"
-          class="px-5 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors">
+          class="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold transition-colors">
           Done
         </button>
       </div>

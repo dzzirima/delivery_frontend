@@ -1,0 +1,81 @@
+<div class="min-h-screen bg-gray-50">
+  <header class="bg-white border-b border-gray-100">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a routerLink="/" class="flex items-center gap-2">
+        <img src="icons/zagaah-z-mark.png" alt="Zagaah" class="w-8 h-8 object-contain" />
+        <span class="font-bold text-gray-900">Zagaah</span>
+      </a>
+      <a routerLink="/terms" class="text-sm text-orange-600 font-semibold hover:text-orange-700">Terms &amp; Conditions</a>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-6 py-10">
+    <article class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-10 text-gray-700 text-sm leading-relaxed space-y-6 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-8 [&_h2]:mb-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1.5 [&_p]:mb-2">
+      <h1 class="text-3xl font-extrabold text-gray-900">Privacy Policy</h1>
+      <p class="text-gray-500">Effective date: {{ effective }}</p>
+
+      <p>
+        {{ company }} ("<strong>Zagaah</strong>", "<strong>we</strong>") respects your privacy. This policy explains what personal data we collect through the Zagaah website, dashboard and rider app, why we collect it, and your rights under the Cyber and Data Protection Act [Chapter 12:07] and other applicable Zimbabwean law. It should be read with our <a routerLink="/terms" class="text-orange-600 underline">Terms and Conditions</a>.
+      </p>
+
+      <h2>1. Data we collect</h2>
+      <ul>
+        <li><strong>Account data:</strong> name, email, phone number, password (stored encrypted/hashed), role, business name and registration number.</li>
+        <li><strong>Rider verification (KYC) data:</strong> national ID, driver's licence, vehicle registration and insurance documents, photographs and vehicle details.</li>
+        <li><strong>Delivery data:</strong> pickup and drop-off addresses, Customer name and phone number, Item descriptions, order values, status history, proof-of-delivery, notes and ratings.</li>
+        <li><strong>Location data:</strong> precise GPS location of Riders while online or on a Delivery, and addresses entered by Businesses.</li>
+        <li><strong>Payment data:</strong> fees, amounts, payment status and references. We do not store full card numbers.</li>
+        <li><strong>Technical data:</strong> device type, IP address, browser, log data, app version, and usage information.</li>
+        <li><strong>Communications:</strong> messages, support requests and notifications.</li>
+      </ul>
+
+      <h2>2. Why we use your data</h2>
+      <ul>
+        <li>to create and manage accounts, and verify identity and Riders;</li>
+        <li>to match, dispatch, track, complete and price Deliveries;</li>
+        <li>to process payments, invoices and reports;</li>
+        <li>to keep the Platform safe: preventing fraud, abuse and prohibited use, and investigating incidents and claims;</li>
+        <li>to send service messages such as OTPs, password resets, delivery updates and notices;</li>
+        <li>to improve, test and support the Platform;</li>
+        <li>to comply with legal obligations and enforce our Terms.</li>
+      </ul>
+      <p>Our lawful bases are: performing our contract with you, your consent (for example location and KYC documents), our legitimate interests in running a safe and secure service, and legal obligation.</p>
+
+      <h2>3. Who we share data with</h2>
+      <ul>
+        <li><strong>Businesses, Riders and Customers</strong> involved in a Delivery, only to the extent needed (for example a Rider sees pickup/drop-off details and Customer phone; a Business sees Rider name, vehicle and live location).</li>
+        <li><strong>Service providers</strong> who help us operate: cloud hosting, SMS/email, maps and payment providers, under confidentiality and data-protection obligations.</li>
+        <li><strong>Authorities</strong>, courts and regulators, where required by law or to protect rights, safety and property.</li>
+        <li><strong>Successors</strong> in a merger, sale or restructuring, subject to this policy.</li>
+      </ul>
+      <p><strong>We do not sell your personal data.</strong></p>
+
+      <h2>4. International transfers</h2>
+      <p>Our providers may store data outside Zimbabwe. Where we transfer data abroad we take steps to ensure it is protected to a standard consistent with the Act.</p>
+
+      <h2>5. Retention</h2>
+      <p>We keep personal data only as long as needed for the purposes above, to meet legal, tax, accounting and dispute requirements, and to prevent fraud. Delivery and financial records are generally retained for at least 6 years. When no longer needed, data is deleted or anonymised.</p>
+
+      <h2>6. Security</h2>
+      <p>We use reasonable technical and organisational measures, such as encryption in transit, access controls and role-based permissions. No system is completely secure, so we cannot guarantee absolute security. Please protect your password. If a breach affects your data we will notify you and the regulator (POTRAZ) as required by law.</p>
+
+      <h2>7. Your rights</h2>
+      <p>Subject to law, you may ask us to: access your data; correct inaccurate data; delete data we no longer need; restrict or object to processing; withdraw consent (which does not affect prior processing); and lodge a complaint with the Postal and Telecommunications Regulatory Authority of Zimbabwe (POTRAZ), the Data Protection Authority. To exercise these rights, email <a href="mailto:{{ email }}" class="text-orange-600 underline">{{ email }}</a>. We may need to verify your identity, and some data must be kept by law.</p>
+
+      <h2>8. Businesses and Customer data</h2>
+      <p>When a Business enters Customer details, the Business is the data controller for that data and Zagaah acts as a processor on its behalf. The Business must have a lawful basis to share it, and must inform its Customers that their details are shared with Zagaah and Riders for delivery.</p>
+
+      <h2>9. Children</h2>
+      <p>The Platform is not for anyone under 18. We do not knowingly collect data from children. If you believe we have, contact us and we will delete it.</p>
+
+      <h2>10. Cookies and similar technologies</h2>
+      <p>We use essential cookies and local storage to keep you signed in and remember your preferences, and basic analytics to understand usage. You can control cookies in your browser, but some features may not work without them.</p>
+
+      <h2>11. Changes</h2>
+      <p>We may update this policy. Material changes will be posted with a new effective date and notified where appropriate.</p>
+
+      <h2>12. Contact</h2>
+      <p>{{ company }}<br />Email: <a href="mailto:{{ email }}" class="text-orange-600 underline">{{ email }}</a></p>
+    </article>
+  </main>
+</div>

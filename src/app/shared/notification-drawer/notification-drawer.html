@@ -27,7 +27,7 @@
       @if (notif.unreadCount() > 0) {
         <button
           (click)="notif.markAllRead()"
-          class="text-xs text-green-600 font-medium hover:text-green-700 px-2 py-1 rounded-md hover:bg-green-50 transition-colors"
+          class="text-xs text-orange-600 font-medium hover:text-orange-700 px-2 py-1 rounded-md hover:bg-orange-50 transition-colors"
         >
           Mark all read
         </button>
@@ -79,9 +79,9 @@
             (click)="onItemClick(item)"
             class="flex gap-3 px-5 py-3.5 cursor-pointer transition-colors"
             [class.bg-white]="item.read"
-            [class.bg-green-50/40]="!item.read"
+            [class.bg-orange-50/40]="!item.read"
             [class.hover:bg-gray-50]="item.read"
-            [class.hover:bg-green-50/60]="!item.read"
+            [class.hover:bg-orange-50/60]="!item.read"
           >
             <!-- Icon bubble -->
             <div
@@ -135,7 +135,7 @@
                   {{ item.title }}
                 </p>
                 @if (!item.read) {
-                  <span class="w-2 h-2 rounded-full bg-green-500 shrink-0 mt-1.5"></span>
+                  <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-1.5"></span>
                 }
               </div>
               <p class="text-xs text-gray-500 mt-0.5 leading-relaxed line-clamp-2">{{ item.body }}</p>
@@ -151,7 +151,7 @@
           <button
             (click)="notif.loadMore()"
             [disabled]="notif.loading()"
-            class="text-xs text-green-600 font-medium hover:text-green-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg hover:bg-green-50 transition-colors"
+            class="text-xs text-orange-600 font-medium hover:text-orange-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors"
           >
             @if (notif.loading()) { Loading… } @else { Load more }
           </button>

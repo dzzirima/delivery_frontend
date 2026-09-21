@@ -1,0 +1,191 @@
+<div class="min-h-screen bg-gray-50">
+  <header class="bg-white border-b border-gray-100">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a routerLink="/" class="flex items-center gap-2">
+        <img src="icons/zagaah-z-mark.png" alt="Zagaah" class="w-8 h-8 object-contain" />
+        <span class="font-bold text-gray-900">Zagaah</span>
+      </a>
+      <a routerLink="/privacy" class="text-sm text-orange-600 font-semibold hover:text-orange-700">Privacy Policy</a>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-6 py-10">
+    <article class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-10 text-gray-700 text-sm leading-relaxed space-y-6 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-8 [&_h2]:mb-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1.5 [&_p]:mb-2">
+      <h1 class="text-3xl font-extrabold text-gray-900">Terms and Conditions of Use</h1>
+      <p class="text-gray-500">Effective date: {{ effective }}</p>
+
+      <p>
+        These Terms and Conditions ("<strong>Terms</strong>") are a binding agreement between you and
+        <strong>{{ company }}</strong> ("<strong>Zagaah</strong>", "<strong>we</strong>", "<strong>us</strong>"),
+        a company operating in Zimbabwe. They govern your access to and use of the Zagaah website, dashboard,
+        rider mobile application and related services (the "<strong>Platform</strong>").
+        <strong>By creating an account, signing in, or using the Platform you confirm that you have read,
+        understood and agree to these Terms and to our <a routerLink="/privacy" class="text-orange-600 underline">Privacy Policy</a>.
+        If you do not agree, do not use the Platform.</strong>
+      </p>
+
+      <h2>1. Definitions</h2>
+      <ul>
+        <li><strong>Business</strong> – an organisation, shop or merchant that registers on the Platform to request deliveries.</li>
+        <li><strong>Rider</strong> – an independent person who registers to carry out deliveries using the Platform.</li>
+        <li><strong>Customer</strong> – the person who receives, or on whose behalf, a delivery is made.</li>
+        <li><strong>User</strong> – any Business, Business team member, Rider, Customer or other person using the Platform.</li>
+        <li><strong>Delivery</strong> – a request for goods to be collected from one location and delivered to another through the Platform.</li>
+        <li><strong>Items</strong> – the goods, parcels or documents being delivered.</li>
+      </ul>
+
+      <h2>2. Our role</h2>
+      <p>
+        Zagaah provides technology that connects Businesses with Riders and helps them manage, track and pay for deliveries.
+        <strong>Zagaah is a technology platform. We are not a courier, carrier, employer, insurer, bank or seller of the Items.</strong>
+        The contract for the carriage of an Item is between the Business and the Rider (and, where applicable, the Customer).
+        Except where the law says otherwise, Zagaah is not a party to that contract and does not guarantee that any Delivery will be requested, accepted, completed on time, or completed at all.
+      </p>
+
+      <h2>3. Eligibility and accounts</h2>
+      <ul>
+        <li>You must be at least 18 years old and legally able to enter into a contract. Businesses must be lawfully operating and authorised to bind the organisation.</li>
+        <li>You must provide accurate, complete and current information and keep it updated.</li>
+        <li>You are responsible for keeping your login details confidential and for <strong>all activity under your account</strong>, including activity by team members you add. Tell us immediately at {{ email }} if you suspect unauthorised use.</li>
+        <li>One person may not hold multiple accounts to evade suspension, fees or verification.</li>
+        <li>Business account owners are responsible for the roles and permissions they give to their team members.</li>
+      </ul>
+
+      <h2>4. Rider verification</h2>
+      <ul>
+        <li>Riders must pass identity, driver and vehicle verification (KYC), which may include national ID, driver's licence, vehicle registration, insurance and photographs. We may approve, reject, suspend or re-verify at any time at our discretion.</li>
+        <li>Verification is an administrative check only. It is <strong>not</strong> a guarantee, warranty or endorsement of a Rider's character, skill, safety or reliability.</li>
+        <li>Riders must hold and keep valid all licences, road-worthiness certificates, permits and insurance required by Zimbabwean law, and must comply with the Road Traffic Act and all traffic laws.</li>
+        <li>Riders are <strong>independent contractors</strong>. Nothing in these Terms creates an employment, partnership, agency or joint-venture relationship between a Rider and Zagaah or a Business. Riders are responsible for their own tax, insurance, vehicle costs, fuel, fines and equipment.</li>
+      </ul>
+
+      <h2>5. Requesting and performing deliveries</h2>
+      <p><strong>Businesses agree to:</strong></p>
+      <ul>
+        <li>give accurate pickup and drop-off addresses, contact numbers, Item descriptions, values and instructions;</li>
+        <li>package Items securely and ensure they are lawful and safe to carry;</li>
+        <li>have the right to send the Items and, where required, obtain the Customer's consent to share their details with us and the Rider;</li>
+        <li>be reachable while a Delivery is in progress.</li>
+      </ul>
+      <p><strong>Riders agree to:</strong></p>
+      <ul>
+        <li>collect and deliver Items with reasonable care, promptly and only to the intended recipient;</li>
+        <li>not open, tamper with, use, sell, or keep any Item;</li>
+        <li>drive safely, sober, and not use a phone in a way that is unsafe or unlawful while riding;</li>
+        <li>use the Platform's status updates, proof-of-delivery and location features honestly and not falsify any information.</li>
+      </ul>
+
+      <h2>6. Prohibited Items and conduct</h2>
+      <p>You must not send, carry or request the delivery of:</p>
+      <ul>
+        <li>illegal drugs, weapons, ammunition, explosives, or any item unlawful to possess or transport in Zimbabwe;</li>
+        <li>stolen, counterfeit or smuggled goods;</li>
+        <li>hazardous, flammable, toxic or radioactive material;</li>
+        <li>live animals, human remains, or organs;</li>
+        <li>large amounts of cash, valuables, jewellery, or negotiable instruments unless we have expressly agreed in writing;</li>
+        <li>any Item that may harm a Rider, third party or property.</li>
+      </ul>
+      <p>You must also not: use the Platform for fraud, money laundering or any unlawful purpose; harass, threaten or discriminate against any person; scrape, reverse-engineer, disrupt or attempt to gain unauthorised access to the Platform; upload malicious code; or circumvent the Platform to avoid fees for Businesses or Riders introduced through it.</p>
+      <p>A Rider may refuse or stop a Delivery if they reasonably suspect the Item is prohibited, or if continuing would be unsafe. We may report suspected criminal activity to the police and cooperate with law enforcement.</p>
+
+      <h2>7. Fees, pricing and payment</h2>
+      <ul>
+        <li>Delivery prices are calculated using the pricing configuration shown on the Platform (which may include distance, time, vehicle type, surcharges and Platform fees) and are shown before you confirm a Delivery. Prices are quoted in the currency displayed (currently USD unless stated otherwise).</li>
+        <li>Businesses must pay all fees owed on time. We may charge subscription, service, or commission fees which we may change on reasonable notice.</li>
+        <li>Where payment is collected in cash or by mobile money directly between Users, those Users are responsible for the transaction. Zagaah is not liable for cash that is lost, stolen, miscounted or not remitted, and Riders handle any cash at their own risk.</li>
+        <li>Fees are non-refundable except where we decide otherwise, or where required by law. Amounts you owe us may be set off against amounts we owe you.</li>
+        <li>You are responsible for all taxes that apply to you. Fees may be exclusive of VAT or other taxes where applicable.</li>
+        <li>Free trials, if offered, may be modified or ended at any time and convert to paid plans as stated at sign-up.</li>
+      </ul>
+
+      <h2>8. Cancellations and failed deliveries</h2>
+      <ul>
+        <li>A Business may cancel a Delivery before pickup. Cancellation after a Rider has been dispatched or has arrived may attract a cancellation fee.</li>
+        <li>If a Customer is unreachable, refuses the Item, provides a wrong address, or the Item is prohibited, the Delivery may be treated as failed. The Business remains liable for the fees and for return costs.</li>
+        <li>Items that cannot be delivered or returned within a reasonable time may be disposed of or handed to the authorities, at the Business's cost and risk, after notice where practicable.</li>
+      </ul>
+
+      <h2>9. Loss, damage and claims</h2>
+      <ul>
+        <li>Items are carried <strong>at the Business's own risk</strong>. Businesses are strongly encouraged to insure Items independently.</li>
+        <li>Any claim for loss or damage must be reported through the Platform or to {{ email }} within <strong>48 hours</strong> of the scheduled delivery, with supporting evidence (photos, proof of value, order details). Late claims may be rejected.</li>
+        <li>Zagaah may, at its discretion, help investigate and mediate a claim, but is not obliged to compensate any User. Any goodwill payment is not an admission of liability.</li>
+        <li>Nothing here limits a Rider's own liability to the Business, which is a matter between them.</li>
+      </ul>
+
+      <h2>10. Safety, location and tracking</h2>
+      <p>
+        The Platform uses GPS and location data to match, track and verify Deliveries. Riders consent to their location being collected while they are online or on a Delivery and shared with the relevant Business and Customer.
+        Location and ETA information is an estimate and may be inaccurate. Riders and Users are responsible for their own personal safety. In an emergency, contact the Zimbabwe Republic Police or emergency services first.
+      </p>
+
+      <h2>11. Suspension and termination</h2>
+      <ul>
+        <li>We may suspend, restrict or terminate any account, with or without notice, if we believe you have breached these Terms or the law, pose a safety or fraud risk, have unpaid fees, or if required by law or a regulator.</li>
+        <li>You may close your account at any time, subject to settling outstanding fees and Deliveries.</li>
+        <li>Sections that by their nature should survive termination (fees owed, liability, indemnity, disputes, governing law) will survive.</li>
+      </ul>
+
+      <h2>12. Intellectual property</h2>
+      <p>
+        The Platform, including the Zagaah name, logo, software, design and content, belongs to Zagaah or its licensors and is protected by law.
+        We grant you a limited, revocable, non-exclusive, non-transferable licence to use the Platform for its intended purpose. You keep ownership of the content you submit but grant us a worldwide, royalty-free licence to use it to operate, secure and improve the Platform. You must not copy, modify, sell or create derivative works from the Platform.
+      </p>
+
+      <h2>13. Disclaimers</h2>
+      <p>
+        <strong>The Platform is provided "as is" and "as available".</strong> To the fullest extent permitted by law, we disclaim all warranties, express or implied, including fitness for a particular purpose, uninterrupted or error-free service, accuracy of pricing, tracking, ETAs or reports, and the conduct, quality or reliability of any Rider, Business or Customer. We are not responsible for internet, network, power, mobile-money, GPS or third-party service failures.
+      </p>
+
+      <h2>14. Limitation of liability</h2>
+      <p>To the fullest extent permitted by Zimbabwean law:</p>
+      <ul>
+        <li>Zagaah, its directors, employees, shareholders and affiliates will not be liable for any indirect, incidental, special, consequential or punitive loss, or for loss of profit, revenue, business, goodwill or data, arising from your use of the Platform or any Delivery;</li>
+        <li>we are not liable for the acts or omissions of Riders, Businesses, Customers or other third parties, including theft, accident, injury, death, property damage, delay or misconduct;</li>
+        <li>our total aggregate liability to you for any claim will not exceed the <strong>lesser of (a) the fees you paid to Zagaah in the 3 months before the claim, or (b) USD 100</strong>.</li>
+      </ul>
+      <p>Nothing in these Terms excludes liability that cannot lawfully be excluded, such as liability for fraud or wilful misconduct.</p>
+
+      <h2>15. Indemnity</h2>
+      <p>
+        You agree to defend, indemnify and hold harmless Zagaah and its directors, employees and affiliates from any claim, loss, liability, penalty, fine, damage or expense (including reasonable legal fees) arising from: your breach of these Terms or the law; the Items you send or carry; your content or information; your use of the Platform; any accident, injury or damage caused by you or by Riders you engage; or any dispute between you and another User.
+      </p>
+
+      <h2>16. Privacy and data protection</h2>
+      <p>
+        We process personal data in line with our <a routerLink="/privacy" class="text-orange-600 underline">Privacy Policy</a> and the Cyber and Data Protection Act [Chapter 12:07]. Businesses who upload Customer details confirm that they have a lawful basis to do so and are responsible for that data's accuracy.
+      </p>
+
+      <h2>17. Force majeure</h2>
+      <p>
+        We are not liable for any failure or delay caused by events beyond our reasonable control, including natural disaster, fuel shortages, strikes, civil unrest, government action, power or network outages, pandemics, or failures of third-party providers.
+      </p>
+
+      <h2>18. Disputes and governing law</h2>
+      <ul>
+        <li>These Terms are governed by the laws of <strong>Zimbabwe</strong>.</li>
+        <li>Parties will first try to resolve any dispute in good faith by written notice to {{ email }}, allowing at least 30 days.</li>
+        <li>Unresolved disputes will be referred to mediation and, failing that, to arbitration in Harare under the Arbitration Act [Chapter 7:15] before a single arbitrator. The courts of Zimbabwe retain jurisdiction for urgent interim relief.</li>
+        <li>To the extent permitted by law, claims must be brought within <strong>one (1) year</strong> after the cause of action arises, and only in your individual capacity, not as a class or representative action.</li>
+      </ul>
+
+      <h2>19. Changes to the Terms or Platform</h2>
+      <p>
+        We may update these Terms or the Platform at any time. We will post the new version with a new effective date and, for material changes, notify you by email, in-app or on the dashboard. Continued use after the changes take effect means you accept them.
+      </p>
+
+      <h2>20. General</h2>
+      <ul>
+        <li><strong>Entire agreement:</strong> these Terms and the Privacy Policy are the entire agreement between you and Zagaah on their subject.</li>
+        <li><strong>Severability:</strong> if any provision is invalid, the rest remains in force.</li>
+        <li><strong>No waiver:</strong> not enforcing a right is not a waiver of it.</li>
+        <li><strong>Assignment:</strong> you may not transfer your rights without our consent; we may assign ours in a merger, sale or restructuring.</li>
+        <li><strong>Notices:</strong> we may send notices to the email, phone number or in-app inbox on your account.</li>
+        <li><strong>Electronic acceptance:</strong> clicking to accept or using the Platform is a valid electronic signature under the Electronic Transactions and Electronic Commerce laws of Zimbabwe.</li>
+      </ul>
+
+      <h2>21. Contact</h2>
+      <p>Questions about these Terms: <a href="mailto:{{ email }}" class="text-orange-600 underline">{{ email }}</a>.</p>
+    </article>
+  </main>
+</div>

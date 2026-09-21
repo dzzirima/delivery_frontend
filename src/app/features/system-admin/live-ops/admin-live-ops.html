@@ -25,7 +25,7 @@
         >
           Active
           <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold transition-colors"
-            [class.bg-green-100]="viewMode() === 'active'" [class.text-green-700]="viewMode() === 'active'"
+            [class.bg-orange-100]="viewMode() === 'active'" [class.text-orange-700]="viewMode() === 'active'"
             [class.bg-gray-200]="viewMode() !== 'active'" [class.text-gray-500]="viewMode() !== 'active'">
             {{ activeDeliveries().length }}
           </span>
@@ -72,7 +72,7 @@
 
       @if (deliveryLoading()) {
         <div class="flex items-center justify-center py-16">
-          <svg class="w-5 h-5 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-orange-500 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
@@ -94,10 +94,10 @@
           <div class="group relative border-b border-gray-50 last:border-0">
             <button
               (click)="focusDelivery(item)"
-              class="w-full text-left px-3 py-2.5 transition-colors hover:bg-indigo-50"
-              [class.bg-indigo-50]="selectedDeliveryId() === item.id"
+              class="w-full text-left px-3 py-2.5 transition-colors hover:bg-orange-50"
+              [class.bg-orange-50]="selectedDeliveryId() === item.id"
               [class.border-l-2]="selectedDeliveryId() === item.id"
-              [class.border-l-indigo-500]="selectedDeliveryId() === item.id"
+              [class.border-l-orange-500]="selectedDeliveryId() === item.id"
             >
               <!-- Row 1 -->
               <div class="flex items-center gap-1.5 min-w-0">
@@ -125,7 +125,7 @@
 
               <!-- Row 3: Shop (admin-only context) -->
               @if (item.shopName) {
-                <p class="text-[10px] text-indigo-400 mt-0.5 truncate">{{ item.shopName }}</p>
+                <p class="text-[10px] text-orange-400 mt-0.5 truncate">{{ item.shopName }}</p>
               }
             </button>
           </div>
@@ -282,7 +282,7 @@
                   }
                 </div>
                 <a [routerLink]="['/admin/deliveries', d.id]"
-                  class="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+                  class="flex items-center gap-1.5 text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -319,7 +319,7 @@
                 <!-- People -->
                 <div class="px-5 py-4 flex flex-col gap-3 overflow-hidden">
                   <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full bg-green-100 text-green-700 font-bold text-[11px] flex items-center justify-center shrink-0">
+                    <div class="w-6 h-6 rounded-full bg-orange-100 text-orange-700 font-bold text-[11px] flex items-center justify-center shrink-0">
                       {{ d.driverName ? d.driverName.charAt(0).toUpperCase() : '?' }}
                     </div>
                     <div class="min-w-0">
@@ -417,7 +417,7 @@
                 }
                 <div class="flex-1"></div>
                 <a [routerLink]="['/admin/deliveries', d.id]"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-colors">
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-600 text-white text-xs font-semibold hover:bg-orange-700 transition-colors">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -438,7 +438,7 @@
             <span class="text-[10px] text-gray-400 font-mono shrink-0 hidden sm:block">#{{ d.id.slice(-6).toUpperCase() }}</span>
             <span class="w-px h-5 bg-gray-200 shrink-0"></span>
             <div class="flex items-center gap-1.5 min-w-0 shrink">
-              <div class="w-6 h-6 rounded-full bg-green-100 text-green-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+              <div class="w-6 h-6 rounded-full bg-orange-100 text-orange-700 font-bold text-[10px] flex items-center justify-center shrink-0">
                 {{ d.driverName ? d.driverName.charAt(0).toUpperCase() : '?' }}
               </div>
               <span class="text-xs font-semibold text-gray-800 truncate max-w-[100px]">{{ d.driverName ?? 'No rider' }}</span>

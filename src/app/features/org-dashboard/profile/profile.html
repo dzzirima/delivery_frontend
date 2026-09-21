@@ -11,7 +11,7 @@
 
     <!-- Avatar row -->
     <div class="flex items-center gap-4 pb-5 border-b border-gray-100">
-      <div class="w-14 h-14 rounded-full bg-green-100 text-green-700 text-xl font-bold flex items-center justify-center shrink-0">
+      <div class="w-14 h-14 rounded-full bg-orange-100 text-orange-700 text-xl font-bold flex items-center justify-center shrink-0">
         {{ form.name ? form.name.charAt(0).toUpperCase() : '?' }}
       </div>
       <div>
@@ -28,7 +28,7 @@
         [(ngModel)]="form.name"
         placeholder="Your name"
         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-               focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"
+               focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"
       />
     </div>
 
@@ -54,7 +54,7 @@
         [(ngModel)]="form.phoneNumber"
         placeholder="+263 77 123 4567"
         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-               focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"
+               focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"
       />
     </div>
 
@@ -66,7 +66,7 @@
         [(ngModel)]="form.address"
         placeholder="Your address"
         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 placeholder:text-gray-400
-               focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors"
+               focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors"
       />
     </div>
 
@@ -75,7 +75,7 @@
       <button
         (click)="save()"
         [disabled]="saving()"
-        class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700
+        class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700
                disabled:opacity-60 disabled:cursor-not-allowed rounded-xl transition-colors"
       >
         @if (saving()) {

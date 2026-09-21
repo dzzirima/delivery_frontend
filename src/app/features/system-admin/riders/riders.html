@@ -30,7 +30,7 @@
     </div>
     <button
       (click)="search()"
-      class="px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
+      class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-xl hover:bg-orange-700 transition-colors"
     >Search</button>
   </div>
 
@@ -38,7 +38,7 @@
   <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     @if (loading()) {
       <div class="flex items-center justify-center py-20">
-        <svg class="w-5 h-5 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-orange-500 animate-spin" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
@@ -70,8 +70,8 @@
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-5 py-3.5">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center
-                              text-indigo-700 font-bold text-xs shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center
+                              text-orange-700 font-bold text-xs shrink-0">
                     {{ rider.name.charAt(0).toUpperCase() }}
                   </div>
                   <div>

@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col items-center justify-center px-4 py-12">
+<div class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 flex flex-col items-center justify-center px-4 py-12">
 
   <!-- Logo -->
   <img src="icons/zagaah-z-mark.png" alt="Zagaah" class="w-16 h-16 object-contain mb-6" />
@@ -10,14 +10,14 @@
   <div class="flex items-center gap-3 mb-6">
     <div class="flex items-center gap-2">
       <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-        [class]="step() >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'">1</div>
-      <span class="text-xs font-medium" [class]="step() === 1 ? 'text-indigo-600' : 'text-gray-400'">Your account</span>
+        [class]="step() >= 1 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-500'">1</div>
+      <span class="text-xs font-medium" [class]="step() === 1 ? 'text-orange-600' : 'text-gray-400'">Your account</span>
     </div>
-    <div class="w-8 h-px" [class]="step() >= 2 ? 'bg-indigo-400' : 'bg-gray-200'"></div>
+    <div class="w-8 h-px" [class]="step() >= 2 ? 'bg-orange-400' : 'bg-gray-200'"></div>
     <div class="flex items-center gap-2">
       <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-        [class]="step() >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'">2</div>
-      <span class="text-xs font-medium" [class]="step() === 2 ? 'text-indigo-600' : 'text-gray-400'">Your organisation</span>
+        [class]="step() >= 2 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-500'">2</div>
+      <span class="text-xs font-medium" [class]="step() === 2 ? 'text-orange-600' : 'text-gray-400'">Your organisation</span>
     </div>
   </div>
 
@@ -36,7 +36,7 @@
             name="adminName"
             placeholder="John Doe"
             autocomplete="name"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm"
           />
         </div>
 
@@ -48,7 +48,7 @@
             name="adminEmail"
             placeholder="you@example.com"
             autocomplete="email"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm"
           />
         </div>
 
@@ -61,7 +61,7 @@
               name="adminPassword"
               placeholder="Min. 6 characters"
               autocomplete="new-password"
-              class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+              class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm"
             />
             <button
               type="button"
@@ -88,7 +88,7 @@
 
         <button
           type="submit"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 mt-2 flex items-center justify-center gap-2"
+          class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-orange-200 mt-2 flex items-center justify-center gap-2"
         >
           Continue
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +110,7 @@
             [(ngModel)]="orgName"
             name="orgName"
             placeholder="Green Pharmacy"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm"
           />
         </div>
 
@@ -121,7 +121,7 @@
             [(ngModel)]="orgContactPhone"
             name="orgContactPhone"
             placeholder="+263 77 123 4567"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm"
           />
         </div>
 
@@ -135,7 +135,7 @@
             [(ngModel)]="orgContactEmail"
             name="orgContactEmail"
             placeholder="info@greenbusiness.co.zw"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm"
           />
         </div>
 
@@ -149,10 +149,17 @@
             [(ngModel)]="businessRegistrationNumber"
             name="businessRegistrationNumber"
             placeholder="BP12345"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm"
           />
         </div>
 
+
+        <p class="text-xs text-gray-500 text-center">
+          By creating an account you agree to our
+          <a routerLink="/terms" target="_blank" class="text-orange-600 font-semibold hover:underline">Terms &amp; Conditions</a>
+          and
+          <a routerLink="/privacy" target="_blank" class="text-orange-600 font-semibold hover:underline">Privacy Policy</a>.
+        </p>
 
         <div class="flex gap-3 mt-2">
           <button
@@ -166,7 +173,7 @@
           <button
             type="submit"
             [disabled]="loading()"
-            class="flex-2 flex-grow bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-indigo-200"
+            class="flex-2 flex-grow bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm shadow-md shadow-orange-200"
           >
             {{ loading() ? 'Creating account…' : 'Create Account' }}
           </button>
@@ -180,7 +187,7 @@
   <!-- Sign-in link -->
   <p class="text-sm text-gray-500 mt-6">
     Already have an account?
-    <a routerLink="/signin" class="text-indigo-600 font-semibold hover:text-indigo-700">Sign in</a>
+    <a routerLink="/signin" class="text-orange-600 font-semibold hover:text-orange-700">Sign in</a>
   </p>
 
 </div>

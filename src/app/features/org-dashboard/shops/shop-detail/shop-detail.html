@@ -17,7 +17,7 @@
 
   @if (shopLoading() && !shop()) {
     <div class="py-16 flex flex-col items-center gap-3">
-      <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+      <svg class="w-6 h-6 text-orange-400 animate-spin" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
       </svg>
@@ -26,14 +26,14 @@
   } @else if (!shop()) {
     <div class="bg-white rounded-2xl border border-gray-100 py-16 flex flex-col items-center gap-3">
       <p class="text-sm text-gray-500">Shop not found.</p>
-      <button (click)="goBack()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">← Back to Shops</button>
+      <button (click)="goBack()" class="text-sm font-semibold text-orange-600 hover:text-orange-700">← Back to Shops</button>
     </div>
   } @else {
 
     <!-- Shop header card -->
     <div class="bg-white rounded-2xl border border-gray-100 p-5 mb-6 flex items-start justify-between gap-4">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22V12h6v10"/>
@@ -89,7 +89,7 @@
         </p>
       </div>
       <button (click)="openItemModal()"
-        class="flex items-center gap-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200 shrink-0">
+        class="flex items-center gap-2 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-orange-200 shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -100,7 +100,7 @@
     <!-- Search bar -->
     <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2.5 mb-4">
       @if (searchLoading()) {
-        <svg class="w-4 h-4 text-indigo-400 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 text-orange-400 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
@@ -126,7 +126,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       @if (itemsLoading() && items().length === 0) {
         <div class="py-16 flex flex-col items-center gap-3">
-          <svg class="w-6 h-6 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-orange-400 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
@@ -135,8 +135,8 @@
       } @else if (totalItems() === 0 && !searchQuery()) {
         <!-- Truly empty shop -->
         <div class="py-16 flex flex-col items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
-            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center">
+            <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
@@ -145,7 +145,7 @@
             <p class="text-xs text-gray-400 mt-0.5">Add products and stock to this shop.</p>
           </div>
           <button (click)="openItemModal()"
-            class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            class="mt-1 text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
             Add first item →
           </button>
         </div>
@@ -158,7 +158,7 @@
           <p class="text-sm font-semibold text-gray-700">No results found</p>
           <p class="text-xs text-gray-400">No items match "{{ searchQuery() }}"</p>
           <button (click)="clearSearch()"
-            class="mt-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            class="mt-1 text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
             Clear search
           </button>
         </div>
@@ -258,7 +258,7 @@
               @for (n of pageNumbers(); track n) {
                 <button (click)="setPage(n)"
                   class="w-8 h-8 rounded-lg text-xs font-semibold transition-colors"
-                  [class.bg-indigo-600]="n === currentPage()"
+                  [class.bg-orange-600]="n === currentPage()"
                   [class.text-white]="n === currentPage()"
                   [class.text-gray-500]="n !== currentPage()"
                   [class.hover:bg-gray-100]="n !== currentPage()">
@@ -380,23 +380,23 @@
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1.5">Item Name <span class="text-red-400">*</span></label>
           <input type="text" [(ngModel)]="itemForm.name" name="name" required placeholder="e.g. Medium Box"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1.5">Description <span class="text-gray-400 font-normal">(optional)</span></label>
           <input type="text" [(ngModel)]="itemForm.description" name="description" placeholder="Brief description"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1.5">SKU <span class="text-gray-400 font-normal">(optional)</span></label>
             <input type="text" [(ngModel)]="itemForm.sku" name="sku" placeholder="e.g. BOX-M"
-              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-orange-400"/>
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Unit <span class="text-gray-400 font-normal">(optional)</span></label>
             <input type="text" [(ngModel)]="itemForm.unit" name="unit" placeholder="e.g. kg, pcs"
-              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
           </div>
         </div>
         <div class="flex gap-3 pt-1">
@@ -406,7 +406,7 @@
           </button>
           <button type="submit"
             [disabled]="itemsLoading() || !itemForm.name.trim()"
-            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            class="flex-1 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
             {{ itemEditing() ? 'Save Changes' : 'Add Item' }}
           </button>
         </div>
@@ -444,18 +444,18 @@
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1.5">Shop Name <span class="text-red-400">*</span></label>
           <input type="text" [(ngModel)]="shopForm.name" name="name" required placeholder="Main Branch"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1.5">Address</label>
           <input type="text" appGooglePlaces (placeSelected)="onShopAddressSelected($event)"
             [(ngModel)]="shopForm.address" name="address" placeholder="123 Main St, Harare"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone</label>
           <input type="tel" [(ngModel)]="shopForm.phone" name="phone" placeholder="+263 77 123 4567"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
         </div>
         <div class="flex gap-3 pt-1">
           <button type="button" (click)="closeShopModal()"
@@ -464,7 +464,7 @@
           </button>
           <button type="submit"
             [disabled]="!shopForm.name.trim()"
-            class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
+            class="flex-1 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
             Save Changes
           </button>
         </div>
