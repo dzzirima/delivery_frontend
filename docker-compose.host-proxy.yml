@@ -1,5 +1,5 @@
 # Use when ports 80/443 are already taken by nginx/apache on the host.
-# Frontend listens only on localhost:8080; the host web server proxies zagaah.com to it.
+# Frontend listens only on localhost:8081; the host web server proxies zagaah.com to it.
 services:
   frontend:
     build:
@@ -12,4 +12,4 @@ services:
     container_name: zagaah-frontend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8080:80"
+      - "127.0.0.1:8081:80"
