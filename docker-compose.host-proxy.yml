@@ -1,0 +1,15 @@
+# Use when ports 80/443 are already taken by nginx/apache on the host.
+# Frontend listens only on localhost:8081; the host web server proxies zagaah.com to it.
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        API_URL: ${API_URL:-https://api.fantracker.net/delivery}
+        WS_URL: ${WS_URL:-https://api.fantracker.net/delivery}
+        GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+    image: zagaah-frontend
+    container_name: zagaah-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:80"

@@ -11,11 +11,17 @@ const get = (key, fallback = '') => process.env[key] || fallback;
 
 const isProd = process.env['NODE_ENV'] === 'production';
 
+// Defaults: production points at the live backend, dev at localhost.
+// Anything set in .env / the build environment still overrides these.
+const defaults = isProd
+  ? { api: 'https://api.fantracker.net/delivery', ws: 'https://api.fantracker.net/delivery' }
+  : { api: 'http://localhost:4001/api/v1',        ws: 'http://localhost:4001' };
+
 const content = `// AUTO-GENERATED — do not edit by hand. Edit .env instead.
 export const environment = {
   production: ${isProd},
-  apiUrl:     '${get('API_URL', 'http://localhost:4001/api/v1')}',
-  wsUrl:      '${get('WS_URL',  'http://localhost:4001')}',
+  apiUrl:     '${get('API_URL', defaults.api)}',
+  wsUrl:      '${get('WS_URL',  defaults.ws)}',
   googleApiKey: '${get('GOOGLE_API_KEY')}',
 };
 `;

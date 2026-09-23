@@ -1,0 +1,9 @@
+# Caddy obtains and renews Let's Encrypt certificates automatically.
+www.zagaah.com {
+  redir https://zagaah.com{uri} permanent
+}
+
+zagaah.com {
+  encode gzip
+  reverse_proxy frontend:80
+}

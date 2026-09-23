@@ -1,0 +1,32 @@
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        API_URL: ${API_URL:-https://api.fantracker.net/delivery}
+        WS_URL: ${WS_URL:-https://api.fantracker.net/delivery}
+        GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+    image: zagaah-frontend
+    container_name: zagaah-frontend
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: zagaah-caddy
+    restart: unless-stopped
+    depends_on:
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
