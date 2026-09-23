@@ -14,7 +14,7 @@ const isProd = process.env['NODE_ENV'] === 'production';
 // Defaults: production points at the live backend, dev at localhost.
 // Anything set in .env / the build environment still overrides these.
 const defaults = isProd
-  ? { api: 'https://api.fantracker.net/delivery/v1', ws: 'https://api.fantracker.net/delivery' }
+  ? { api: 'https://api.fantracker.net/delivery/api/v1', ws: 'https://api.fantracker.net/delivery' }
   : { api: 'http://localhost:4001/api/v1',        ws: 'http://localhost:4001' };
 
 const content = `// AUTO-GENERATED — do not edit by hand. Edit .env instead.

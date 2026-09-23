@@ -3,7 +3,7 @@ services:
     build:
       context: .
       args:
-        API_URL: ${API_URL:-https://api.fantracker.net/delivery/v1}
+        API_URL: ${API_URL:-https://api.fantracker.net/delivery/api/v1}
         WS_URL: ${WS_URL:-https://api.fantracker.net/delivery}
         GOOGLE_API_KEY: ${GOOGLE_API_KEY}
     image: zagaah-frontend
