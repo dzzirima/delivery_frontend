@@ -8,7 +8,7 @@ RUN npm ci
 COPY . .
 
 # Angular bakes these in at build time (see scripts/set-env.js)
-ARG API_URL=https://api.fantracker.net/delivery
+ARG API_URL=https://api.fantracker.net/delivery/api/v1
 ARG WS_URL=https://api.fantracker.net/delivery
 ARG GOOGLE_API_KEY
 ENV API_URL=$API_URL \
